@@ -6,6 +6,17 @@ const Http = require("http");
 const cookieParser = require("cookie-parser");
 const indexRouter = require("./routes");
 
+const { sequelize } = require("./models");
+
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log("데이터 베이스 연결완료");
+  })
+  .catch((err) => {
+    console.log("연결실패");
+  });
+
 //로그 관리를 위해 morgan 설치
 const morgan = require("morgan");
 app.use(morgan("dev"));
@@ -33,8 +44,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/", indexRouter);
-
-
 
 http.listen(http_port, () => {
   console.log(`🟢 ${http_port} 포트로 서버가 열렸어요!`);
