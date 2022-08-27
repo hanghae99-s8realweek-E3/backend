@@ -1,0 +1,89 @@
+### 회원가입
+POST http://localhost:3000/user/join
+Content-Type: application/json
+
+{
+  "userId":"qwe123",
+  "nickName":"nicknam",
+  "password":"asd123",
+  "email":"email@naver.com",
+  "address":"한국 서울"
+}
+
+### 로그인
+POST http://localhost:3000/user/login
+Content-Type: application/json
+
+{
+  "userId": "qwe123",
+  "password": "asd123"
+}
+
+### 중복체크
+POST http://localhost:3000/user/auth
+Content-Type: application/json
+
+{
+  "key": "userId",
+  "value": "qwe123"
+}
+
+### 중복체크
+POST http://localhost:3000/user/auth
+Content-Type: application/json
+
+{
+  "key": "email",
+  "value": "email@naver.com"
+}
+
+# ========================================================
+
+### 상품 등록(admin)
+POST http://localhost:3000/product
+Content-Type: application/json
+
+{
+    "productImage": "wine.img",
+    "productName": "토마토",
+    "price": 20000,
+    "desc": "좋은그릇",
+    "category": "식기",
+    "delivery": "샛별 배송"
+}
+
+### 전체 상품 조회
+GET http://localhost:3000/product
+
+### 상품 삭제
+DELETE http://localhost:3000/product/17
+
+### 특정 상품 상세 조회
+GET http://localhost:3000/product/1
+
+### 카테고리 상품 상세 조회
+GET http://localhost:3000/product/search/와인
+
+# ========================================================
+
+### 장바구니 조회
+GET http://localhost:3000/cart
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
+
+
+### 장바구니 등록, 갯수 수정
+POST http://localhost:3000/cart/5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
+
+
+{
+    "quantity": 1
+}
+
+
+### 장바구니 삭제
+DELETE http://localhost:3000/cart/5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
