@@ -18,6 +18,7 @@ const sequelize = new Sequelize(
   config.password,
   config
 );
+
 db.sequelize = sequelize;
 db.User = User;
 db.Comment = Comment;
