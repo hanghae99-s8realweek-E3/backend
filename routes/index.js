@@ -1,14 +1,10 @@
 const express = require("express");
 const User = require("./user");
-// const Product = require("./product");
-// const Cart = require("./cart");
-// const Email = require("./email");
+const Comment = require("./comment");
 
 const router = express.Router();
 
 router.use("/accounts", User);
-// router.use("/product", Product);
-// router.use("/cart", Cart);
-// router.use("/user/email", Email);
+router.use("/comments", Comment);
 
 module.exports = router;
