@@ -3,7 +3,7 @@ POST http://localhost:3000/api/accounts/signup
 Content-Type: application/json
 
 {
-  "email":"tjdngur3@naver.com",
+  "email":"tjdngur15@naver.com",
   "password":"asd123",
   "confirmpassword":"asd123",
   "nickname":"asq1"
@@ -21,19 +21,12 @@ Content-Type: application/json
 ### MBTI
 POST http://localhost:3000/api/accounts/mbti
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MTk1MDM4NiwiZXhwIjoxNjYyMTIzMTg2fQ.eefv54rM8SaAD91MYQRp7pyOkmPPeAykx07vuv5IkrM
 
 {
   "mbti":"estj"
 }
 
-### 중복체크
-POST http://localhost:3000/user/auth
-Content-Type: application/json
-
-{
-  "key": "email",
-  "value": "email@naver.com"
-}
 
 # ========================================================
 
