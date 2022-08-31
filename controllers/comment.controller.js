@@ -18,7 +18,7 @@ class CommentController {
 
       res.status(200).json({ message: success, data: createComment });
     } catch (err) {
-      return next(err);
+      next(err);
     }
   };
 
@@ -32,7 +32,7 @@ class CommentController {
 
       res.status(200).json({ message: success });
     } catch (err) {
-      return next(err);
+      next(err);
     }
   };
 }
