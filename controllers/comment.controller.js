@@ -16,7 +16,7 @@ class CommentController {
         comment
       );
 
-      res.status(200).json({ message: success, data: createComment });
+      res.status(200).json({ message: "success", data: createComment });
     } catch (err) {
       next(err);
     }
@@ -30,7 +30,7 @@ class CommentController {
 
       await this.commentService.deleteComment(user, commentId);
 
-      res.status(200).json({ message: success });
+      res.status(200).json({ message: "success" });
     } catch (err) {
       next(err);
     }
