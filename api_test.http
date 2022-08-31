@@ -1,31 +1,29 @@
 ### 회원가입
-POST http://localhost:3000/user/join
+POST http://localhost:3000/api/accounts/signup
 Content-Type: application/json
 
 {
-  "userId":"qwe123",
-  "nickName":"nicknam",
+  "email":"tjdngur3@naver.com",
   "password":"asd123",
-  "email":"email@naver.com",
-  "address":"한국 서울"
+  "confirmpassword":"asd123",
+  "nickname":"asq1"
 }
 
 ### 로그인
-POST http://localhost:3000/user/login
+POST http://localhost:3000/api/accounts
 Content-Type: application/json
 
 {
-  "userId": "qwe123",
-  "password": "asd123"
+  "email":"tjdngur3@naver.com",
+  "password":"asd123"
 }
 
-### 중복체크
-POST http://localhost:3000/user/auth
+### MBTI
+POST http://localhost:3000/api/accounts/mbti
 Content-Type: application/json
 
 {
-  "key": "userId",
-  "value": "qwe123"
+  "mbti":"estj"
 }
 
 ### 중복체크

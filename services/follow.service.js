@@ -1,4 +1,4 @@
-const { Follow } = require("../models/followers");
+// const { Follow } = require("../models/followers");
 const { User } = require("../models");
 
 class FollowService {

@@ -10,6 +10,8 @@ const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const app = express();
 
+const cors = require("cors");
+
 //보안과 가독성을 위해 환경변수사용
 require("dotenv").config();
 
@@ -23,12 +25,13 @@ sequelize
     console.error(err);
   });
 
+
 // morgan(로그 관리), hpp(중복된 파라미터 처리 -> production 모드에서만 사용)
 if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));
   app.use(hpp());
 } else {
-  app.use(morgan("dev", { stream: logger.stream }));
+  app.use(morgan("dev"));
 }
 
 const http = Http.createServer(app);
