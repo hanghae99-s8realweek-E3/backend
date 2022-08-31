@@ -39,11 +39,6 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.STRING(50),
           allowNull: true,
         },
-        isUser: {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-          defaultValue: true,
-        },
       },
       {
         sequelize,
@@ -62,7 +57,6 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Todo, {
       foreignKey: "userId",
       sourceKey: "userId",
-      onDelete: "CASCADE",
     });
     db.User.hasMany(db.MyTodo, {
       foreignKey: "userId",
@@ -72,7 +66,6 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Comment, {
       foreignKey: "userId",
       sourceKey: "userId",
-      onDelete: "CASCADE",
     });
     // db.User.belongsToMany(db.User, {
     //   foreignKey: "userIdFollowing",
