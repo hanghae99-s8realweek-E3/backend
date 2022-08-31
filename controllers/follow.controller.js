@@ -26,9 +26,9 @@ class FollowController {
   followEdit = async (req, res, next) => {
     try {
       const url_userId = req.params.userId; //수정할 유저 아이디
-      // const { userId } = res.locals.user; //나의 유저아이디
+      const { userId } = res.locals.user; //나의 유저아이디
       //수정할 유저 아이디
-      await this.followService.editFollowList(url_userId);
+      await this.followService.editFollowList(userId, url_userId);
       res.status(201).json({
         message: "success",
       });

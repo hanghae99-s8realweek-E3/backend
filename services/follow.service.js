@@ -53,13 +53,13 @@ class FollowService {
     return `following: ${myFollowinglist}, follower: ${myFollowerlist}`;
   };
 
-  followListEdit = async (url_userId) => {
-    //팔로잉 테이블에 팔로잉 되어있으면
+  followListEdit = async (userId, url_userId) => {
+    //나의 팔로잉 테이블에 팔로잉 되어있으면
     //팔로잉 테이블 에서 팔로우 usrerId 삭제
     //팔로잉 테이블에 팔로잉 안되어있으면
     //팔로잉 테이블 에서 팔로우 usrerId 추가
     const myFollowingTable = await Follow.findAll({
-      where: { userId_following: url_userId },
+      where: { userId_following: userId },
     });
     if (!myFollowingTable) {
       await Follow.create({ userId_folloing: url_userId });
