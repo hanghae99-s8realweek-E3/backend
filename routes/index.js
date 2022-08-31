@@ -6,7 +6,7 @@ const User = require("./user");
 
 const router = express.Router();
 
-router.use("/user", User);
+router.use("/accounts", User);
 // router.use("/product", Product);
 // router.use("/cart", Cart);
 // router.use("/user/email", Email);
