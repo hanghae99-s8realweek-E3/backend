@@ -6,14 +6,14 @@ class UserController {
   signup = async (req, res, next) => {
     try {
       const { email, password, confirmpassword, nickname } = req.body;
-      const data = await this.userService.userSignup(
+      const token = await this.userService.userSignup(
         email,
         password,
         confirmpassword,
         nickname
       );
       res.status(201).json({
-        data,
+        token,
         message: "success",
       });
     } catch (err) {
@@ -25,7 +25,7 @@ class UserController {
   mbti = async (req, res, next) => {
     try {
       const { mbti } = req.body;
-      const { userId } = res.locals.user
+      const { userId } = res.locals.user;
       await this.userService.userMbti(mbti, userId);
       res.status(201).json({
         message: "success",
@@ -39,9 +39,9 @@ class UserController {
   login = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      const data = await this.userService.userLogin(email, password);
+      const token = await this.userService.userLogin(email, password);
       res.status(200).json({
-        data,
+        token,
         message: "success",
       });
     } catch (err) {

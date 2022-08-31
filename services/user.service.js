@@ -34,17 +34,19 @@ class UserService {
 
     const userData = await User.findOne({ where: { email: email } });
     const userId = userData.userId;
+    const mbti = userData.mbti;
 
     const payload = {
       userId: userId,
-      nickName: nickname,
+      nickname: nickname,
+      mbti: mbti,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
       expiresIn: "2d",
     });
 
-    return { token, userId, nickname, mbti: null };
+    return token;
   };
 
   userMbti = async (mbti, userId) => {
@@ -74,14 +76,15 @@ class UserService {
 
     const payload = {
       userId: userId,
-      nickName: nickname,
+      nickname: nickname,
+      mbti: mbti,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
       expiresIn: "2d",
     });
 
-    return { token, userId, nickname, mbti };
+    return token;
   };
 }
 
