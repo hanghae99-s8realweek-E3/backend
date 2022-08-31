@@ -29,7 +29,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));
   app.use(hpp());
 } else {
-  app.use(morgan("dev", { stream: logger.stream }));
+  app.use(morgan("dev"));
 }
 
 const http = Http.createServer(app);
@@ -44,7 +44,7 @@ const corsOption = {
   credentials: true,
 };
 
-app.use(cors(corsOption));
+// app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
