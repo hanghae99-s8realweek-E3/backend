@@ -33,10 +33,12 @@ class UserService {
     if (!email || !password) {
       throw new Error("빈칸을 채워주세요");
     }
+
     if (!userData) {
       throw new Error("회원정보가 없습니다.");
     }
-    const passwordSame = await bcrypt.compare(password, userData.password);
+
+    const passwordSame = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
     if (!passwordSame) {
       throw new Error("아이디나 비번이 올바르지 않습니다.");
@@ -51,6 +53,12 @@ class UserService {
       expiresIn: "2d",
     });
     return token;
+  };
+
+  userMbti = async (mbti) => {
+    const userMbti = await User.create({
+      mbti,
+    });
   };
 }
 

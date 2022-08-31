@@ -30,9 +30,20 @@ class UserController {
         message: "success",
       });
     } catch (error) {
-      res.status(400).json({
-        errorMessage: error,
+      next(error);
+    }
+  };
+
+  //mbti
+  mbti = async () => {
+    try {
+      const { mbti } = req.body;
+      await this.userService.userMbti(mbti);
+      res.status(201).json({
+        message: "success",
       });
+    } catch (error) {
+      next(error);
     }
   };
 }
