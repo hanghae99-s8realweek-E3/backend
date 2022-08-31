@@ -43,7 +43,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/", indexRouter);
+app.use("/api", indexRouter);
 
 http.listen(http_port, () => {
   console.log(`🟢 ${http_port} 포트로 서버가 열렸어요!`);
