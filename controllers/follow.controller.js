@@ -5,31 +5,28 @@ class FollowController {
   followService = new FollowService();
   userService = new UserService();
 
-  //팔로우 리스트 조회
+  //팔로우 팔로잉 조회===ok
   followList = async (req, res, next) => {
     try {
-      const url_userId = req.params.userId; //상대방 유저 아이디
-      // const { userId } = res.locals.user; //나의 유저아이디
-      const userFollowlist = await this.followService.getFollowList(
-        userId,
-        url_userId
-      );
+      const { userId } = req.params; //팔로우 조회할 유저 아이디
+      const data = await this.followService.getFollowList(userId);
       res.status(200).json({
-        userFollowlist,
+        data,
       });
     } catch (err) {
       next(err);
     }
   };
 
-  //팔로우 추가 및 삭제
+  //팔로우 추가 및 삭제====ok
   followEdit = async (req, res, next) => {
     try {
-      const url_userId = req.params.userId; //수정할 유저 아이디
+      const elseUserId = Number(req.params.userId); //수정할 유저 아이디
       const { userId } = res.locals.user; //나의 유저아이디
       //수정할 유저 아이디
-      await this.followService.editFollowList(userId, url_userId);
+      const asd = await this.followService.editFollowList(userId, elseUserId);
       res.status(201).json({
+        asd,
         message: "success",
       });
     } catch (err) {
@@ -39,3 +36,5 @@ class FollowController {
 }
 
 module.exports = FollowController;
+
+
