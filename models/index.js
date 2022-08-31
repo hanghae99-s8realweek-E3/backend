@@ -1,15 +1,12 @@
 const Sequelize = require("sequelize");
-
-const User = require("./user");
-const Comment = require("./user");
-const Childcomment = require("./user");
-const like = require("./user");
-const Post = require("./user");
-const Posthashtag = require("./user");
-const Hashtag = require("./user");
-
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.js")[env];
+
+const User = require("./user");
+const Todo = require("./todo");
+const MyTodo = require("./mytodo");
+const Comment = require("./comment");
+
 const db = {};
 
 const sequelize = new Sequelize(
@@ -21,27 +18,18 @@ const sequelize = new Sequelize(
 
 db.sequelize = sequelize;
 db.User = User;
+db.Todo = Todo;
+db.MyTodo = MyTodo;
 db.Comment = Comment;
-db.Childcomment = Childcomment;
-db.like = like;
-db.Post = Post;
-db.Posthashtag = Posthashtag;
-db.Hashtag = Hashtag;
 
 User.init(sequelize);
+Todo.init(sequelize);
+MyTodo.init(sequelize);
 Comment.init(sequelize);
-Childcomment.init(sequelize);
-like.init(sequelize);
-Post.init(sequelize);
-Posthashtag.init(sequelize);
-Hashtag.init(sequelize);
 
-User.associate(sequelize);
-Comment.associate(sequelize);
-Childcomment.associate(sequelize);
-like.associate(sequelize);
-Post.associate(sequelize);
-Posthashtag.associate(sequelize);
-Hashtag.associate(sequelize);
+User.associate(db);
+Todo.associate(db);
+MyTodo.associate(db);
+Comment.associate(db);
 
 module.exports = db;
