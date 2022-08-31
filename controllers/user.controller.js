@@ -1,38 +1,51 @@
-const UserService = require("../services/userservice.js");
+const UserService = require("../services/user.service");
 
 class UserController {
   userService = new UserService();
-
-  signup = async (res, req) => {
+  //회원가입=====ok
+  signup = async (req, res, next) => {
     try {
       const { email, password, confirmpassword, nickname } = req.body;
-      await this.userService.userSignup(
+      const data = await this.userService.userSignup(
         email,
         password,
         confirmpassword,
         nickname
       );
       res.status(201).json({
+        data,
         message: "success",
       });
-    } catch (error) {
-      res.status(400).json({
-        errorMessage: error,
-      });
+    } catch (err) {
+      next(err);
     }
   };
 
-  login = async (res, req) => {
+  //mbti====ok
+  mbti = async (req, res, next) => {
     try {
-      const { email, password } = req.body;
-      await this.userService.userLogin(email, password);
-      res.status(200).json({
+      const { mbti } = req.body;
+      const { userId } = res.locals.user
+      await this.userService.userMbti(mbti, userId);
+      res.status(201).json({
         message: "success",
       });
-    } catch (error) {
-      res.status(400).json({
-        errorMessage: error,
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  //로그인 ====ok
+  login = async (req, res, next) => {
+    try {
+      const { email, password } = req.body;
+      const data = await this.userService.userLogin(email, password);
+      res.status(200).json({
+        data,
+        message: "success",
       });
+    } catch (err) {
+      next(err);
     }
   };
 }

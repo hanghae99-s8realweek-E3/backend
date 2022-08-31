@@ -22,7 +22,7 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.STRING(150),
           allowNull: true,
         },
-        mbit: {
+        mbti: {
           type: Sequelize.STRING(4),
           allowNull: true,
         },
@@ -75,12 +75,12 @@ module.exports = class User extends Sequelize.Model {
       onDelete: "CASCADE",
     });
     db.User.belongsToMany(db.User, {
-      foreignKey: "followingId",
+      foreignKey: "userIdFollowing",
       as: "Followers",
       through: "Follow",
     });
     db.User.belongsToMany(db.User, {
-      foreignKey: "followerId",
+      foreignKey: "userIdFollower",
       as: "Followings",
       through: "Follow",
     });

@@ -37,7 +37,6 @@ module.exports = (req, res, next) => {
         let user = await User.findOne({ where: { userId: decoded.userId } });
 
         res.locals.user = user;
-        console.log(res.locals.user);
         next();
       }
     );
