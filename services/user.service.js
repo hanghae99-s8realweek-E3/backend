@@ -60,6 +60,7 @@ class UserService {
       mbti,
     });
   };
+  
 }
 
 module.exports = UserService;

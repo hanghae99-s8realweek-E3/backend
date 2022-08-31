@@ -1,7 +1,7 @@
 const UserService = require("../services/user.service");
 
 class UserController {
-  userService = new UserService();
+  v
 
   //회원가입
   signup = async (res, req, next) => {
@@ -16,36 +16,38 @@ class UserController {
       res.status(201).json({
         message: "success",
       });
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      next(err);
     }
   };
 
   //로그인
-  login = async (res, req) => {
+  login = async (res, req, next) => {
     try {
       const { email, password } = req.body;
       await this.userService.userLogin(email, password);
       res.status(200).json({
         message: "success",
       });
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      next(err);
     }
   };
 
   //mbti
-  mbti = async () => {
+  mbti = async (res, req, next) => {
     try {
       const { mbti } = req.body;
       await this.userService.userMbti(mbti);
       res.status(201).json({
         message: "success",
       });
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      next(err);
     }
   };
+
+  
 }
 
 module.exports = UserController;
