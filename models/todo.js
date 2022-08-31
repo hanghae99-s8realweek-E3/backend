@@ -54,7 +54,6 @@ module.exports = class Todo extends Sequelize.Model {
     db.Todo.belongsTo(db.User, {
       foreignKey: "userId",
       targetKey: "userId",
-      onDelete: "CASCADE",
     });
     db.Todo.hasMany(db.Comment, {
       foreignKey: "todoId",
