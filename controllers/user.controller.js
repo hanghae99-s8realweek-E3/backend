@@ -1,9 +1,10 @@
-const UserService = require("../services/userservice.js");
+const UserService = require("../services/user.service");
 
 class UserController {
   userService = new UserService();
 
-  signup = async (res, req) => {
+  //회원가입
+  signup = async (res, req, next) => {
     try {
       const { email, password, confirmpassword, nickname } = req.body;
       await this.userService.userSignup(
@@ -16,12 +17,11 @@ class UserController {
         message: "success",
       });
     } catch (error) {
-      res.status(400).json({
-        errorMessage: error,
-      });
+      next(error);
     }
   };
 
+  //로그인
   login = async (res, req) => {
     try {
       const { email, password } = req.body;

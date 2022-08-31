@@ -8,6 +8,7 @@ const indexRouter = require("./routes");
 
 const { sequelize } = require("./models");
 
+
 sequelize
   .sync({ force: false })
   .then(() => {
