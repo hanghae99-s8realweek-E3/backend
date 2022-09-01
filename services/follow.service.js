@@ -64,8 +64,8 @@ class FollowService {
     const myfollowingCount = myFollowinglist.length;
 
     return {
-      followingCount: myfollowingCount,
-      followerCount: myfollowerCount,
+      // followingCount: myfollowingCount,
+      // followerCount: myfollowerCount,
       following: myFollowinglist,
       follower: myFollowerlist,
     };

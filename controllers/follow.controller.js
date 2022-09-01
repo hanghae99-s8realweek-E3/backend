@@ -36,5 +36,3 @@ class FollowController {
 }
 
 module.exports = FollowController;
-
-
