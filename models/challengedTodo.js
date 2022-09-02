@@ -1,34 +1,26 @@
 const Sequelize = require("sequelize");
 
-module.exports = class MyTodo extends Sequelize.Model {
+module.exports = class ChallengedTodo extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
-        mytodoId: {
+        challengedTodoId: {
           type: Sequelize.INTEGER,
           primaryKey: true,
           autoIncrement: true,
         },
-        challengedTodo: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-        },
-        isComplete: {
+        isCompleted: {
           type: Sequelize.BOOLEAN,
           allowNull: true,
           defaultValue: false,
-        },
-        createdTodo: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
         },
       },
       {
         sequelize,
         timestamps: true,
         underscored: false,
-        modelName: "MyTodo",
-        tableName: "myTodos",
+        modelName: "ChallengedTodo",
+        tableName: "challengedTodos",
         paranoid: false,
         charset: "utf8",
         collate: "utf8_general_ci",
@@ -37,10 +29,14 @@ module.exports = class MyTodo extends Sequelize.Model {
   }
 
   static associate(db) {
-    db.MyTodo.belongsTo(db.User, {
+    db.ChallengedTodo.belongsTo(db.User, {
       foreignKey: "userId",
       targetKey: "userId",
       onDelete: "CASCADE",
+    });
+    db.ChallengedTodo.belongsTo(db.Todo, {
+      foreignKey: "challengedTodo",
+      targetKey: "todoId",
     });
   }
 };
