@@ -2,7 +2,6 @@ const { User, Follow } = require("../models");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
-const Boom = require("boom");
 
 //이메일 형식
 const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
@@ -25,7 +24,7 @@ class UserService {
     if (password !== confirmpassword) {
       throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
-    const bcr_password = bcrypt.hashSync(password, 10); //비밀번호 암호화
+    const bcr_password = bcrypt.hashSync(password, process.env.SALT); //비밀번호 암호화
 
     await User.create({
       email,
@@ -112,6 +111,7 @@ class UserService {
   changeUserInfo = async (
     userId,
     password,
+    newPassword,
     confirmPassword,
     nickname,
     profile,
@@ -120,13 +120,18 @@ class UserService {
     const userData = await User.findByPk(userId);
 
     if (password) {
-      if (password !== confirmPassword) {
+      const compareResult = await bcrypt.compare(password, userData.password);
+      if (!compareResult) {
+        throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+      }
+
+      if (newPassword !== confirmPassword) {
         // const error = new Error(
         //   "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
         // );
         // error.code = 400;
         // throw error;
-        // 이래서 에러 핸들러 라이브러리를 쓰는군... 언제 하나하나 다 정의하고 코드 넣어주고 던지나... Boom 쓸 이유가 생겼다
+        // 이래서 에러 핸들러 라이브러리를 쓰는군... 언제 하나하나 다 정의하고 코드 넣어주고 던지나... Boom 라이브러리 쓸 이유가 생겼다
         throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
       }
 
@@ -167,7 +172,7 @@ class UserService {
       throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
-    return await User.destroy({ where: { userId } });
+    return await User.update({ isUser: false }, { where: { userId } });
   };
 }
 

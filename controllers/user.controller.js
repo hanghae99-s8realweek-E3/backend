@@ -49,6 +49,12 @@ class UserController {
     }
   };
 
+  // 이메일 중복 검사 + 인증메일 발송
+  // emailAuth = async (req, res, next) => {};
+
+  // 이메일 인증확인
+  // emailAuthCheck = async (req, res, next) => {};
+
   // 회원 정보 조회
   getUserInfo = async (req, res, next) => {
     try {
@@ -66,11 +72,19 @@ class UserController {
   changeUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
-      const { password, confirmPassword, nickname, profile, mbti } = req.body;
+      const {
+        password,
+        newPassword,
+        confirmPassword,
+        nickname,
+        profile,
+        mbti,
+      } = req.body;
 
       await this.userService.changeUserInfo(
         userId,
         password,
+        newPassword,
         confirmPassword,
         nickname,
         profile,
