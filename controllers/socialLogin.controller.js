@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const passport = require('passport');
 require('dotenv').config();
 
-//Kakao callback Controller
+//Kakao callback Controller======ok
 exports.kakaologin = (req, res, next) => {
     passport.authenticate(
         'kakao',

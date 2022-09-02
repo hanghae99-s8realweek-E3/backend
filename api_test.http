@@ -3,7 +3,7 @@ POST http://localhost:3000/api/accounts/signup
 Content-Type: application/json
 
 {
-  "email":"tjdngur11@naver.com",
+  "email":"tjdngur14@naver.com",
   "password":"asd123",
   "confirmpassword":"asd123",
   "nickname":"asq1"
@@ -13,10 +13,10 @@ Content-Type: application/json
 POST http://localhost:3000/api/accounts
 Content-Type: application/json
 
-{
-  "email":"tjdngur3@naver.com",
-  "password":"asd123"
-}
+# {
+#   "email":"tjdngur3@naver.com",
+#   "password":"asd123"
+# }
 
 ### MBTI
 POST http://localhost:3000/api/accounts/mbti

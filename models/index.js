@@ -35,4 +35,6 @@ Todo.associate(db);
 MyTodo.associate(db);
 Comment.associate(db);
 
+
+
 module.exports = db;
