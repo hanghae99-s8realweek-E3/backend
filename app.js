@@ -12,19 +12,20 @@ const app = express();
 
 const cors = require("cors");
 
+const kakaoPassport = require("./passport/index");
+kakaoPassport(app);
 //보안과 가독성을 위해 환경변수사용
 require("dotenv").config();
 
 // sequelize 연결
 sequelize
-  .sync({ force: false })
+  .sync({ force: true })
   .then(() => {
     console.log("데이터베이스 연결 성공");
   })
   .catch((err) => {
     console.error(err);
   });
-
 
 // morgan(로그 관리), hpp(중복된 파라미터 처리 -> production 모드에서만 사용)
 if (process.env.NODE_ENV === "production") {
