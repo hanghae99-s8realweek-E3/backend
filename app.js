@@ -13,6 +13,8 @@ const app = express();
 
 const cors = require("cors");
 
+const kakaoPassport = require("./passport/index");
+kakaoPassport(app);
 //보안과 가독성을 위해 환경변수사용
 require("dotenv").config();
 
