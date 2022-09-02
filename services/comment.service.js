@@ -1,4 +1,4 @@
-const { Comment, Todo, User, MyTodo, Follow } = require("../models");
+const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
 
 class CommentService {
   // 댓글 작성 [POST] /api/comments/:todoId
@@ -20,10 +20,10 @@ class CommentService {
 
     const userinfo = await User.findOne({
       where: { userId: user.userId },
-      include: [Follow, MyTodo],
+      include: [Follow, ChallengedTodo],
     });
 
-    const challengedTodos = await MyTodo.findAll({
+    const challengedTodos = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
 
@@ -44,7 +44,9 @@ class CommentService {
       commentCounts: todo.Comments.length,
       challengedCounts: challengedTodos.length,
       isChallenged:
-        userinfo.MyTodos.findIndex((t) => t.challengedTodo === todoId) !== -1
+        userinfo.challengedTodos.findIndex(
+          (t) => t.challengedTodo === todoId
+        ) !== -1
           ? true
           : false,
       comment: todo.Comments.map((c) => {
@@ -53,7 +55,7 @@ class CommentService {
           userId: c.userId,
           comment: c.comment,
           nickname: c.nickname,
-          isComment: c.userId === user.userId ? true : false,
+          isCommented: c.userId === user.userId ? true : false,
         };
       }),
     };
