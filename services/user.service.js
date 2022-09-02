@@ -1,4 +1,4 @@
-const { User } = require("../models");
+const { User, Follow } = require("../models");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
@@ -24,7 +24,7 @@ class UserService {
     if (password !== confirmpassword) {
       throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
-    const bcr_password = bcrypt.hashSync(password, 10); //비밀번호 암호화
+    const bcr_password = bcrypt.hashSync(password, process.env.SALT); //비밀번호 암호화
 
     await User.create({
       email,
@@ -85,6 +85,94 @@ class UserService {
     });
 
     return token;
+  };
+
+  getUserInfo = async (userId) => {
+    const userData = await User.findByPk(userId);
+
+    const myfolloing = await Follow.findAll({
+      where: { userIdFollower: userId },
+    });
+
+    const myfollower = await Follow.findAll({
+      where: { userIdFollowing: userId },
+    });
+
+    return {
+      userId: userData.userId,
+      mbti: userData.mbti,
+      nickname: userData.nickname,
+      profile: userData.profile,
+      following: myfolloing.length,
+      follower: myfollower.length,
+    };
+  };
+
+  changeUserInfo = async (
+    userId,
+    password,
+    newPassword,
+    confirmPassword,
+    nickname,
+    profile,
+    mbti
+  ) => {
+    const userData = await User.findByPk(userId);
+
+    if (password) {
+      const compareResult = await bcrypt.compare(password, userData.password);
+      if (!compareResult) {
+        throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+      }
+
+      if (newPassword !== confirmPassword) {
+        // const error = new Error(
+        //   "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
+        // );
+        // error.code = 400;
+        // throw error;
+        // 이래서 에러 핸들러 라이브러리를 쓰는군... 언제 하나하나 다 정의하고 코드 넣어주고 던지나... Boom 라이브러리 쓸 이유가 생겼다
+        throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
+      }
+
+      // const compareResult = await bcrypt.compare(password, userData.password);
+      // if (compareResult) {
+      //   throw new Error("기존 비밀번호와 동일한 비밀번호입니다.");
+      // }
+
+      const hash = bcrypt.hashSync(password, parseInt(process.env.SALT));
+      await User.update({ password: hash }, { where: { userId } });
+    }
+
+    if (nickname) {
+      // if (nickname === userData.nickname) {
+      //   throw new Error("기존 닉네임과 동일한 닉네임입니다.");
+      // }
+
+      await User.update({ nickname }, { where: { userId } });
+    }
+
+    if (profile) {
+      await User.update({ profile }, { where: { userId } });
+    }
+
+    if (mbti) {
+      // if (mbti === userData.mbti) {
+      //   throw new Error("기존 MBTI와 동일한 MBTI입니다.");
+      // }
+      await User.update({ mbti }, { where: { userId } });
+    }
+  };
+
+  deleteUserInfo = async (userId, password) => {
+    const userData = await User.findByPk(userId);
+
+    const compareResult = await bcrypt.compare(password, userData.password);
+    if (!compareResult) {
+      throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+    }
+
+    return await User.update({ isUser: false }, { where: { userId } });
   };
 }
 

@@ -48,6 +48,68 @@ class UserController {
       next(err);
     }
   };
+
+  // 이메일 중복 검사 + 인증메일 발송
+  // emailAuth = async (req, res, next) => {};
+
+  // 이메일 인증확인
+  // emailAuthCheck = async (req, res, next) => {};
+
+  // 회원 정보 조회
+  getUserInfo = async (req, res, next) => {
+    try {
+      const { userId } = res.locals.user;
+
+      const userInfo = await this.userService.getUserInfo(userId);
+
+      res.status(200).json({ message: "success", userInfo });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 회원 정보 변경
+  changeUserInfo = async (req, res, next) => {
+    try {
+      const { userId } = res.locals.user;
+      const {
+        password,
+        newPassword,
+        confirmPassword,
+        nickname,
+        profile,
+        mbti,
+      } = req.body;
+
+      await this.userService.changeUserInfo(
+        userId,
+        password,
+        newPassword,
+        confirmPassword,
+        nickname,
+        profile,
+        mbti
+      );
+
+      res.status(200).json({ message: "success" });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 회원탈퇴
+  deleteUserInfo = async (req, res, next) => {
+    try {
+      const { userId } = res.locals.user;
+      const { password } = req.body;
+
+      await this.userService.deleteUserInfo(userId, password);
+
+      res.status(200).json({ message: "success" });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 module.exports = UserController;

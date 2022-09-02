@@ -62,9 +62,8 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Todo, {
       foreignKey: "userId",
       sourceKey: "userId",
-      onDelete: "CASCADE",
     });
-    db.User.hasMany(db.MyTodo, {
+    db.User.hasMany(db.ChallengedTodo, {
       foreignKey: "userId",
       sourceKey: "userId",
       onDelete: "CASCADE",
@@ -72,7 +71,6 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Comment, {
       foreignKey: "userId",
       sourceKey: "userId",
-      onDelete: "CASCADE",
     });
     // db.User.belongsToMany(db.User, {
     //   foreignKey: "userIdFollowing",

@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const logger = require("./logger");
 const hpp = require("hpp");
+const Boom = require("boom");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
