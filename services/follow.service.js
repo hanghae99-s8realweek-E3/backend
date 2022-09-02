@@ -78,13 +78,12 @@ class FollowService {
       throw new Error("존재하지 않는 사용자 입니다.");
     }
 
-    //나자신 팔로우 금지
+    //나 자신 팔로우 금지
     if (userId === elseUserId) {
       throw new Error("자기 자신은 팔로우를 하지 못합니다.");
     }
 
     //팔로우 관계 동일한것 제작 금지
-
     //나의 팔로잉 테이블에 팔로잉 되어있으면
     //팔로잉 테이블 에서 팔로우 usrerId 삭제
     //팔로잉 테이블에 팔로잉 안되어있으면
