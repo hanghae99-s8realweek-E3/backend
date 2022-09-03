@@ -1,9 +1,9 @@
 const UserService = require("../services/user.service");
-const nodemailer = require("nodemailer");
 
 class UserController {
   userService = new UserService();
-  //회원가입=====ok
+
+  // 로컬 회원가입 [POST] /api/accounts/signup
   signup = async (req, res, next) => {
     try {
       const { email, password, confirmpassword, nickname } = req.body;
@@ -22,7 +22,7 @@ class UserController {
     }
   };
 
-  //mbti====ok
+  // mbti 등록 [POST] /api/accounts/mbti
   mbti = async (req, res, next) => {
     try {
       const { mbti } = req.body;
@@ -36,7 +36,7 @@ class UserController {
     }
   };
 
-  //로그인 ====ok
+  // 로그인 [POST] /api/accounts/login
   login = async (req, res, next) => {
     try {
       const { email, password } = req.body;
@@ -50,7 +50,7 @@ class UserController {
     }
   };
 
-  // 이메일 중복 검사 + 인증메일 발송
+  // 이메일 중복 검사 + 인증메일 발송 [POST] /api/accounts/emailAuth
   emailAuth = async (req, res, next) => {
     try {
       const { email } = req.body;
@@ -63,12 +63,12 @@ class UserController {
     }
   };
 
-  // 이메일 인증확인
+  // 이메일 인증확인 [POST] /api/accounts/emailAuth/check
   emailAuthCheck = async (req, res, next) => {
     try {
       const { email, emailAuthNumber } = req.body;
 
-      // await this.userService.checkEmailAuth(email, emailAuthNumber);
+      await this.userService.checkEmailAuth(email, emailAuthNumber);
 
       res.status(200).json({ message: "success" });
     } catch (err) {
@@ -76,7 +76,7 @@ class UserController {
     }
   };
 
-  // 회원 정보 조회
+  // 회원 정보 조회 [GET] /api/accounts
   getUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
@@ -89,7 +89,7 @@ class UserController {
     }
   };
 
-  // 회원 정보 변경
+  // 회원 정보 변경 [PUT] /api/accounts
   changeUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
@@ -118,7 +118,7 @@ class UserController {
     }
   };
 
-  // 회원탈퇴
+  // 회원탈퇴 [DELETE] /api/accounts
   deleteUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;

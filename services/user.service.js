@@ -1,6 +1,6 @@
-const { User, Follow } = require("../models");
+const { User, Follow, EmailAuth } = require("../models");
 const bcrypt = require("bcrypt");
-require("dotenv").config();
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 
 //이메일 형식
@@ -10,6 +10,7 @@ const regexPassword =
   /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
 
 class UserService {
+  // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmpassword, nickname) => {
     const emailCheck = regexEmail.test(email);
     const passwordCheck = regexPassword.test(password);
@@ -24,7 +25,7 @@ class UserService {
     if (password !== confirmpassword) {
       throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
-    const bcr_password = bcrypt.hashSync(password, process.env.SALT); //비밀번호 암호화
+    const bcr_password = bcrypt.hashSync(password, parseInt(process.env.SALT)); //비밀번호 암호화
 
     await User.create({
       email,
@@ -49,11 +50,13 @@ class UserService {
     return token;
   };
 
+  // mbti 등록 [POST] /api/accounts/mbti
   userMbti = async (mbti, userId) => {
     await User.update({ mbti: mbti }, { where: { userId: userId } });
     return;
   };
 
+  // 로그인 [POST] /api/accounts/login
   userLogin = async (email, password) => {
     const userData = await User.findOne({ where: { email: email } });
     const userId = userData.userId;
@@ -87,6 +90,7 @@ class UserService {
     return token;
   };
 
+  // 이메일 중복 검사 + 인증메일 발송 [POST] /api/accounts/emailAuth
   authEmail = async (email) => {
     // 중복인 경우 (isUser:false인 경우도 있으니 에러메시지는 "이미 존재하거나 탈퇴한 이메일입니다")
     const dupCheck = await User.findOne({ where: { email } });
@@ -94,11 +98,55 @@ class UserService {
       throw new Error("이미 존재하거나 탈퇴한 이메일입니다.");
     }
 
-    // 중복 아닌 경우 인증번호 전송
+    // 6자리의 난수
+    const authNumber = Math.floor(Math.random() * 1000000);
+
+    // 중복 아닌 경우 emailAuth 테이블에 데이터 존재하는지 확인하고 없으면 인증번호 전송
+    // 존재하면 삭제하고 인증번호 재전송
+    const exEmailAuth = await EmailAuth.findOne({ where: { email } });
+    if (exEmailAuth) {
+      await EmailAuth.destroy({ where: { email } });
+      await EmailAuth.create({ email, authNumber });
+    }
+
+    // 인증번호 전송
+    const configOptions = {
+      service: process.env.NODEMAILER_SERVICE,
+      host: process.env.NODEMAILER_HOST,
+      port: process.env.NODEMAILER_PORT,
+      maxConnections: 50,
+      auth: {
+        user: process.env.NODEMAILER_USER, // generated ethereal user
+        pass: process.env.NODEMAILER_PASSWORD, // generated ethereal password
+      },
+    };
+    const emailForm = {
+      from: process.env.NODEMAILER_USER, // sender address
+      to: email, // list of receivers
+      subject: "MIMIC 이메일 인증", // Subject line
+      text: "MIMIC", // plain text body
+      html: `<b>인증번호는 ${authNumber} 입니다</b>`, // html body
+    };
+
+    const transporter = nodemailer.createTransport(configOptions);
+    transporter.sendMail(emailForm);
+
+    await EmailAuth.create({ email, authNumber });
   };
 
-  // checkEmailAuth = async (email, emailAuthNumber) => {};
+  // 이메일 인증확인 [POST] /api/accounts/emailAuth/check
+  checkEmailAuth = async (email, emailAuthNumber) => {
+    const authNumber = await EmailAuth.findOne({ where: { email } });
+    if (!authNumber) {
+      throw new Error("email 정보가 존재하지 않습니다. 다시 인증 바랍니다.");
+    }
 
+    if (authNumber.authNumber !== emailAuthNumber) {
+      throw new Error("인증번호가 일치하지 않습니다.");
+    }
+  };
+
+  // 회원 정보 조회 [GET] /api/accounts
   userInfoGet = async (userId) => {
     const userData = await User.findByPk(userId);
 
@@ -120,6 +168,7 @@ class UserService {
     };
   };
 
+  // 회원 정보 변경 [PUT] /api/accounts
   userInfoChange = async (
     userId,
     password,
@@ -176,6 +225,7 @@ class UserService {
     }
   };
 
+  // 회원탈퇴 [DELETE] /api/accounts
   userInfoDelete = async (userId, password) => {
     const userData = await User.findByPk(userId);
 
