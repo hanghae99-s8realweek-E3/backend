@@ -2,7 +2,7 @@ const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
 
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
-  getTodoLists = async (user, mbti, filter) => {
+  todoListsGet = async (user, mbti, filter) => {
     const userInfo = await User.findOne({
       where: { userId: user.userId },
       include: [ChallengedTodo],
@@ -187,7 +187,7 @@ class TodoListService {
   };
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
-  getTodo = async (user, todoId) => {
+  todoGet = async (user, todoId) => {
     const userInfo = await User.findOne({
       where: { userId: user.userId },
       include: [ChallengedTodo],

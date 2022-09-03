@@ -9,7 +9,7 @@ class TodoListController {
       const { user } = res.locals;
       const { mbti, filter } = req.query;
 
-      const data = await this.todoListService.getTodoLists(user, mbti, filter);
+      const data = await this.todoListService.todoListsGet(user, mbti, filter);
 
       res.status(200).json({ data });
     } catch (err) {
@@ -23,7 +23,7 @@ class TodoListController {
       const { user } = res.locals;
       const { todoId } = req.params;
 
-      const data = await this.todoListService.getTodo(user, todoId);
+      const data = await this.todoListService.todoGet(user, todoId);
 
       res.status(200).json({ message: "success", data });
     } catch (err) {
