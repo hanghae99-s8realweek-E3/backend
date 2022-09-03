@@ -87,7 +87,19 @@ class UserService {
     return token;
   };
 
-  getUserInfo = async (userId) => {
+  authEmail = async (email) => {
+    // 중복인 경우 (isUser:false인 경우도 있으니 에러메시지는 "이미 존재하거나 탈퇴한 이메일입니다")
+    const dupCheck = await User.findOne({ where: { email } });
+    if (dupCheck) {
+      throw new Error("이미 존재하거나 탈퇴한 이메일입니다.");
+    }
+
+    // 중복 아닌 경우 인증번호 전송
+  };
+
+  // checkEmailAuth = async (email, emailAuthNumber) => {};
+
+  userInfoGet = async (userId) => {
     const userData = await User.findByPk(userId);
 
     const myfolloing = await Follow.findAll({
@@ -108,7 +120,7 @@ class UserService {
     };
   };
 
-  changeUserInfo = async (
+  userInfoChange = async (
     userId,
     password,
     newPassword,
@@ -164,7 +176,7 @@ class UserService {
     }
   };
 
-  deleteUserInfo = async (userId, password) => {
+  userInfoDelete = async (userId, password) => {
     const userData = await User.findByPk(userId);
 
     const compareResult = await bcrypt.compare(password, userData.password);
