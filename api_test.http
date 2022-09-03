@@ -1,5 +1,5 @@
-### 회원가입
-POST http://localhost:3000/api/accounts/signup
+### 회원가입===ok
+POST http://localhost:4000/api/accounts/signup
 Content-Type: application/json
 
 {
@@ -9,8 +9,8 @@ Content-Type: application/json
   "nickname":"asq1"
 }
 
-### 로그인
-POST http://localhost:3000/api/accounts
+### 로그인====ok
+POST http://localhost:4000/api/accounts
 Content-Type: application/json
 
 # {
@@ -18,7 +18,7 @@ Content-Type: application/json
 #   "password":"asd123"
 # }
 
-### MBTI
+### MBTI===ok
 POST http://localhost:3000/api/accounts/mbti
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MTk1MDM4NiwiZXhwIjoxNjYyMTIzMTg2fQ.eefv54rM8SaAD91MYQRp7pyOkmPPeAykx07vuv5IkrM
@@ -30,7 +30,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY
 
 # ========================================================
 
-### 팔로우 추가 삭제
+### 팔로우 추가 삭제===ok
 # userId는 팔로우 추가 삭제 대상
 PUT  http://localhost:3000/api/followLists/5
 Content-Type: application/json
@@ -38,7 +38,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsIm5pY
 
 
 
-### 팔로우 조회
+### 팔로우 조회====ok
 # 토큰 담겨있는 userId 기준으로 
 GET  http://localhost:3000/api/followLists/1
 Content-Type: application/json
@@ -46,39 +46,47 @@ Content-Type: application/json
 
 # ========================================================
 
-
-### 전체 상품 조회
-GET http://localhost:3000/product
-
-### 상품 삭제
-DELETE http://localhost:3000/product/17
-
-### 특정 상품 상세 조회
-GET http://localhost:3000/product/1
-
-### 카테고리 상품 상세 조회
-GET http://localhost:3000/product/search/와인
-
-# ========================================================
-
-### 장바구니 조회
-GET http://localhost:3000/cart
+### TODO 제안 하기 (TODO 작성)====ok
+POST http://localhost:4000/api/mytodos
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
-
-
-### 장바구니 등록, 갯수 수정
-POST http://localhost:3000/cart/5
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
 
 {
-    "quantity": 1
+  "todo":"투두작성"
 }
 
 
-### 장바구니 삭제
-DELETE http://localhost:3000/cart/5
+### TODO 삭제 ==ok
+DELETE http://localhost:4000/api/mytodos/8
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+
+{
+  "date":"22-09-03"
+}
+
+### TODO mytodo에 담기 ===ok
+POST  http://localhost:4000/api/mytodos/5/challenged
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+
+
+### TODO mytodo 담은거 제거 ===ok
+DELETE  http://localhost:4000/api/mytodos/5/challenged
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+
+{
+  "date":"22-09-03"
+}
+
+### TODO mytodo 도전 진행완료 or 진행취소 ===ok
+PUT  http://localhost:4000/api/mytodos/1/challenged
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+
+{
+  "date":"22-09-03"
+}
+
+# ========================================================

@@ -4,14 +4,15 @@ const Follow = require("./follow");
 const TodoList = require("./todolist");
 const MyTodo = require("./mytodo");
 const Comment = require("./comment");
-const Social = require("./social");
+const MyTodo = require("./mytodo");
 const router = express.Router();
 
 router.use("/accounts", User);
-router.use("/follows", Follow);
-router.use("/todolists", TodoList);
+router.use("/followLists", Follow);
+// router.use("/todolists", TodoList);
 router.use("/mytodos", MyTodo);
 router.use("/comments", Comment);
-router.use("/accounts", Social);
+// router.use("/todoLists", Todo);
+
 
 module.exports = router;
