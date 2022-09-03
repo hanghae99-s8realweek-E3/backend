@@ -10,13 +10,13 @@ Content-Type: application/json
 }
 
 ### 로그인====ok
-POST http://localhost:4000/api/accounts
+POST http://localhost:4000/api/accounts/login
 Content-Type: application/json
 
-# {
-#   "email":"tjdngur3@naver.com",
-#   "password":"asd123"
-# }
+{
+  "email":"tjdngur3@naver.com",
+  "password":"asd123"
+}
 
 ### MBTI===ok
 POST http://localhost:3000/api/accounts/mbti
