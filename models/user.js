@@ -39,6 +39,11 @@ module.exports = class User extends Sequelize.Model {
           type: Sequelize.STRING(50),
           allowNull: true,
         },
+        isUser: {
+          type: Sequelize.BOOLEAN,
+          allowNull: true,
+          defaultValue: true, //true:1,false:0
+        },
       },
       {
         sequelize,
@@ -58,7 +63,7 @@ module.exports = class User extends Sequelize.Model {
       foreignKey: "userId",
       sourceKey: "userId",
     });
-    db.User.hasMany(db.MyTodo, {
+    db.User.hasMany(db.ChallengedTodo, {
       foreignKey: "userId",
       sourceKey: "userId",
       onDelete: "CASCADE",

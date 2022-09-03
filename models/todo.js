@@ -60,5 +60,9 @@ module.exports = class Todo extends Sequelize.Model {
       sourceKey: "todoId",
       onDelete: "CASCADE",
     });
+    db.Todo.hasOne(db.ChallengedTodo, {
+      foreignKey: "challengedTodo",
+      sourceKey: "todoId",
+    });
   }
 };
