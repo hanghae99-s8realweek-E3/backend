@@ -40,7 +40,9 @@ class TodoService {
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     //오늘 다은것만
     const updateQuery = `DELETE FROM myTodos
-    WHERE userId ='${userId}' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')`;
+    WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
+    ;
+    //사용자별로 먼저 범위를 찾는게 찾는 법위를 줄여서
     await sequelize.query(updateQuery, {
       type: QueryTypes.DELETE,
     });
@@ -59,7 +61,7 @@ class TodoService {
   challengedTodoComplete = async (date, userId) => {
     const updateQuery = `UPDATE myTodos 
     SET isComplete = IF (isComplete = true ,false ,true) 
-    WHERE userId ='${userId}' AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')`;
+    WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
     await sequelize.query(updateQuery, {
       type: QueryTypes.UPDATE,
     });
