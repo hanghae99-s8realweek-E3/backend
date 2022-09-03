@@ -21,8 +21,9 @@ class MyTodoController {
   deleteChallengedTodo = async (req, res, next) => {
     try {
       const { date } = req.body;
+      const { todoId } = req.params;
       const { userId } = res.locals.user;
-      await this.myTodoService.challengedTodoDelete(date, userId);
+      await this.myTodoService.challengedTodoDelete(date, userId, todoId);
       res.status(201).json({
         message: "success",
       });
@@ -46,7 +47,7 @@ class MyTodoController {
   };
 
   //나의오늘의 제안 Todo 작성
-  createTod = async (req, res, next) => {
+  createTodo = async (req, res, next) => {
     try {
       const { todo } = req.body;
       const { userId } = res.locals.user;

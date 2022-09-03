@@ -2,7 +2,7 @@ const { Follow } = require("../models");
 const { User } = require("../models");
 
 class FollowService {
-  getFollowList = async (userId) => {
+  followListGet = async (userId) => {
     const checkUserId = await User.findOne({ where: { userId: userId } });
     if (!checkUserId) {
       throw new Error("존재하지 않는 사용자 입니다.");
@@ -71,7 +71,7 @@ class FollowService {
     };
   };
 
-  editFollowList = async (userId, elseUserId) => {
+  followListEdit = async (userId, elseUserId) => {
     //팔로잉 할 userId 있나 조회
     const checkUserId = await User.findOne({ where: { userId: elseUserId } });
     if (!checkUserId) {

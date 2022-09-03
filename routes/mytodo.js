@@ -3,14 +3,9 @@ const router = express.Router();
 const MyTodoController = require("../controllers/mytodo.controller");
 
 const authMiddleware = require("../middlewares/auth_middlewares");
-const nonUserMiddleware = require("../middlewares/nonUser_middlewares");
+// const nonUserMiddleware = require("../middlewares/nonUser_middlewares");
 
-// const myTodoController = new MyTodoController();
-
-// // 나의 todo 피드 조회
-// router.get("/", authMiddleware, myTodoController.getMyTodo);
-// // 타인의 todo 피드 조회
-// router.get("/:userId", nonUserMiddleware, myTodoController.getUserTodo);
+const myTodoController = new MyTodoController();
 
 // 오늘의 도전 todo 등록
 router.post(
