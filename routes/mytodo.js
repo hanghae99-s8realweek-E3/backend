@@ -13,8 +13,11 @@ const nonUserMiddleware = require("../middlewares/nonUser_middlewares");
 router.get("/", authMiddleware, myTodoController.getMyTodo);
 // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
 router.get("/:userId", nonUserMiddleware, myTodoController.getUserTodo);
+
+
 // 오늘의 제안 todo 작성 [POST] /api/mytodos
 router.post("/", authMiddleware, myTodoController.createTodo);
+
 // todo 삭제 [DELETE] /api/mytodos/:todoId
 router.delete("/:todoId", authMiddleware, myTodoController.deleteTodo);
 

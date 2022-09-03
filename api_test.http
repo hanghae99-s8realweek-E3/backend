@@ -14,14 +14,14 @@ POST http://localhost:4000/api/accounts/login
 Content-Type: application/json
 
 {
-  "email":"tjdngur3@naver.com",
+  "email":"tjdngur14@naver.com",
   "password":"asd123"
 }
 
 ### MBTI===ok
 POST http://localhost:3000/api/accounts/mbti
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MTk1MDM4NiwiZXhwIjoxNjYyMTIzMTg2fQ.eefv54rM8SaAD91MYQRp7pyOkmPPeAykx07vuv5IkrM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 {
   "mbti":"estj"
@@ -32,9 +32,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY
 
 ### 팔로우 추가 삭제===ok
 # userId는 팔로우 추가 삭제 대상
-PUT  http://localhost:3000/api/followLists/5
+PUT  http://localhost:3000/api/followLists/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MTk2MTA3MiwiZXhwIjoxNjYyMTMzODcyfQ.VJbcNpjiBSeaBuM45f0EE_aV8rhs5Af-xFUIL0pLgCQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 
 
@@ -49,7 +49,7 @@ Content-Type: application/json
 ### TODO 제안 하기 (TODO 작성)====ok
 POST http://localhost:4000/api/mytodos
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 {
   "todo":"투두작성"
@@ -57,9 +57,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY
 
 
 ### TODO 삭제 ==ok
-DELETE http://localhost:4000/api/mytodos/8
+DELETE http://localhost:4000/api/mytodos/2
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 {
   "date":"22-09-03"
@@ -68,19 +68,19 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY
 ### TODO mytodo에 담기 ===ok
 POST  http://localhost:4000/api/mytodos/5/challenged
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 
-### TODO mytodo 담은거 제거 ===ok
+### TODO mytodo 담은거 제거 
 DELETE  http://localhost:4000/api/mytodos/5/challenged
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 {
   "date":"22-09-03"
 }
 
-### TODO mytodo 도전 진행완료 or 진행취소 ===ok
+### TODO mytodo 도전 진행완료 or 진행취소 
 PUT  http://localhost:4000/api/mytodos/1/challenged
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjE4OTA4OCwiZXhwIjoxNjYyMzYxODg4fQ.JE7Uw1OsUTvBU4F76880pyd_q-RoWYM19yXZVBxmlbg

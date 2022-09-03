@@ -37,6 +37,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev"));
 }
 
+
 const http = Http.createServer(app);
 // const https = Https.createServer(options, app);
 
@@ -56,6 +57,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api", indexRouter);
+
 
 // errorHandler
 app.use(routerError);

@@ -3,7 +3,6 @@ const MyTodoService = require("../services/mytodo.service");
 class MyTodoController {
   myTodoService = new MyTodoService();
 
-
   //나의 오늘의  Todo 도전 등록
   createChallengedTodo = async (req, res, next) => {
     try {
@@ -13,6 +12,10 @@ class MyTodoController {
       res.status(201).json({
         message: "success",
       });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (req, res, next) => {
@@ -23,7 +26,6 @@ class MyTodoController {
       const data = await this.myTodoService.getMyTodo(user, date);
 
       res.status(200).json({ message: "success", data });
-
     } catch (err) {
       next(err);
     }
@@ -58,6 +60,7 @@ class MyTodoController {
     }
   };
 
+  
   //나의오늘의 제안 Todo 작성
   createTodo = async (req, res, next) => {
     try {
@@ -81,6 +84,11 @@ class MyTodoController {
       res.status(201).json({
         message: "success",
       });
+    } catch (err) {
+      next(err);
+    }
+  };
+
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (req, res, next) => {
@@ -95,7 +103,6 @@ class MyTodoController {
       next(err);
     }
   };
-
 }
 
 module.exports = MyTodoController;

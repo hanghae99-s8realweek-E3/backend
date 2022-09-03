@@ -1,5 +1,5 @@
 
-const { MyTodo,Todo, User, ChallengedTodo, Follow } = require("../models");
+const { ChallengedTodo,Todo, User, Follow } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { sequelize } = require("../models/index");
 
@@ -18,12 +18,12 @@ class myTodoController {
       throw new Error("삭제된 todo 입니다.");
     }
 
-    await MyTodo.create({
+    await ChallengedTodo.create({
       userId: userId,
       challengedTodo: todoId,
     });
 
-    const challengedTodo = await MyTodo.findAll({
+    const challengedTodo = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
     const challengCount = challengedTodo.length;
@@ -46,7 +46,7 @@ class myTodoController {
       type: QueryTypes.DELETE,
     });
 
-    const challengedTodo = await MyTodo.findAll({
+    const challengedTodo = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
 
