@@ -1,4 +1,5 @@
 const UserService = require("../services/user.service");
+const nodemailer = require("nodemailer");
 
 class UserController {
   userService = new UserService();
@@ -50,17 +51,37 @@ class UserController {
   };
 
   // 이메일 중복 검사 + 인증메일 발송
-  // emailAuth = async (req, res, next) => {};
+  emailAuth = async (req, res, next) => {
+    try {
+      const { email } = req.body;
+
+      await this.userService.authEmail(email);
+
+      res.status(200).json({ message: "success" });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   // 이메일 인증확인
-  // emailAuthCheck = async (req, res, next) => {};
+  emailAuthCheck = async (req, res, next) => {
+    try {
+      const { email, emailAuthNumber } = req.body;
+
+      // await this.userService.checkEmailAuth(email, emailAuthNumber);
+
+      res.status(200).json({ message: "success" });
+    } catch (err) {
+      next(err);
+    }
+  };
 
   // 회원 정보 조회
   getUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
 
-      const userInfo = await this.userService.getUserInfo(userId);
+      const userInfo = await this.userService.userInfoGet(userId);
 
       res.status(200).json({ message: "success", userInfo });
     } catch (err) {
@@ -81,7 +102,7 @@ class UserController {
         mbti,
       } = req.body;
 
-      await this.userService.changeUserInfo(
+      await this.userService.userInfoChange(
         userId,
         password,
         newPassword,
@@ -103,7 +124,7 @@ class UserController {
       const { userId } = res.locals.user;
       const { password } = req.body;
 
-      await this.userService.deleteUserInfo(userId, password);
+      await this.userService.userInfoDelete(userId, password);
 
       res.status(200).json({ message: "success" });
     } catch (err) {

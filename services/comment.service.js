@@ -10,7 +10,7 @@ class CommentService {
       comment,
     });
 
-    const todo = await Todo.findOne({
+    const todoInfo = await Todo.findOne({
       where: { todoId },
       include: [{ model: Comment }],
     });
@@ -18,13 +18,12 @@ class CommentService {
       throw new Error("이미 삭제된 todo입니다.");
     }
 
-    const userinfo = await User.findOne({
-      where: { userId: user.userId },
-      include: [Follow, ChallengedTodo],
-    });
+    const commentCounts = todo.Comments.length;
+    await Todo.update({ commentCounts }, { where: { todoId } });
 
-    const challengedTodos = await ChallengedTodo.findAll({
-      where: { challengedTodo: todoId },
+    const userInfo = await User.findOne({
+      where: { userId: user.userId },
+      include: [ChallengedTodo],
     });
 
     const myfolloing = await Follow.findAll({
@@ -33,29 +32,35 @@ class CommentService {
 
     return {
       todoId,
-      userId: todo.userId,
-      isFollow:
-        myfolloing.findIndex((f) => f.userIdFollowing === todo.userId) !== -1
+      userId: todoInfo.userId,
+      isFollowed:
+        myfolloing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
+        -1
           ? true
           : false,
-      todo: todo.todo,
-      mbti: todo.mbti,
-      nickname: todo.nickname,
-      commentCounts: todo.Comments.length,
-      challengedCounts: challengedTodos.length,
+      profile: todoInfo.profile,
+      todo: todoInfo.todo,
+      mbti: todoInfo.mbti,
+      nickname: todoInfo.nickname,
+      commentCounts,
+      challengedCounts: todoInfo.challengedCounts,
       isChallenged:
-        userinfo.challengedTodos.findIndex(
-          (t) => t.challengedTodo === todoId
+        userInfo.challengedTodos.findIndex(
+          (c) => c.challengedTodo === todoId
         ) !== -1
           ? true
           : false,
-      comment: todo.Comments.map((c) => {
+      createdAt: todoInfo.createdAt,
+      updatedAt: todoInfo.updatedAt,
+      comment: todoInfo.Comments.map((c) => {
         return {
           commentId: c.commentId,
           userId: c.userId,
           comment: c.comment,
           nickname: c.nickname,
           isCommented: c.userId === user.userId ? true : false,
+          createdAt: c.createdAt,
+          updatedAt: c.updatedAt,
         };
       }),
     };

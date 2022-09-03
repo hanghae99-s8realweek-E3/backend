@@ -60,9 +60,10 @@ module.exports = class Todo extends Sequelize.Model {
       sourceKey: "todoId",
       onDelete: "CASCADE",
     });
-    db.Todo.hasOne(db.ChallengedTodo, {
-      foreignKey: "challengedTodo",
-      sourceKey: "todoId",
-    });
+    // hasOne이 아닌데...? 어띃게 해야하지~~
+    // db.Todo.hasOne(db.ChallengedTodo, {
+    //   foreignKey: "challengedTodo",
+    //   sourceKey: "todoId",
+    // });
   }
 };
