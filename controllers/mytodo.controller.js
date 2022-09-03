@@ -8,7 +8,7 @@ class MyTodoController {
     try {
       const { todoId } = req.params;
       const { userId } = res.locals.user;
-      await this.todoService.challengedTodoCreate(todo, userId);
+      await this.myTodoService.challengedTodoCreate(todoId, userId);
       res.status(201).json({
         message: "success",
       });
@@ -21,9 +21,8 @@ class MyTodoController {
   deleteChallengedTodo = async (req, res, next) => {
     try {
       const { date } = req.body;
-      const { todoId } = req.params;
       const { userId } = res.locals.user;
-      await this.todoService.challengedTodoDelete(todo, userId);
+      await this.myTodoService.challengedTodoDelete(date, userId);
       res.status(201).json({
         message: "success",
       });
@@ -37,7 +36,7 @@ class MyTodoController {
     try {
       const { date } = req.body;
       const { userId } = res.locals.user;
-      await this.todoService.challengedTodoComplete(date, userId);
+      await this.myTodoService.challengedTodoComplete(date, userId);
       res.status(201).json({
         message: "success",
       });
@@ -51,7 +50,7 @@ class MyTodoController {
     try {
       const { todo } = req.body;
       const { userId } = res.locals.user;
-      await this.todoService.todoCreate(todo, userId);
+      await this.myTodoService.todoCreate(todo, userId);
       res.status(201).json({
         message: "success",
       });
@@ -65,7 +64,7 @@ class MyTodoController {
     try {
       const { todoId } = req.params;
       const { userId } = res.locals.user;
-      await this.todoService.todoDelete(todoId, userId);
+      await this.myTodoService.todoDelete(todoId, userId);
       res.status(201).json({
         message: "success",
       });

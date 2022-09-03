@@ -10,8 +10,9 @@ const date = KoreanTime; //YYYYMMDD
 
 class TodoService {
   challengedTodoCreate = async (todoId, userId) => {
+    //===ok
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력
-    //todo테이블 challengcount count +1
+    //todo테이블 challengcount count +1====이야기 해야함
     await MyTodo.create({
       userId: userId,
       todoId: todoId,
@@ -19,20 +20,24 @@ class TodoService {
   };
 
   challengedTodoDelete = async (date, userId) => {
-    //my todo 테이블에서 <userId + 날짜 date>에 맞는  todoId 삭제
+    //======
+    //my todo 테이블에서 <userId + 날짜 date>에 맞는  ChallengedTodo 삭제
     // todo테이블 challengcount count -1
-    const query = `SELECT * FROM ${MyTodo} WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
-    const mytodoDateData = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
-    });
-    await mytodoDateData.destroy({
-      where: { userId: userId },
+    const updateQuery = 
+    `UPDATE ${MyTodo}
+    SET challengedTodo ='${changeComplete}'
+    WHERE userId ='${userId}' AND DATE(createdAt) = '${date}'`;
+    await sequelize.query(updateQuery, {
+      type: QueryTypes.UPDATE,
     });
   };
 
   challengedTodoComplete = async (date, userId) => {
+    //======
     //my todo테이블에서 <userId +날짜 date>에 맞는 isComplete true\\flase로
-    const selectQuery = `SELECT * FROM ${MyTodo} WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+    const selectQuery = 
+    `SELECT * FROM ${MyTodo} 
+    WHERE userId ='${userId}' AND DATE(createdAt) = '${date}'`;
     const mytodoDateData = await sequelize.query(selectQuery, {
       type: QueryTypes.SELECT,
     });
@@ -42,19 +47,18 @@ class TodoService {
     });
 
     let changeComplete = !mytodoData.isComplete; //ture || false 값으로 변환
-    const updateQuery = `UPDATE ${MyTodo} SET isComplete ='${changeComplete}' 
-    WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${date}', '%Y-%m-%d') OR userId ='${userId}';`;
-    // await MyTodo.update( 
-    //   { isComplete: !changeComplete },
-    //   {
-    //     where: {
-    //       [Op.and]: [{ userId: userId }, { date: date }],
-    //     },
-    //   }
-    // );
+
+    const updateQuery =
+      //isComplete ture || false 값으로 변환
+      `UPDATE ${MyTodo}
+    SET isComplete ='${changeComplete}'
+    WHERE userId ='${userId}' AND DATE(createdAt) = '${date}'`;
+    await sequelize.query(updateQuery, {
+      type: QueryTypes.UPDATE,
+    });
   };
 
-  postTodo = async (todo, userId) => {
+  todoCreate = async (todo, userId) => {
     //todo 테이블에 todo, user의mbti,nickname,userId,를 넣어야함
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
     const UserData = await User.findOne({ where: { userId: userId } });
@@ -63,17 +67,16 @@ class TodoService {
       mbti: UserData.mbti,
       nickname: User.nickname,
       userId: userId,
-      date: date,
     });
 
     await MyTodo.create({
       todoId: todoId,
       userId: userId,
-      date: date,
     });
   };
 
-  deleteTodo = async (todoId) => {
+  todoDelete = async (todoId) => {
+    //====ok
     await Todo.update({ isTodo: false }, { where: { todoId: todoId } });
     //todo테이블에 istodo false로 변경
   };
