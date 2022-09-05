@@ -1,4 +1,5 @@
 const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
+const Boom = require("@hapi/boom");
 
 class CommentService {
   // 댓글 작성 [POST] /api/comments/:todoId
@@ -15,7 +16,7 @@ class CommentService {
       include: [{ model: Comment }],
     });
     if (todoInfo.isTodo === false) {
-      throw new Error("이미 삭제된 todo입니다.");
+      throw Boom.badRequest("이미 삭제된 todo입니다.");
     }
 
     const commentCounts = todoInfo.Comments.length;
@@ -70,10 +71,10 @@ class CommentService {
   deleteComment = async (user, commentId) => {
     const comment = await Comment.findOne({ where: { commentId } });
     if (!comment) {
-      throw new Error("댓글이 존재하지 않습니다.");
+      throw Boom.badRequest("댓글이 존재하지 않습니다.");
     }
     if (user.userId !== comment.userId) {
-      throw new Error("본인 댓글만 삭제 가능합니다.");
+      throw Boom.unauthorized("본인 댓글만 삭제 가능합니다.");
     }
 
     return await Comment.destroy({ where: { commentId } });
