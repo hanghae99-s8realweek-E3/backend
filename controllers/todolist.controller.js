@@ -19,6 +19,7 @@ class TodoListController {
     }
   };
 
+  
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   getTodo = async (req, res, next) => {
     try {

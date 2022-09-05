@@ -1,5 +1,4 @@
-
-const { ChallengedTodo,Todo, User, Follow } = require("../models");
+const { ChallengedTodo, Todo, User, Follow } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { sequelize } = require("../models/index");
 
@@ -7,22 +6,29 @@ const KoreanTime = require("../advice/date");
 const date = KoreanTime; //YYYYMMDD
 
 class myTodoController {
-  
+  // TODO mytodo에 담기
   challengedTodoCreate = async (todoId, userId) => {
     //Todo 테이블에 isTodo가 false이면 이용불가===ok
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
-    const isTodo = await Todo.findOne({ where: { todoId: todoId } });
+    const todoData = await Todo.findOne({ where: { todoId: todoId } });
 
-    if (!isTodo) {
-      throw new Error("삭제된 todo 입니다.");
+    if (!todoData || !todoData.isTodo) {
+      throw new Error("삭제 또는 존재 하지 않는 todo 입니다.");
     }
 
+    const challengeTodoData = await ChallengedTodo.findOne({
+      where: { challengedTodoId: todoId },
+    });
+
+    if (challengeTodoData.userId === userId) {
+      throw new Error("이미 등록된 todo 입니다.");
+    }
     await ChallengedTodo.create({
       userId: userId,
       challengedTodo: todoId,
     });
-
+    
     const challengedTodo = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
@@ -34,15 +40,14 @@ class myTodoController {
     );
   };
 
+  // TODO mytodo 담은거 제거
   challengedTodoDelete = async (date, userId, todoId) => {
-    //my todo 테이블에서 <userId + 날짜 date>에 맞는  ChallengedTodo 를 null 값으로 변경====ok
+    //challengedTodos 테이블에서 <userId + 날짜 date>에 맞는 데이터 삭제
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
-    //오늘 다은것만
-    const updateQuery = `DELETE FROM myTodos
+    const deleteQuery = `DELETE FROM challengedTodos
     WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
-    ;
     //사용자별로 먼저 범위를 찾는게 찾는 법위를 줄여서
-    await sequelize.query(updateQuery, {
+    await sequelize.query(deleteQuery, {
       type: QueryTypes.DELETE,
     });
 
@@ -57,15 +62,17 @@ class myTodoController {
     );
   };
 
+  //TODO mytodo 도전 진행완료 or 진행취소  ==ok
   challengedTodoComplete = async (date, userId) => {
-    const updateQuery = `UPDATE myTodos 
-    SET isComplete = IF (isComplete = true ,false ,true) 
+    const updateQuery = `UPDATE challengedTodos 
+    SET isCompleted = IF (isCompleted = true ,false ,true) 
     WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
     await sequelize.query(updateQuery, {
       type: QueryTypes.UPDATE,
     });
   };
 
+  // TODO 제안 하기 (TODO 작성)
   todoCreate = async (todo, userId) => {
     //todo 테이블에 todo, user의mbti,nickname,userId,를 넣어야함
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
@@ -81,12 +88,12 @@ class myTodoController {
     });
   };
 
+  // TODO 삭제
   todoDelete = async (todoId) => {
     //====ok
     //todo테이블에 istodo false로 변경
     await Todo.update({ isTodo: false }, { where: { todoId: todoId } });
   };
-
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (user, date) => {
@@ -187,6 +194,3 @@ class myTodoController {
 }
 
 module.exports = myTodoController;
-
-
-
