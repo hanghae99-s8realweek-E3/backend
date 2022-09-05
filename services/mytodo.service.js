@@ -6,7 +6,7 @@ const KoreanTime = require("../advice/date");
 const date = KoreanTime; //YYYYMMDD
 
 class myTodoController {
-  // TODO mytodo에 담기
+  // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     //Todo 테이블에 isTodo가 false이면 이용불가===ok
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
@@ -28,7 +28,7 @@ class myTodoController {
       userId: userId,
       challengedTodo: todoId,
     });
-    
+
     const challengedTodo = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
@@ -40,7 +40,7 @@ class myTodoController {
     );
   };
 
-  // TODO mytodo 담은거 제거
+  // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   challengedTodoDelete = async (date, userId, todoId) => {
     //challengedTodos 테이블에서 <userId + 날짜 date>에 맞는 데이터 삭제
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
@@ -62,7 +62,7 @@ class myTodoController {
     );
   };
 
-  //TODO mytodo 도전 진행완료 or 진행취소  ==ok
+  // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
   challengedTodoComplete = async (date, userId) => {
     const updateQuery = `UPDATE challengedTodos 
     SET isCompleted = IF (isCompleted = true ,false ,true) 
@@ -72,7 +72,7 @@ class myTodoController {
     });
   };
 
-  // TODO 제안 하기 (TODO 작성)
+  // 오늘의 제안 todo 작성 [POST] /api/mytodos
   todoCreate = async (todo, userId) => {
     //todo 테이블에 todo, user의mbti,nickname,userId,를 넣어야함
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
@@ -88,7 +88,7 @@ class myTodoController {
     });
   };
 
-  // TODO 삭제
+  // todo 삭제 [DELETE] /api/mytodos/:todoId
   todoDelete = async (todoId) => {
     //====ok
     //todo테이블에 istodo false로 변경
@@ -163,11 +163,11 @@ class myTodoController {
     // 도전 todo 최신 20개
     const challenges = await ChallengedTodo.findAll({
       where: { userId },
-      attributes: [ChallengedTodo],
+      attributes: ["challengedTodo"],
       order: [["createdAt", "DESC"]],
       limit: 20,
     });
-    const challengedTodo = await Todo.findAll({
+    const challengedTodos = await Todo.findAll({
       where: { todoId: challenges },
       order: [["createdAt", "DESC"]],
       attributes: { exclude: ["isTodo"] },
@@ -187,7 +187,7 @@ class myTodoController {
             ? true
             : false,
       },
-      challengedTodo,
+      challengedTodos,
       createdTodo,
     };
   };
