@@ -10,7 +10,7 @@ class TodoListService {
     } else {
       userInfo = await User.findOne({
         where: { userId: user.userId },
-        include: [ChallengedTodo],
+        include: [{ model: ChallengedTodo }],
       });
     }
 
@@ -31,7 +31,7 @@ class TodoListService {
           nickname: t.nickname,
           isChallenged:
             userInfo.ChallengedTodos.findIndex(
-              (c) => c.challengedTodo === todoId
+              (c) => c.challengedTodo === t.todoId
             ) !== -1
               ? true
               : false,
@@ -60,7 +60,7 @@ class TodoListService {
           nickname: t.nickname,
           isChallenged:
             userInfo.ChallengedTodos.findIndex(
-              (c) => c.challengedTodo === todoId
+              (c) => c.challengedTodo === t.todoId
             ) !== -1
               ? true
               : false,
@@ -94,7 +94,7 @@ class TodoListService {
             nickname: t.nickname,
             isChallenged:
               userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === todoId
+                (c) => c.challengedTodo === t.todoId
               ) !== -1
                 ? true
                 : false,
@@ -125,7 +125,7 @@ class TodoListService {
             nickname: t.nickname,
             isChallenged:
               userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === todoId
+                (c) => c.challengedTodo === t.todoId
               ) !== -1
                 ? true
                 : false,
@@ -160,7 +160,7 @@ class TodoListService {
             nickname: t.nickname,
             isChallenged:
               userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === todoId
+                (c) => c.challengedTodo === t.todoId
               ) !== -1
                 ? true
                 : false,
@@ -191,7 +191,7 @@ class TodoListService {
             nickname: t.nickname,
             isChallenged:
               userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === todoId
+                (c) => c.challengedTodo === t.todoId
               ) !== -1
                 ? true
                 : false,
@@ -216,7 +216,7 @@ class TodoListService {
     } else {
       userInfo = await User.findOne({
         where: { userId: user.userId },
-        include: [ChallengedTodo],
+        include: [{ model: ChallengedTodo }],
       });
       myfollowing = await Follow.findAll({
         where: { userIdFollower: user.userId },
@@ -248,7 +248,7 @@ class TodoListService {
       challengedCounts: todoInfo.challengedCounts,
       isChallenged:
         userInfo.ChallengedTodos.findIndex(
-          (c) => c.challengedTodo === todoId
+          (c) => c.challengedTodo === todoInfo.todoId
         ) !== -1
           ? true
           : false,

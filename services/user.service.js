@@ -114,7 +114,6 @@ class UserService {
     const exEmailAuth = await EmailAuth.findOne({ where: { email } });
     if (exEmailAuth) {
       await EmailAuth.destroy({ where: { email } });
-      await EmailAuth.create({ email, authNumber });
     }
 
     // 인증번호 전송
