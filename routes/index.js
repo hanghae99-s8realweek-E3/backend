@@ -8,10 +8,8 @@ const router = express.Router();
 
 router.use("/accounts", User);
 router.use("/followLists", Follow);
-// router.use("/todolists", TodoList);
+router.use("/todolists", TodoList);
 router.use("/mytodos", MyTodo);
 router.use("/comments", Comment);
-// router.use("/todoLists", Todo);
-
 
 module.exports = router;

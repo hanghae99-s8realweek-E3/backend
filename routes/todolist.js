@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 
@@ -11,4 +10,4 @@ router.get("/", nonUserMiddleware, todoListController.getTodoLists);
 // 상세 todo 조회 [GET] /api/todolists/:todoId
 router.get("/:todoId", nonUserMiddleware, todoListController.getTodo);
 
-
+module.exports = router;
