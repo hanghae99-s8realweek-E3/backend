@@ -227,8 +227,6 @@ class TodoListService {
         where: { userIdFollower: user.userId },
       });
     }
-    console.log("!!!!!userInfo@@@ : ", userInfo);
-    console.log("!!!!!myfolloing@@@ : ", myfolloing);
 
     const todoInfo = await Todo.findOne({
       where: { todoId },
