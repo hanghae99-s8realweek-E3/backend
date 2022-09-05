@@ -6,29 +6,35 @@ const KoreanTime = require("../advice/date");
 const date = KoreanTime; //YYYYMMDD
 
 class myTodoController {
-  // TODO mytodo에 담기
+  // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     //Todo 테이블에 isTodo가 false이면 이용불가===ok
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
+    if (!todoData.mbti) {
+      throw new Error("MBTI 정보 등록바랍니다.");
+    }
 
     if (!todoData || !todoData.isTodo) {
-      throw new Error("삭제 또는 존재 하지 않는 todo 입니다.");
+      throw new Error("존재 하지않거나 삭제된 todo 입니다.");
     }
 
     const challengeTodoData = await ChallengedTodo.findOne({
-      where: { challengedTodoId: todoId },
+      where: { challengedTodo: todoId },
     });
 
-    if (challengeTodoData.userId === userId) {
-      throw new Error("이미 등록된 todo 입니다.");
+    if (challengeTodoData !== null) {
+      if (challengeTodoData.userId === userId) {
+        throw new Error("이미 등록된 todo 입니다.");
+      }
     }
+
     await ChallengedTodo.create({
       userId: userId,
       challengedTodo: todoId,
     });
-    
+
     const challengedTodo = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
@@ -40,7 +46,7 @@ class myTodoController {
     );
   };
 
-  // TODO mytodo 담은거 제거
+  // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   challengedTodoDelete = async (date, userId, todoId) => {
     //challengedTodos 테이블에서 <userId + 날짜 date>에 맞는 데이터 삭제
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
@@ -62,8 +68,18 @@ class myTodoController {
     );
   };
 
-  //TODO mytodo 도전 진행완료 or 진행취소  ==ok
-  challengedTodoComplete = async (date, userId) => {
+  // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
+  challengedTodoComplete = async (date, userId, todoId) => {
+    const query = `SELECT *
+      FROM challengedTodos
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+    const checktodoId = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+    });
+
+    if (!checktodoId.length) {
+      throw new Error("오늘 도전한 todo가 없습니다.");
+    }
     const updateQuery = `UPDATE challengedTodos 
     SET isCompleted = IF (isCompleted = true ,false ,true) 
     WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
@@ -72,7 +88,7 @@ class myTodoController {
     });
   };
 
-  // TODO 제안 하기 (TODO 작성)
+  // 오늘의 제안 todo 작성 [POST] /api/mytodos
   todoCreate = async (todo, userId) => {
     //todo 테이블에 todo, user의mbti,nickname,userId,를 넣어야함
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
@@ -88,7 +104,7 @@ class myTodoController {
     });
   };
 
-  // TODO 삭제
+  // todo 삭제 [DELETE] /api/mytodos/:todoId
   todoDelete = async (todoId) => {
     //====ok
     //todo테이블에 istodo false로 변경
@@ -163,11 +179,11 @@ class myTodoController {
     // 도전 todo 최신 20개
     const challenges = await ChallengedTodo.findAll({
       where: { userId },
-      attributes: [ChallengedTodo],
+      attributes: ["challengedTodo"],
       order: [["createdAt", "DESC"]],
       limit: 20,
     });
-    const challengedTodo = await Todo.findAll({
+    const challengedTodos = await Todo.findAll({
       where: { todoId: challenges },
       order: [["createdAt", "DESC"]],
       attributes: { exclude: ["isTodo"] },
@@ -187,7 +203,7 @@ class myTodoController {
             ? true
             : false,
       },
-      challengedTodo,
+      challengedTodos,
       createdTodo,
     };
   };

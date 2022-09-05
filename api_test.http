@@ -31,7 +31,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY
 # ========================================================
 
 ### 팔로우 추가 삭제===ok
-# userId는 팔로우 추가 삭제 대상
+# 토큰 userId기준 url의 userId추가 삭제 대상
 PUT  http://localhost:3000/api/followLists/1
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
@@ -39,7 +39,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY
 
 
 ### 팔로우 조회====ok
-# 토큰 담겨있는 userId 기준으로 
+# url userId 기준으로 
 GET  http://localhost:3000/api/followLists/1
 Content-Type: application/json
 
@@ -68,8 +68,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY
 ### TODO mytodo에 담기 ===ok
 POST  http://localhost:4000/api/mytodos/6/challenged
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo 
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOiJlc3RqIiwiaWF0IjoxNjYyMzYzNDM2LCJleHAiOjE2NjI1MzYyMzZ9.CFzWAT7wxTynjDcUjERT2Tz0xMYGFm6hiwQaOw_oW0g
 
 ### TODO mytodo 담은거 제거 ==ok
 DELETE  http://localhost:4000/api/mytodos/5/challenged
