@@ -7,7 +7,12 @@ module.exports = {
     database: process.env.MYSQL_DB_DEV,
     host: process.env.MYSQL_HOST_DEV,
     dialect: "mysql",
-    // logging: false,
+    logging: false,
+    timezone: "+09:00",
+    dialectOptions: {
+      dateStrings: true,
+      typeCast: true,
+    },
   },
   test: {
     username: process.env.MYSQL_USER_TEST,
@@ -16,6 +21,11 @@ module.exports = {
     host: process.env.MYSQL_HOST_TEST,
     dialect: "mysql",
     logging: false,
+    timezone: "+09:00",
+    dialectOptions: {
+      dateStrings: true,
+      typeCast: true,
+    },
   },
   production: {
     username: process.env.MYSQL_USER_PD,
@@ -24,5 +34,10 @@ module.exports = {
     host: process.env.MYSQL_HOST_PD,
     dialect: "mysql",
     logging: false,
+    timezone: "+09:00",
+    dialectOptions: {
+      dateStrings: true,
+      typeCast: true,
+    },
   },
 };
