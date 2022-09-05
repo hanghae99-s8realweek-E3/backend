@@ -11,7 +11,7 @@ const regexPassword =
 
 class UserService {
   // 회원가입 [POST] /api/accounts/signup
-  userSignup = async (email, password, confirmpassword, nickname) => {
+  userSignup = async (email, password, confirmPassword, nickname) => {
     const emailCheck = regexEmail.test(email);
     const passwordCheck = regexPassword.test(password);
     const duplicateCheck = await User.findOne({ where: { email: email } });
@@ -22,7 +22,7 @@ class UserService {
     if (!emailCheck && !passwordCheck) {
       throw new Error("이메일 비밀번호 형식이 알맞지 않습니다");
     }
-    if (password !== confirmpassword) {
+    if (password !== confirmPassword) {
       throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
 
