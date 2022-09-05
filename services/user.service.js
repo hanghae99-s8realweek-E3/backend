@@ -209,7 +209,7 @@ class UserService {
       //   throw new Error("기존 비밀번호와 동일한 비밀번호입니다.");
       // }
 
-      const hash = bcrypt.hashSync(password, parseInt(process.env.SALT));
+      const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
       await User.update({ password: hash }, { where: { userId } });
     }
 
