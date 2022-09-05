@@ -5,12 +5,10 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const logger = require("./logger");
 const hpp = require("hpp");
-const Boom = require("boom");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const app = express();
-
 
 const cors = require("cors");
 
@@ -37,10 +35,8 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev"));
 }
 
-
 const http = Http.createServer(app);
 // const https = Https.createServer(options, app);
-
 
 const http_port = process.env.HTTP_PORT || 4000;
 // const https_port = process.env.HTTPS_PORT || 443;
@@ -57,7 +53,6 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api", indexRouter);
-
 
 // errorHandler
 app.use(routerError);
