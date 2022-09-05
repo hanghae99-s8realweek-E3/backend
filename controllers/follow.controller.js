@@ -5,7 +5,7 @@ class FollowController {
   followService = new FollowService();
   userService = new UserService();
 
-  //팔로우 팔로잉 조회===ok
+  // 팔로우 목록 조회 [GET] /api/follows/:userId
   followList = async (req, res, next) => {
     try {
       const { userId } = req.params; //팔로우 조회할 유저 아이디
@@ -18,7 +18,7 @@ class FollowController {
     }
   };
 
-  //팔로우 추가 및 삭제====ok
+  // 팔로우 추가 및 삭제 [PUT] /api/follows/:userId
   followEdit = async (req, res, next) => {
     try {
       const elseUserId = Number(req.params.userId); //수정할 유저 아이디
@@ -36,5 +36,3 @@ class FollowController {
 }
 
 module.exports = FollowController;
-
-

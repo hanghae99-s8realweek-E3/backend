@@ -2,6 +2,7 @@ const { Follow } = require("../models");
 const { User } = require("../models");
 
 class FollowService {
+  // 팔로우 목록 조회 [GET] /api/follows/:userId
   getFollowList = async (userId) => {
     const checkUserId = await User.findOne({ where: { userId: userId } });
     if (!checkUserId) {
@@ -71,6 +72,7 @@ class FollowService {
     };
   };
 
+  // 팔로우 추가 및 삭제 [PUT] /api/follows/:userId
   editFollowList = async (userId, elseUserId) => {
     //팔로잉 할 userId 있나 조회
     const checkUserId = await User.findOne({ where: { userId: elseUserId } });
