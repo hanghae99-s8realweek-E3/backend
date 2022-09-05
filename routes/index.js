@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.use("/accounts", Social);
 router.use("/accounts", User);
-router.use("/followLists", Follow);
+router.use("/follows", Follow);
 router.use("/todolists", TodoList);
 router.use("/mytodos", MyTodo);
 router.use("/comments", Comment);

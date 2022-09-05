@@ -17,6 +17,11 @@ module.exports = class EmailAuth extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: false,
         },
+        authCheck: {
+          type: Sequelize.BOOLEAN,
+          allowNull: true,
+          defaultValue: false,
+        },
       },
       {
         sequelize,
