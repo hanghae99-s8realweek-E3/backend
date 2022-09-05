@@ -12,23 +12,29 @@ class myTodoController {
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
+    if (!todoData.mbti) {
+      throw new Error("MBTI 정보 등록바랍니다.");
+    }
 
     if (!todoData || !todoData.isTodo) {
-      throw new Error("삭제 또는 존재 하지 않는 todo 입니다.");
+      throw new Error("존재 하지않거나 삭제된 todo 입니다.");
     }
 
     const challengeTodoData = await ChallengedTodo.findOne({
-      where: { challengedTodoId: todoId },
+      where: { challengedTodo: todoId },
     });
 
-    if (challengeTodoData.userId === userId) {
-      throw new Error("이미 등록된 todo 입니다.");
+    if (challengeTodoData !== null) {
+      if (challengeTodoData.userId === userId) {
+        throw new Error("이미 등록된 todo 입니다.");
+      }
     }
+
     await ChallengedTodo.create({
       userId: userId,
       challengedTodo: todoId,
     });
-    
+
     const challengedTodo = await ChallengedTodo.findAll({
       where: { challengedTodo: todoId },
     });
@@ -63,7 +69,17 @@ class myTodoController {
   };
 
   //TODO mytodo 도전 진행완료 or 진행취소  ==ok
-  challengedTodoComplete = async (date, userId) => {
+  challengedTodoComplete = async (date, userId, todoId) => {
+    const query = `SELECT *
+      FROM challengedTodos
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+    const checktodoId = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+    });
+
+    if (!checktodoId.length) {
+      throw new Error("오늘 도전한 todo가 없습니다.");
+    }
     const updateQuery = `UPDATE challengedTodos 
     SET isCompleted = IF (isCompleted = true ,false ,true) 
     WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
@@ -106,13 +122,6 @@ class myTodoController {
     });
     const myfollower = await Follow.findAll({
       where: { userIdFollowing: user.userId },
-    });
-
-    const query = `SELECT *
-      FROM todos
-      WHERE isTodo = true AND userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
-    const createdTodo = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
     });
 
     const query2 = `SELECT *
