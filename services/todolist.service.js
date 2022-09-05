@@ -1,4 +1,5 @@
 const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
+const Boom = require("@hapi/boom");
 
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
@@ -229,7 +230,7 @@ class TodoListService {
     });
 
     if (!todoInfo.isTodo) {
-      throw new Error("이미 삭제된 Todo입니다.");
+      throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
 
     return {
