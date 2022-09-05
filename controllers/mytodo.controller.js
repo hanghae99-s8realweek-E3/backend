@@ -22,9 +22,7 @@ class MyTodoController {
     try {
       const { user } = res.locals;
       const { date } = req.query;
-
       const data = await this.myTodoService.getMyTodo(user, date);
-
       res.status(200).json({ message: "success", data });
     } catch (err) {
       next(err);
@@ -50,8 +48,9 @@ class MyTodoController {
   completeChallengedTodo = async (req, res, next) => {
     try {
       const { date } = req.body;
+      const { todoId } = req.params;
       const { userId } = res.locals.user;
-      await this.myTodoService.challengedTodoComplete(date, userId);
+      await this.myTodoService.challengedTodoComplete(date, userId, todoId);
       res.status(201).json({
         message: "success",
       });
