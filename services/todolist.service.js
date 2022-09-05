@@ -4,18 +4,13 @@ class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (user, mbti, filter) => {
     let userInfo = "";
-    let myfolloing = [];
     if (!user) {
       userInfo = [];
       userInfo.ChallengedTodos = [];
-      myfolloing = [];
     } else {
       userInfo = await User.findOne({
         where: { userId: user.userId },
         include: [ChallengedTodo],
-      });
-      myfolloing = await Follow.findAll({
-        where: { userIdFollower: user.userId },
       });
     }
 
@@ -213,17 +208,17 @@ class TodoListService {
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   todoGet = async (user, todoId) => {
     let userInfo = "";
-    let myfolloing = [];
+    let myfollowing = [];
     if (!user) {
       userInfo = [];
       userInfo.ChallengedTodos = [];
-      myfolloing = [];
+      myfollowing = [];
     } else {
       userInfo = await User.findOne({
         where: { userId: user.userId },
         include: [ChallengedTodo],
       });
-      myfolloing = await Follow.findAll({
+      myfollowing = await Follow.findAll({
         where: { userIdFollower: user.userId },
       });
     }
@@ -241,7 +236,7 @@ class TodoListService {
       todoId,
       userId: todoInfo.userId,
       isFollowed:
-        myfolloing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
+        myfollowing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
         -1
           ? true
           : false,
