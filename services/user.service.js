@@ -24,7 +24,9 @@ class UserService {
     if (password !== confirmpassword) {
       throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
-    const bcr_password = bcrypt.hashSync(password, process.env.SALT); //비밀번호 암호화
+
+
+    const bcr_password = bcrypt.hashSync(password,parseInt(process.env.SALT)); //비밀번호 암호화
 
     await User.create({
       email,
@@ -56,6 +58,10 @@ class UserService {
 
   userLogin = async (email, password) => {
     const userData = await User.findOne({ where: { email: email } });
+    if(!userData){
+      throw new Error("이메일 또는 비번을 잘못 입력하셨습니다.")
+    }
+
     const userId = userData.userId;
     const nickname = userData.nickname;
     const mbti = userData.mbti;

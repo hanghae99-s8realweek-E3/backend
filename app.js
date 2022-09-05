@@ -11,6 +11,7 @@ const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 const app = express();
 
+
 const cors = require("cors");
 
 const kakaoPassport = require("./passport/index");
@@ -36,10 +37,12 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev"));
 }
 
+
 const http = Http.createServer(app);
 // const https = Https.createServer(options, app);
 
-const http_port = process.env.HTTP_PORT || 3000;
+
+const http_port = process.env.HTTP_PORT || 4000;
 // const https_port = process.env.HTTPS_PORT || 443;
 // const port = process.env.Port;
 
@@ -54,6 +57,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api", indexRouter);
+
 
 // errorHandler
 app.use(routerError);

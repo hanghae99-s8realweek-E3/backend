@@ -5,7 +5,7 @@ const userController = new UserController();
 
 const authMiddleware = require("../middlewares/auth_middlewares");
 
-router.post("/", userController.login); //로그인
+router.post("/login", userController.login); //로그인
 router.get("/", authMiddleware, userController.getUserInfo); //회원정보조회
 router.put("/", authMiddleware, userController.changeUserInfo); //회원정보변경
 router.delete("/", authMiddleware, userController.deleteUserInfo); //회원탈퇴(회원정보 삭제)
