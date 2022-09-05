@@ -23,15 +23,12 @@ class CommentService {
 
     const userInfo = await User.findOne({
       where: { userId: user.userId },
-      include: [ChallengedTodo],
+      include: [{ model: ChallengedTodo }],
     });
 
     const myfollowing = await Follow.findAll({
       where: { userIdFollower: user.userId },
     });
-
-    console.log("!!@@@ myfollowing : ");
-    myfollowing.findIndex((a) => console.log(a));
 
     return {
       todoId,
@@ -49,7 +46,7 @@ class CommentService {
       challengedCounts: todoInfo.challengedCounts,
       isChallenged:
         userInfo.ChallengedTodos.findIndex(
-          (c) => c.challengedTodo === todoId
+          (c) => c.challengedTodo === todoInfo.todoId
         ) !== -1
           ? true
           : false,

@@ -115,7 +115,7 @@ class myTodoController {
   getMyTodo = async (user, date) => {
     const userInfo = await User.findOne({
       where: { userId: user.userId },
-      include: [ChallengedTodo],
+      include: [{ model: ChallengedTodo }],
     });
     const myfolloing = await Follow.findAll({
       where: { userIdFollower: user.userId },
@@ -131,14 +131,14 @@ class myTodoController {
       type: QueryTypes.SELECT,
     });
 
-    const query2 = `SELECT *
+    const query2 = `SELECT challengedTodo,isCompleted
       FROM challengedTodos
       WHERE userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const challenge = await sequelize.query(query2, {
       type: QueryTypes.SELECT,
     });
     const challengedTodo = await Todo.findOne({
-      where: { todoId: challenge },
+      where: { todoId: challenge[0].challengedTodo },
       attributes: { exclude: ["isTodo"] },
     });
 
@@ -151,7 +151,16 @@ class myTodoController {
         followingCount: myfolloing.length,
         followerCount: myfollower.length,
       },
-      challengedTodo,
+      challengedTodo: {
+        todoId: challengedTodo.todoId,
+        userId: challengedTodo.userId,
+        todo: challengedTodo.todo,
+        mbti: challengedTodo.mbti,
+        nickname: challengedTodo.nickname,
+        commentCounts: challengedTodo.commentCounts,
+        challengedCounts: challengedTodo.challengedCounts,
+        isCompleted: challenge[0].isCompleted,
+      },
       createdTodo,
       date,
     };
@@ -161,7 +170,7 @@ class myTodoController {
   getUserTodo = async (user, userId) => {
     const userInfo = await User.findOne({
       where: { userId },
-      include: [ChallengedTodo],
+      include: [{ model: ChallengedTodo }],
     });
     const following = await Follow.findAll({
       where: { userIdFollower: userId },
@@ -183,8 +192,9 @@ class myTodoController {
       order: [["createdAt", "DESC"]],
       limit: 20,
     });
+    const challengesArr = challenges.map((c) => c.challengedTodo);
     const challengedTodos = await Todo.findAll({
-      where: { todoId: challenges },
+      where: { todoId: challengesArr },
       order: [["createdAt", "DESC"]],
       attributes: { exclude: ["isTodo"] },
       limit: 20,
