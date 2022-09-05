@@ -1,89 +1,92 @@
-### 회원가입
-POST http://localhost:3000/user/join
+### 회원가입===ok
+POST http://localhost:4000/api/accounts/signup
 Content-Type: application/json
 
 {
-  "userId":"qwe123",
-  "nickName":"nicknam",
+  "email":"tjdngur14@naver.com",
   "password":"asd123",
-  "email":"email@naver.com",
-  "address":"한국 서울"
+  "confirmpassword":"asd123",
+  "nickname":"asq1"
 }
 
-### 로그인
-POST http://localhost:3000/user/login
+### 로그인====ok
+POST http://localhost:4000/api/accounts/login
 Content-Type: application/json
 
 {
-  "userId": "qwe123",
-  "password": "asd123"
+  "email":"tjdngur14@naver.com",
+  "password":"asd123"
 }
 
-### 중복체크
-POST http://localhost:3000/user/auth
+### MBTI===ok
+POST http://localhost:3000/api/accounts/mbti
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 {
-  "key": "userId",
-  "value": "qwe123"
+  "mbti":"estj"
 }
 
-### 중복체크
-POST http://localhost:3000/user/auth
-Content-Type: application/json
-
-{
-  "key": "email",
-  "value": "email@naver.com"
-}
 
 # ========================================================
 
-### 상품 등록(admin)
-POST http://localhost:3000/product
+### 팔로우 추가 삭제===ok
+# userId는 팔로우 추가 삭제 대상
+PUT  http://localhost:3000/api/followLists/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
+
+
+
+### 팔로우 조회====ok
+# 토큰 담겨있는 userId 기준으로 
+GET  http://localhost:3000/api/followLists/1
 Content-Type: application/json
 
-{
-    "productImage": "wine.img",
-    "productName": "토마토",
-    "price": 20000,
-    "desc": "좋은그릇",
-    "category": "식기",
-    "delivery": "샛별 배송"
-}
-
-### 전체 상품 조회
-GET http://localhost:3000/product
-
-### 상품 삭제
-DELETE http://localhost:3000/product/17
-
-### 특정 상품 상세 조회
-GET http://localhost:3000/product/1
-
-### 카테고리 상품 상세 조회
-GET http://localhost:3000/product/search/와인
 
 # ========================================================
 
-### 장바구니 조회
-GET http://localhost:3000/cart
+### TODO 제안 하기 (TODO 작성)====ok
+POST http://localhost:4000/api/mytodos
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
-
-
-### 장바구니 등록, 갯수 수정
-POST http://localhost:3000/cart/5
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
 
 {
-    "quantity": 1
+  "todo":"투두작성"
 }
 
 
-### 장바구니 삭제
-DELETE http://localhost:3000/cart/5
+### TODO 삭제 ==ok
+DELETE http://localhost:4000/api/mytodos/4
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJxd2UxMjMiLCJuaWNrTmFtZSI6Im5pY2tuYW0iLCJlbWFpbCI6ImVtYWlsQG5hdmVyLmNvbSIsImFkZHJlc3MiOiLtlZzqta0g7ISc7Jq4IiwiaWF0IjoxNjYxMzI3NTcxLCJleHAiOjE2NjE1MDAzNzF9.qR2n1xgzbUUWDmE-LEEAJ9sEVyeNSr2i3JWJotmVHZA
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
+
+{
+  "date":"22-09-05"
+}
+
+### TODO mytodo에 담기 ===ok
+POST  http://localhost:4000/api/mytodos/6/challenged
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo 
+
+
+### TODO mytodo 담은거 제거 ==ok
+DELETE  http://localhost:4000/api/mytodos/5/challenged
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo
+
+{
+  "date":"22-09-03"
+}
+
+### TODO mytodo 도전 진행완료 or 진행취소  ==ok
+PUT  http://localhost:4000/api/mytodos/5/challenged
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsIm5pY2tuYW1lIjoiYXNxMSIsIm1idGkiOm51bGwsImlhdCI6MTY2MjIwMjk5MSwiZXhwIjoxNjYyMzc1NzkxfQ.X1iqyb85KmWSGti5Pw-ZHo5HWRwHBrXkImQ2DdDKoMo 
+
+{
+  "date":"22-09-05"
+}
+
+# ========================================================

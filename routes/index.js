@@ -1,14 +1,17 @@
 const express = require("express");
 const User = require("./user");
-const Product = require("./product");
-const Cart = require("./cart");
-const Email = require("./email");
-
+const Follow = require("./follow");
+const TodoList = require("./todolist");
+const Comment = require("./comment");
+const MyTodo = require("./mytodo");
 const router = express.Router();
 
-router.use("/user", User);
-router.use("/product", Product);
-router.use("/cart", Cart);
-router.use("/user/email", Email);
+router.use("/accounts", User);
+router.use("/followLists", Follow);
+// router.use("/todolists", TodoList);
+router.use("/mytodos", MyTodo);
+router.use("/comments", Comment);
+// router.use("/todoLists", Todo);
+
 
 module.exports = router;
