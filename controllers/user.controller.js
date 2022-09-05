@@ -6,11 +6,11 @@ class UserController {
   // 로컬 회원가입 [POST] /api/accounts/signup
   signup = async (req, res, next) => {
     try {
-      const { email, password, confirmpassword, nickname } = req.body;
+      const { email, password, confirmPassword, nickname } = req.body;
       const token = await this.userService.userSignup(
         email,
         password,
-        confirmpassword,
+        confirmPassword,
         nickname
       );
       res.status(201).json({
