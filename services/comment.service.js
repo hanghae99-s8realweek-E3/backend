@@ -14,11 +14,11 @@ class CommentService {
       where: { todoId },
       include: [{ model: Comment }],
     });
-    if (todo.isTodo === false) {
+    if (todoInfo.isTodo === false) {
       throw new Error("이미 삭제된 todo입니다.");
     }
 
-    const commentCounts = todo.Comments.length;
+    const commentCounts = todoInfo.Comments.length;
     await Todo.update({ commentCounts }, { where: { todoId } });
 
     const userInfo = await User.findOne({
@@ -26,15 +26,18 @@ class CommentService {
       include: [ChallengedTodo],
     });
 
-    const myfolloing = await Follow.findAll({
+    const myfollowing = await Follow.findAll({
       where: { userIdFollower: user.userId },
     });
+
+    console.log("!!@@@ myfollowing : ");
+    myfollowing.findIndex((a) => console.log(a));
 
     return {
       todoId,
       userId: todoInfo.userId,
       isFollowed:
-        myfolloing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
+        myfollowing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
         -1
           ? true
           : false,
@@ -45,7 +48,7 @@ class CommentService {
       commentCounts,
       challengedCounts: todoInfo.challengedCounts,
       isChallenged:
-        userInfo.challengedTodos.findIndex(
+        userInfo.ChallengedTodos.findIndex(
           (c) => c.challengedTodo === todoId
         ) !== -1
           ? true
