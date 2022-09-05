@@ -4,6 +4,7 @@ const Http = require("http");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const logger = require("./logger");
+const helmet = require("helmet");
 const hpp = require("hpp");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
@@ -30,6 +31,7 @@ sequelize
 // morgan(로그 관리), hpp(중복된 파라미터 처리 -> production 모드에서만 사용)
 if (process.env.NODE_ENV === "production") {
   app.use(morgan("combined"));
+  app.use(helmet());
   app.use(hpp());
 } else {
   app.use(morgan("dev"));
