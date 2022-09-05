@@ -3,10 +3,14 @@ const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (user, mbti, filter) => {
-    const userInfo = await User.findOne({
-      where: { userId: user.userId },
-      include: [ChallengedTodo],
-    });
+    let userInfo = "";
+    if (user) {
+      userInfo = await User.findOne({
+        where: { userId: user.userId },
+        include: [ChallengedTodo],
+      });
+    }
+
     // 전체조회 (최신 순)
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
@@ -188,14 +192,17 @@ class TodoListService {
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   todoGet = async (user, todoId) => {
-    const userInfo = await User.findOne({
-      where: { userId: user.userId },
-      include: [ChallengedTodo],
-    });
-
-    const myfolloing = await Follow.findAll({
-      where: { userIdFollower: user.userId },
-    });
+    let userInfo = "";
+    let myfolloing = "";
+    if (user) {
+      userInfo = await User.findOne({
+        where: { userId: user.userId },
+        include: [ChallengedTodo],
+      });
+      myfolloing = await Follow.findAll({
+        where: { userIdFollower: user.userId },
+      });
+    }
 
     const todoInfo = await Todo.findOne({
       where: { todoId },
