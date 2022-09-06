@@ -30,6 +30,19 @@ class TodoListController {
       next(err);
     }
   };
+
+  // mbti 알고리즘 [GET] /api/todolists/mbti/:mbti
+  getMbti = async (req, res, next) => {
+    try {
+      const { user } = res.locals;
+
+      const mbtiData = await this.todoListService.mbtiGet(user);
+
+      res.status(200).json({ message: "success", mbtiData });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 module.exports = TodoListController;

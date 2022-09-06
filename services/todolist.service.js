@@ -1,4 +1,11 @@
-const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
+const {
+  Comment,
+  Todo,
+  User,
+  ChallengedTodo,
+  Follow,
+  Mbti,
+} = require("../models");
 const Boom = require("@hapi/boom");
 
 class TodoListService {
@@ -271,6 +278,40 @@ class TodoListService {
         };
       }),
     };
+  };
+
+  // mbti 알고리즘 [GET] /api/todolists/mbti/:mbti
+  mbtiGet = async (user) => {
+    if (!user) {
+      return {
+        mbti: null,
+      };
+    }
+    return await Mbti.findOne({
+      where: { mbti: user.mbti },
+      attributes: { exclude: ["mbtiId"] },
+    });
+
+    // 비 회원 응답값 이걸로 변경 될 수 있음
+    // return {
+    //   mbti: null,
+    //   INFP: null,
+    //   ENFP: null,
+    //   INFJ: null,
+    //   ENFJ: null,
+    //   INTJ: null,
+    //   ENTJ: null,
+    //   INTP: null,
+    //   ENTP: null,
+    //   ISFP: null,
+    //   ESFP: null,
+    //   ISTP: null,
+    //   ESTP: null,
+    //   ISFJ: null,
+    //   ESFJ: null,
+    //   ISTJ: null,
+    //   ESTJ: null,
+    // };
   };
 }
 

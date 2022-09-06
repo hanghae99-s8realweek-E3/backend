@@ -102,7 +102,7 @@ class UserController {
         mbti,
       } = req.body;
 
-      await this.userService.userInfoChange(
+      const data = await this.userService.userInfoChange(
         userId,
         password,
         newPassword,
@@ -112,7 +112,7 @@ class UserController {
         mbti
       );
 
-      res.status(200).json({ message: "success" });
+      res.status(200).json({ message: "success", token: data });
     } catch (err) {
       next(err);
     }
