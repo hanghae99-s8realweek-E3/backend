@@ -27,8 +27,9 @@ class UserController {
     try {
       const { mbti } = req.body;
       const { userId } = res.locals.user;
-      await this.userService.userMbti(mbti, userId);
+      const token =await this.userService.userMbti(mbti, userId);
       res.status(201).json({
+        token,
         message: "success",
       });
     } catch (err) {
