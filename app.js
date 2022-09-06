@@ -3,21 +3,19 @@ const Http = require("http");
 // const Https = require("https");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
-const logger = require("./logger");
 const helmet = require("helmet");
 const hpp = require("hpp");
+const cors = require("cors");
+const kakaoPassport = require("./passport/index");
+const checkSchedule = require("./checkSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
-const app = express();
-
-const cors = require("cors");
-
-const kakaoPassport = require("./passport/index");
-kakaoPassport(app);
-//보안과 가독성을 위해 환경변수사용
 require("dotenv").config();
 
+const app = express();
+kakaoPassport(app);
+checkSchedule();
 // sequelize 연결
 sequelize
   .sync({ force: false })
