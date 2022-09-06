@@ -169,10 +169,26 @@ class myTodoController {
     const challenge = await sequelize.query(query2, {
       type: QueryTypes.SELECT,
     });
-    const challengedTodo = await Todo.findOne({
-      where: { todoId: challenge[0].challengedTodo },
-      attributes: { exclude: ["isTodo"] },
-    });
+
+    let challengedTodo = "";
+    if (challenge.length === 0) {
+      challengedTodo = [];
+    } else {
+      const getChall = await Todo.findOne({
+        where: { todoId: challenge[0].challengedTodo },
+        attributes: { exclude: ["isTodo"] },
+      });
+      challengedTodo = {
+        todoId: getChall.todoId,
+        userId: getChall.userId,
+        todo: getChall.todo,
+        mbti: getChall.mbti,
+        nickname: getChall.nickname,
+        commentCounts: getChall.commentCounts,
+        challengedCounts: getChall.challengedCounts,
+        isCompleted: challenge[0].isCompleted,
+      };
+    }
 
     return {
       userInfo: {
@@ -183,16 +199,7 @@ class myTodoController {
         followingCount: myfolloing.length,
         followerCount: myfollower.length,
       },
-      challengedTodo: {
-        todoId: challengedTodo.todoId,
-        userId: challengedTodo.userId,
-        todo: challengedTodo.todo,
-        mbti: challengedTodo.mbti,
-        nickname: challengedTodo.nickname,
-        commentCounts: challengedTodo.commentCounts,
-        challengedCounts: challengedTodo.challengedCounts,
-        isCompleted: challenge[0].isCompleted,
-      },
+      challengedTodo,
       createdTodo,
       date,
     };
