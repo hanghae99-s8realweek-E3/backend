@@ -59,7 +59,23 @@ class UserService {
   // mbti 등록 [POST] /api/accounts/mbti
   userMbti = async (mbti, userId) => {
     await User.update({ mbti: mbti }, { where: { userId: userId } });
-    return;
+
+    const userData = await User.findOne({ where: { userId: userId } });
+    const updaetedUserId = userData.userId;
+    const updatedMbti = userData.mbti;
+    const nickname = userData.nickname;
+
+    const payload = {
+      userId: updaetedUserId,
+      nickname: nickname,
+      mbti: updatedMbti,
+    };
+
+    const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
+      expiresIn: "2d",
+    });
+
+    return token;
   };
 
   // 로그인 [POST] /api/accounts/login
