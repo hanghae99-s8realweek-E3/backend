@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const Boom = require("@hapi/boom");
+const schedule = require("node-schedule");
 
 //이메일 형식
 const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
@@ -133,14 +134,21 @@ class UserService {
       to: email, // list of receivers
       subject: "MIMIC 이메일 인증", // Subject line
       text: "MIMIC", // plain text body
-      html: `<b>인증번호는 ${authNumber} 입니다</b>`, // html body
+      html: `<h2><b>당신의 하루, 나의 하루. MIMIC</b></h2><b>인증번호는 ${authNumber} 입니다</b><p>본 인증 번호는 2시간 동안만 유효합니다.</p>`, // html body
     };
-
 
     const transporter = nodemailer.createTransport(configOptions);
     transporter.sendMail(emailForm);
 
     await EmailAuth.create({ email, authNumber });
+
+    // create 후 2시간 지나면 DB에서 삭제
+    const end = new Date();
+    end.setHours(end.getHours() + 2); // 2시간 후로 스케쥴링
+    schedule.scheduleJob(end, async () => {
+      // 1시간 후에 삭제
+      await EmailAuth.destroy({ where: { email } });
+    });
   };
 
   // 이메일 인증확인 [POST] /api/accounts/emailAuth/check
@@ -196,13 +204,11 @@ class UserService {
       if (!compareResult) {
         throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
-
       if (newPassword !== confirmPassword) {
         throw Boom.unauthorized(
           "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
         );
       }
-
       const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
       await User.update({ password: hash }, { where: { userId } });
     }
@@ -218,6 +224,19 @@ class UserService {
     if (mbti) {
       await User.update({ mbti }, { where: { userId } });
     }
+
+    // token 새로 보내주기
+    const payload = {
+      userId: userId,
+      nickname: nickname,
+      mbti: mbti,
+    };
+
+    const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
+      expiresIn: "2d",
+    });
+
+    return token;
   };
 
   // 회원탈퇴 [DELETE] /api/accounts
@@ -229,7 +248,7 @@ class UserService {
       throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
-    return await User.update({ isUser: false }, { where: { userId } });
+    await User.update({ isUser: false }, { where: { userId } });
   };
 }
 
