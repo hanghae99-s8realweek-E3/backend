@@ -64,7 +64,8 @@ class MyTodoController {
     try {
       const { todo } = req.body;
       const { userId } = res.locals.user;
-      await this.myTodoService.todoCreate(todo, userId);
+      const { mbti } = res.locals.user;
+      await this.myTodoService.todoCreate(todo, userId, mbti);
       res.status(201).json({
         message: "success",
       });
@@ -92,7 +93,6 @@ class MyTodoController {
     try {
       const { user } = res.locals;
       const { userId } = req.params;
-
       const data = await this.myTodoService.getUserTodo(user, userId);
 
       res.status(200).json({ message: "success", data });

@@ -1,10 +1,11 @@
 const { ChallengedTodo, Todo, User, Follow } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { sequelize } = require("../models/index");
+const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 
 const KoreanTime = require("../advice/date");
-const date = KoreanTime; //YYYYMMDD
+const todayDate = KoreanTime(); //YYYYMMDD
 
 class myTodoController {
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
@@ -14,11 +15,11 @@ class myTodoController {
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
     if (!todoData.mbti) {
-      throw new Error("MBTI 정보 등록바랍니다.");
+      throw Boom.badRequest("MBTI 정보 등록바랍니다.");
     }
 
     if (!todoData || !todoData.isTodo) {
-      throw new Error("존재 하지않거나 삭제된 todo 입니다.");
+      throw Boom.badRequest("존재 하지않거나 삭제된 todo 입니다.");
     }
 
     const challengeTodoData = await ChallengedTodo.findOne({
@@ -27,7 +28,7 @@ class myTodoController {
 
     if (challengeTodoData !== null) {
       if (challengeTodoData.userId === userId) {
-        throw new Error("이미 등록된 todo 입니다.");
+        throw Boom.badRequest("이미 등록된 todo 입니다.");
       }
     }
 
@@ -49,6 +50,9 @@ class myTodoController {
 
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   challengedTodoDelete = async (date, userId, todoId) => {
+    if (date !== todayDate) {
+      throw Boom.badRequest("오늘 날짜가 아닙니다.");
+    }
     //challengedTodos 테이블에서 <userId + 날짜 date>에 맞는 데이터 삭제
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const deleteQuery = `DELETE FROM challengedTodos
@@ -71,6 +75,9 @@ class myTodoController {
 
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
   challengedTodoComplete = async (date, userId, todoId) => {
+    if (date !== todayDate) {
+      throw Boom.badRequest("오늘 날짜가 아닙니다.");
+    }
     const query = `SELECT *
       FROM challengedTodos
       WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
@@ -79,7 +86,7 @@ class myTodoController {
     });
 
     if (!checktodoId.length) {
-      throw new Error("오늘 도전한 todo가 없습니다.");
+      throw Boom.badRequest("오늘 도전한 todo가 없습니다.");
     }
     const updateQuery = `UPDATE challengedTodos 
     SET isCompleted = IF (isCompleted = true ,false ,true) 
@@ -95,7 +102,20 @@ class myTodoController {
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
     const UserData = await User.findOne({ where: { userId: userId } });
     if (!UserData) {
-      throw new Error("사용자 정보가 없습니다.");
+      throw Boom.badRequest("사용자 정보가 없습니다.");
+    }
+    if (!UserData.mbti) {
+      throw Boom.badRequest("mbti 정보를 입렵후 사용바랍니다.");
+    }
+    const query = `SELECT *
+      FROM todos
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
+    const checkTodoData = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
+    });
+
+    if (checkTodoData.length) {
+      throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
     }
     await Todo.create({
       todo: todo,
@@ -109,6 +129,17 @@ class myTodoController {
   todoDelete = async (todoId) => {
     //====ok
     //todo테이블에 istodo false로 변경
+
+    const todoData = await Todo.findOne({ where: { todoId: todoId } });
+
+    if (todoData !== null) {
+      if (todoData.isTodo === false) {
+        throw Boom.badRequest("이미 삭제된 todo입니다.");
+      }
+    } else {
+      throw Boom.badRequest("삭제할 todo가 없습니다.");
+    }
+
     await Todo.update({ isTodo: false }, { where: { todoId: todoId } });
   };
 

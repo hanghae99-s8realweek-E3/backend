@@ -2,6 +2,7 @@ const passport = require("passport");
 const KakaoStrategy = require("passport-kakao").Strategy;
 const { User } = require("../models");
 require("dotenv").config();
+const Boom = require("@hapi/boom");
 
 module.exports = (app) => {
   app.use(passport.initialize()); // passport를 초기화 하기 위해서 passport.initialize 미들웨어 사용
@@ -29,7 +30,7 @@ module.exports = (app) => {
           if (exUser) {
             done(null, exUser); // 로그인 인증 완료
           } else if (emailCheck) {
-            throw new Error("이미 있는 이메일정보 입니다.");
+            throw Boom.badRequest ("이미 있는 이메일정보 입니다.");
           } else {
             // 가입되지 않는 유저면 회원가입 시키고 로그인을 시킨다
             const newUser = await User.create({

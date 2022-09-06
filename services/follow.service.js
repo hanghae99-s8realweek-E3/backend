@@ -6,7 +6,7 @@ class FollowService {
   followListGet = async (userId) => {
     const checkUserId = await User.findOne({ where: { userId: userId } });
     if (!checkUserId) {
-      throw new Error("존재하지 않는 사용자 입니다.");
+      throw Boom.badRequest ("존재하지 않는 사용자 입니다.");
     }
     //======================================
     //follower:나를 팔로우 하는 사람
@@ -77,12 +77,12 @@ class FollowService {
     //팔로잉 할 userId 있나 조회
     const checkUserId = await User.findOne({ where: { userId: elseUserId } });
     if (!checkUserId) {
-      throw new Error("존재하지 않는 사용자 입니다.");
+      throw Boom.badRequest("존재하지 않는 사용자 입니다.");
     }
 
     //나 자신 팔로우 금지
     if (userId === elseUserId) {
-      throw new Error("자기 자신은 팔로우를 하지 못합니다.");
+      throw Boom.badRequest("자기 자신은 팔로우를 하지 못합니다.");
     }
 
     //팔로우 관계 동일한것 제작 금지

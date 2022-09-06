@@ -18,13 +18,13 @@ class UserService {
     const duplicateCheck = await User.findOne({ where: { email: email } });
 
     if (duplicateCheck) {
-      throw new Error("중복된 이메일 입니다.");
+      throw Boom.badRequest("중복된 이메일 입니다.");
     }
     if (!emailCheck && !passwordCheck) {
-      throw new Error("이메일 비밀번호 형식이 알맞지 않습니다");
+      throw Boom.badRequest("이메일 비밀번호 형식이 알맞지 않습니다");
     }
     if (password !== confirmPassword) {
-      throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
+      throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
 
     const bcr_password = bcrypt.hashSync(
@@ -65,7 +65,7 @@ class UserService {
   userLogin = async (email, password) => {
     const userData = await User.findOne({ where: { email: email } });
     if (!userData) {
-      throw new Error("이메일 또는 비번을 잘못 입력하셨습니다.");
+      throw Boom.badRequest("이메일 또는 비번을 잘못 입력하셨습니다.");
     }
 
     const userId = userData.userId;
@@ -73,17 +73,17 @@ class UserService {
     const mbti = userData.mbti;
 
     if (!email || !password) {
-      throw new Error("빈칸을 채워주세요");
+      throw Boom.badRequest("빈칸을 채워주세요");
     }
 
     if (!userData) {
-      throw new Error("회원정보가 없습니다.");
+      throw Boom.badRequest("회원정보가 없습니다.");
     }
 
     const passwordSame = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
     if (!passwordSame) {
-      throw new Error("아이디나 비번이 올바르지 않습니다.");
+      throw Boom.badRequest("아이디나 비번이 올바르지 않습니다.");
     }
 
     const payload = {
@@ -135,6 +135,7 @@ class UserService {
       text: "MIMIC", // plain text body
       html: `<b>인증번호는 ${authNumber} 입니다</b>`, // html body
     };
+
 
     const transporter = nodemailer.createTransport(configOptions);
     transporter.sendMail(emailForm);
