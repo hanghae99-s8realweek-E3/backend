@@ -229,6 +229,10 @@ class TodoListService {
       include: [{ model: Comment }],
     });
 
+    if (!todoInfo) {
+      throw Boom.badRequest("존재하지 않는 Todo입니다.");
+    }
+
     if (!todoInfo.isTodo) {
       throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
