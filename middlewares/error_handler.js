@@ -1,12 +1,10 @@
 const logger = require("../logger");
-const Boom = require("@hapi/boom");
 
 module.exports = {
   errorHandler: (err, req, res, next) => {
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
     logger.error(`${err.stack}`);
-    console.error(err);
     res.status(err.output.statusCode || 500).json({
       errorMessage: err.message,
     });
