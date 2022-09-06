@@ -1,1 +1,11 @@
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEwLCJuaWNrbmFtZSI6InRlc3QiLCJtYnRpIjpudWxsLCJpYXQiOjE2NjIzNTgxMTYsImV4cCI6MTY2MjUzMDkxNn0.ByNtv-ih-qybcv9RH8KGT2hfdGnT-e4mAubZ1aHKPxU
+
+mytodo
+  // 오늘의 제안 todo 작성 [POST] /api/mytodos
+
+
+ 
+ 
+ 
+ 
+mbti
+
