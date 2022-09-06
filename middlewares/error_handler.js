@@ -5,8 +5,7 @@ module.exports = {
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
     logger.error(`${err.stack}`);
-    console.error(err);
-    res.status(err.status || 500).json({
+    res.status(err.output.statusCode || 500).json({
       errorMessage: err.message,
     });
   },

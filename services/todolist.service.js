@@ -1,4 +1,5 @@
 const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
+const Boom = require("@hapi/boom");
 
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
@@ -228,8 +229,12 @@ class TodoListService {
       include: [{ model: Comment }],
     });
 
+    if (!todoInfo) {
+      throw Boom.badRequest("존재하지 않는 Todo입니다.");
+    }
+
     if (!todoInfo.isTodo) {
-      throw new Error("이미 삭제된 Todo입니다.");
+      throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
 
     return {

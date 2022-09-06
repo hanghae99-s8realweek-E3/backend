@@ -1,21 +1,60 @@
-const { createLogger, format, transports } = require("winston");
+const {
+  createLogger,
+  format,
+  transports,
+  colorize,
+  printf,
+  combine,
+} = require("winston");
+const winstonDaily = require("winston-daily-rotate-file");
+require("dotenv").config();
+
+const logDir = process.env.LOGDIR;
 
 const logger = createLogger({
   level: "info", // log, info, warn, error 순서 // info면은 info부터 기록됨 (info, warn, error)
-  format: format.json(), // 로그 시간을 표시하려면 json()말고 timestamp() 사용
+  format: format.combine(
+    format.colorize(),
+    format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    format.printf(
+      (info) =>
+        `${info.timestamp} [${info.level.toUpperCase()}] - ${info.message}`
+    )
+  ),
+
   transports: [
     // 로그 저장 방식
-    new transports.File({ filename: "combined.log" }),
-    new transports.File({ filename: "error.log", level: "error" }),
+    new winstonDaily({
+      level: "warn",
+      datePattern: "YYYY-MM-DD",
+      dirname: logDir + "/warn",
+      filename: `%DATE%.warn.log`, // file 이름 날짜로 저장
+      maxFiles: 20, // 20일치 로그 파일 저장
+      zippedArchive: true, // 압축 여부
+    }),
+    new winstonDaily({
+      level: "error",
+      datePattern: "YYYY-MM-DD",
+      dirname: logDir + "/error",
+      filename: `%DATE%.error.log`,
+      maxFiles: 30,
+      zippedArchive: true,
+    }),
   ],
 });
 
+// winston-daily-rotate-file 사용 안 할 시 new transports로 설정
 // new transports.File은 파일에 저장한다는 뜻
 // new transports.Console은 콘솔에 표시한다는 뜻
 
 if (process.env.NODE_ENV !== "production") {
-  logger.add(new transports.Console({ format: format.simple() })); // simple이면 말그대로 간단하게 메시지 나옴 - json()보다 간단
+  logger.add(
+    new transports.Console({
+      format: format.combine(format.colorize(), format.simple()),
+    })
+  );
 }
+// simple이면 말그대로 간단하게 메시지 나옴 - json()보다 간단
 // production이 아닐 때(개발용일땐) 콘솔에만 표시하기.
 // 참고) 콘솔에만 표시할 수도 있고, 파일에 저장할 수도 있고, DB에 넣을 수도 있음
 

@@ -2,6 +2,7 @@ const { User, Follow, EmailAuth } = require("../models");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const Boom = require("@hapi/boom");
 
 //이메일 형식
 const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
@@ -17,13 +18,13 @@ class UserService {
     const duplicateCheck = await User.findOne({ where: { email: email } });
 
     if (duplicateCheck) {
-      throw new Error("중복된 이메일 입니다.");
+      throw Boom.badRequest("중복된 이메일 입니다.");
     }
     if (!emailCheck && !passwordCheck) {
-      throw new Error("이메일 비밀번호 형식이 알맞지 않습니다");
+      throw Boom.badRequest("이메일 비밀번호 형식이 알맞지 않습니다");
     }
     if (password !== confirmPassword) {
-      throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
+      throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
 
     const bcr_password = bcrypt.hashSync(
@@ -64,7 +65,7 @@ class UserService {
   userLogin = async (email, password) => {
     const userData = await User.findOne({ where: { email: email } });
     if (!userData) {
-      throw new Error("이메일 또는 비번을 잘못 입력하셨습니다.");
+      throw Boom.badRequest("이메일 또는 비번을 잘못 입력하셨습니다.");
     }
 
     const userId = userData.userId;
@@ -72,17 +73,17 @@ class UserService {
     const mbti = userData.mbti;
 
     if (!email || !password) {
-      throw new Error("빈칸을 채워주세요");
+      throw Boom.badRequest("빈칸을 채워주세요");
     }
 
     if (!userData) {
-      throw new Error("회원정보가 없습니다.");
+      throw Boom.badRequest("회원정보가 없습니다.");
     }
 
     const passwordSame = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
     if (!passwordSame) {
-      throw new Error("아이디나 비번이 올바르지 않습니다.");
+      throw Boom.badRequest("아이디나 비번이 올바르지 않습니다.");
     }
 
     const payload = {
@@ -103,7 +104,7 @@ class UserService {
     // 중복인 경우 (isUser:false인 경우도 있으니 에러메시지는 "이미 존재하거나 탈퇴한 이메일입니다")
     const dupCheck = await User.findOne({ where: { email } });
     if (dupCheck) {
-      throw new Error("이미 존재하거나 탈퇴한 이메일입니다.");
+      throw Boom.unauthorized("이미 존재하거나 탈퇴한 이메일입니다.");
     }
 
     // 6자리의 난수
@@ -135,6 +136,7 @@ class UserService {
       html: `<b>인증번호는 ${authNumber} 입니다</b>`, // html body
     };
 
+
     const transporter = nodemailer.createTransport(configOptions);
     transporter.sendMail(emailForm);
 
@@ -145,11 +147,13 @@ class UserService {
   checkEmailAuth = async (email, emailAuthNumber) => {
     const authNumber = await EmailAuth.findOne({ where: { email } });
     if (!authNumber) {
-      throw new Error("email 정보가 존재하지 않습니다. 다시 인증 바랍니다.");
+      throw Boom.unauthorized(
+        "email 정보가 존재하지 않습니다. 다시 인증 바랍니다."
+      );
     }
 
     if (authNumber.authNumber !== emailAuthNumber) {
-      throw new Error("인증번호가 일치하지 않습니다.");
+      throw Boom.unauthorized("인증번호가 일치하지 않습니다.");
     }
   };
 
@@ -190,33 +194,20 @@ class UserService {
     if (password) {
       const compareResult = await bcrypt.compare(password, userData.password);
       if (!compareResult) {
-        throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+        throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
 
       if (newPassword !== confirmPassword) {
-        // const error = new Error(
-        //   "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
-        // );
-        // error.code = 400;
-        // throw error;
-        // 이래서 에러 핸들러 라이브러리를 쓰는군... 언제 하나하나 다 정의하고 코드 넣어주고 던지나... Boom 라이브러리 쓸 이유가 생겼다
-        throw new Error("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
+        throw Boom.unauthorized(
+          "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
+        );
       }
-
-      // const compareResult = await bcrypt.compare(password, userData.password);
-      // if (compareResult) {
-      //   throw new Error("기존 비밀번호와 동일한 비밀번호입니다.");
-      // }
 
       const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
       await User.update({ password: hash }, { where: { userId } });
     }
 
     if (nickname) {
-      // if (nickname === userData.nickname) {
-      //   throw new Error("기존 닉네임과 동일한 닉네임입니다.");
-      // }
-
       await User.update({ nickname }, { where: { userId } });
     }
 
@@ -225,9 +216,6 @@ class UserService {
     }
 
     if (mbti) {
-      // if (mbti === userData.mbti) {
-      //   throw new Error("기존 MBTI와 동일한 MBTI입니다.");
-      // }
       await User.update({ mbti }, { where: { userId } });
     }
   };
@@ -238,7 +226,7 @@ class UserService {
 
     const compareResult = await bcrypt.compare(password, userData.password);
     if (!compareResult) {
-      throw new Error("아이디 또는 비밀번호가 올바르지 않습니다.");
+      throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
     return await User.update({ isUser: false }, { where: { userId } });
