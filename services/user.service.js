@@ -164,9 +164,9 @@ class UserService {
 
     await EmailAuth.create({ email, authNumber });
 
-    // create 후 2시간 지나면 DB에서 삭제
+    // create 후 1시간 지나면 DB에서 삭제
     const end = new Date();
-    end.setHours(end.getHours() + 2); // 2시간 후로 스케쥴링
+    end.setHours(end.getHours() + 1); // 1시간 후로 스케쥴링
     schedule.scheduleJob(end, async () => {
       // 1시간 후에 삭제
       await EmailAuth.destroy({ where: { email } });
