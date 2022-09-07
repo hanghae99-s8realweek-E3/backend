@@ -246,11 +246,13 @@ class UserService {
       await User.update({ mbti }, { where: { userId } });
     }
 
+    const changedData = await User.findByPk(userId);
+
     // token 새로 보내주기
     const payload = {
-      userId: userData.userId,
-      nickname: userData.nickname,
-      mbti: userData.mbti,
+      userId: changedData.userId,
+      nickname: changedData.nickname,
+      mbti: changedData.mbti,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
