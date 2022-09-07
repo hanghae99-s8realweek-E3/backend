@@ -1,7 +1,9 @@
 const MyTodoService = require("../services/mytodo.service");
+const Joi = require("./joi");
 
 class MyTodoController {
   myTodoService = new MyTodoService();
+  joi = new Joi();
 
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   createChallengedTodo = async (req, res, next) => {

@@ -1,7 +1,9 @@
 const UserService = require("../services/user.service");
+const Joi = require("./joi");
 
 class UserController {
   userService = new UserService();
+  joi = new Joi();
 
   // 로컬 회원가입 [POST] /api/accounts/signup
   signup = async (req, res, next) => {
@@ -27,7 +29,7 @@ class UserController {
     try {
       const { mbti } = req.body;
       const { userId } = res.locals.user;
-      const token =await this.userService.userMbti(mbti, userId);
+      const token = await this.userService.userMbti(mbti, userId);
       res.status(201).json({
         token,
         message: "success",
@@ -54,7 +56,7 @@ class UserController {
   // 이메일 중복 검사 + 인증메일 발송 [POST] /api/accounts/emailAuth
   emailAuth = async (req, res, next) => {
     try {
-      const { email } = req.body;
+      const { email } = await this.joi.emailAuthSchema.validateAsync(req.body);
 
       await this.userService.authEmail(email);
 
@@ -67,7 +69,8 @@ class UserController {
   // 이메일 인증확인 [POST] /api/accounts/emailAuth/check
   emailAuthCheck = async (req, res, next) => {
     try {
-      const { email, emailAuthNumber } = req.body;
+      const { email, emailAuthNumber } =
+        await this.joi.emailAuthCheckSchema.validateAsync(req.body);
 
       await this.userService.checkEmailAuth(email, emailAuthNumber);
 
@@ -123,7 +126,9 @@ class UserController {
   deleteUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
-      const { password } = req.body;
+      const { password } = await this.joi.deleteUserInfoSchema.validateAsync(
+        req.body
+      );
 
       await this.userService.userInfoDelete(userId, password);
 
