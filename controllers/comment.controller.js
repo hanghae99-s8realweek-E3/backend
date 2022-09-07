@@ -1,14 +1,18 @@
 const CommentService = require("../services/comment.service");
+const Joi = require("./joi");
 
 class CommentController {
   commentService = new CommentService();
+  joi = new Joi();
 
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (req, res, next) => {
     try {
       const { user } = res.locals;
       const { todoId } = req.params;
-      const { comment } = req.body;
+      const { comment } = await this.joi.createCommentSchema.validateAsync(
+        req.body
+      );
 
       const createComment = await this.commentService.createComment(
         user,

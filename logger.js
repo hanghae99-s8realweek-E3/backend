@@ -47,6 +47,22 @@ const logger = createLogger({
 // new transports.File은 파일에 저장한다는 뜻
 // new transports.Console은 콘솔에 표시한다는 뜻
 
+const stream = {
+  write: (message) => {
+    const state = Number(message.split(" ")[2].replace(/\x1b\[[0-9;]*m/g, ""));
+    if (state < 400) {
+      //status code가 400보다 아래면
+      logger.info(message); //level info
+    } else if (400 <= state && state < 500) {
+      //status code가 400이상 500 미만이면
+      logger.warn(message); //level warn
+    } else if (state >= 500) {
+      //status code가 500이상이면
+      logger.error(message); //level error
+    }
+  },
+};
+
 if (process.env.NODE_ENV !== "production") {
   logger.add(
     new transports.Console({
@@ -58,8 +74,9 @@ if (process.env.NODE_ENV !== "production") {
 // production이 아닐 때(개발용일땐) 콘솔에만 표시하기.
 // 참고) 콘솔에만 표시할 수도 있고, 파일에 저장할 수도 있고, DB에 넣을 수도 있음
 
-module.exports = logger;
+module.exports = { logger, stream };
 // 모듈로 export 했으므로 app.js의 라우터 에러 핸들러, 에러 핸들러의 console.log/console.error의 console을 logger로 바꿔서 사용 가능.
+// stream -> morgan에 결합
 
 // winston-daily-rotate-file 패키지로 날짜별 관리도 가능 (combined.log를 알아서 날짜별로 저장해줌)
 // 참고) winston 말고 aws CloudWatch로 로그 기록 관리 가능
