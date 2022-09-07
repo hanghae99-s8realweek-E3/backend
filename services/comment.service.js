@@ -4,20 +4,24 @@ const Boom = require("@hapi/boom");
 class CommentService {
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (user, todoId, comment) => {
-    const todoInfo = await Todo.findOne({
-      where: { todoId },
-      include: [{ model: Comment }],
-    });
-    if (todoInfo.isTodo === false) {
+    const getTodo = await Todo.findOne({ where: { todoId } });
+    if (!getTodo) {
+      throw Boom.badRequest("존재하지 않는 todo입니다.");
+    }
+    if (getTodo.isTodo === false) {
       throw Boom.badRequest("이미 삭제된 todo입니다.");
     }
 
-    // 작성하고 commentCounts 올리는 거 트렌젝션 걸어서 동시에 성공하게 하기
+    // 생성하고 commentCounts update 트렌젝션 걸기
     await Comment.create({
       userId: user.userId,
       nickname: user.nickname,
       todoId,
       comment,
+    });
+    const todoInfo = await Todo.findOne({
+      where: { todoId },
+      include: [{ model: Comment }],
     });
     const commentCounts = todoInfo.Comments.length;
     await Todo.update({ commentCounts }, { where: { todoId } });
@@ -26,7 +30,6 @@ class CommentService {
       where: { userId: user.userId },
       include: [{ model: ChallengedTodo }],
     });
-
     const myfollowing = await Follow.findAll({
       where: { userIdFollower: user.userId },
     });
@@ -77,7 +80,16 @@ class CommentService {
       throw Boom.unauthorized("본인 댓글만 삭제 가능합니다.");
     }
 
-    return await Comment.destroy({ where: { commentId } });
+    // 삭제하고 commentCounts update하는 거 트렌젝션 걸어서 동시에 성공하게 하기
+    await Comment.destroy({ where: { commentId } });
+
+    const todoInfo = await Todo.findOne({
+      where: { todoId: comment.todoId },
+      include: [{ model: Comment }],
+    });
+
+    const commentCounts = todoInfo.Comments.length;
+    await Todo.update({ commentCounts }, { where: { todoId: comment.todoId } });
   };
 }
 
