@@ -1,5 +1,5 @@
 #!/bin/sh
-ssh ubuntu@13.125.248.54 <<EOF	
+sudo ssh ubuntu@13.125.248.54 <<EOF	
     cd ~/github-folder		
     sudo -s	
     git pull origin main
