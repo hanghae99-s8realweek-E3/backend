@@ -145,6 +145,9 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (user, date) => {
+    if (!date) {
+      throw Boom.badRequest("날짜를 입력해 주세요.");
+    }
     const userInfo = await User.findOne({
       where: { userId: user.userId },
       include: [{ model: ChallengedTodo }],
@@ -211,6 +214,10 @@ class myTodoController {
       where: { userId },
       include: [{ model: ChallengedTodo }],
     });
+    if (!userInfo) {
+      throw Boom.badRequest("존재하지 않거나 탈퇴한 회원입니다.");
+    }
+
     const following = await Follow.findAll({
       where: { userIdFollower: userId },
     });

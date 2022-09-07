@@ -19,8 +19,10 @@ module.exports = (app) => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           //회원 DB(사용자)에 이미 있는 이메일 경우
+          console.log(accessToken);
+          console.log(refreshToken);
           const emailCheck = await User.findOne({
-            where: { email: profile._json.kakao_account.email, isUser: true },
+            where: { email: profile._json.kakao_account.email },
           });
           const exUser = await User.findOne({
             // 카카오 플랫폼에서 로그인 했고 & snsId필드에 카카오 아이디가 일치할경우

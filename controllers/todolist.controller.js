@@ -1,7 +1,9 @@
 const TodoListService = require("../services/todolist.service");
+const Joi = require("./joi");
 
 class TodoListController {
   todoListService = new TodoListService();
+  joi = new Joi();
 
   // todo 피드 조회 [GET] /api/todolists
   getTodoLists = async (req, res, next) => {

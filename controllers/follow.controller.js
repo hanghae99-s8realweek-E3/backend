@@ -1,9 +1,9 @@
 const FollowService = require("../services/follow.service");
-const UserService = require("../services/user.service");
+
 
 class FollowController {
   followService = new FollowService();
-  userService = new UserService();
+
 
   // 팔로우 목록 조회 [GET] /api/follows/:userId
   getfollowList = async (req, res, next) => {
