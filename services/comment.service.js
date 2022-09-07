@@ -4,13 +4,6 @@ const Boom = require("@hapi/boom");
 class CommentService {
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (user, todoId, comment) => {
-    await Comment.create({
-      userId: user.userId,
-      nickname: user.nickname,
-      todoId,
-      comment,
-    });
-
     const todoInfo = await Todo.findOne({
       where: { todoId },
       include: [{ model: Comment }],
@@ -19,6 +12,13 @@ class CommentService {
       throw Boom.badRequest("이미 삭제된 todo입니다.");
     }
 
+    // 작성하고 commentCounts 올리는 거 트렌젝션 걸어서 동시에 성공하게 하기
+    await Comment.create({
+      userId: user.userId,
+      nickname: user.nickname,
+      todoId,
+      comment,
+    });
     const commentCounts = todoInfo.Comments.length;
     await Todo.update({ commentCounts }, { where: { todoId } });
 
