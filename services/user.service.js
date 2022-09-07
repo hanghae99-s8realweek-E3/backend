@@ -1,4 +1,5 @@
 const { User, Follow, EmailAuth } = require("../models");
+const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
@@ -118,10 +119,9 @@ class UserService {
 
   // 이메일 중복 검사 + 인증메일 발송 [POST] /api/accounts/emailAuth
   authEmail = async (email) => {
-    // 중복인 경우 (isUser:false인 경우도 있으니 에러메시지는 "이미 존재하거나 탈퇴한 이메일입니다")
     const dupCheck = await User.findOne({ where: { email } });
     if (dupCheck) {
-      throw Boom.unauthorized("이미 존재하거나 탈퇴한 이메일입니다.");
+      throw Boom.unauthorized("이미 가입된 이메일입니다.");
     }
 
     // 6자리의 난수
@@ -249,9 +249,9 @@ class UserService {
 
     // token 새로 보내주기
     const payload = {
-      userId: userId,
-      nickname: nickname,
-      mbti: mbti,
+      userId: userData.userId,
+      nickname: userData.nickname,
+      mbti: userData.mbti,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -270,7 +270,15 @@ class UserService {
       throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
-    await User.update({ isUser: false }, { where: { userId } });
+    await User.destroy({ where: { userId } });
+    // follow 테이블에서 해당 userId 삭제
+    // 이건 관계설정 해서 자동으로 삭제되게 해야할듯
+    // 일단 트렌젝션 걸어서 동시 성공하게 하기
+    await Follow.destroy({
+      where: {
+        [Op.or]: [{ userIdFollowing: userId }, { userIdFollower: userId }],
+      },
+    });
   };
 }
 

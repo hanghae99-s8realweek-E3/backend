@@ -215,10 +215,7 @@ class myTodoController {
       include: [{ model: ChallengedTodo }],
     });
     if (!userInfo) {
-      throw Boom.badRequest("존재하지 않는 회원입니다.");
-    }
-    if (!userInfo.isUser) {
-      throw Boom.badRequest("탈퇴한 회원입니다.");
+      throw Boom.badRequest("존재하지 않거나 탈퇴한 회원입니다.");
     }
 
     const following = await Follow.findAll({
