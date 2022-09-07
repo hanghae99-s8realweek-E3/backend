@@ -2,11 +2,6 @@
 ssh ubuntu@3.36.126.158 <<EOF	
     cd ~/github-folder		
     git pull origin main
-    curl -o-   https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh    | bash
-    . ~/.nvm/nvm.sh 
-    nvm install 16.17.0	
-    npm install
-    npm install -g pm2
     sudo pm2 restart app.js
     exit
 EOF
