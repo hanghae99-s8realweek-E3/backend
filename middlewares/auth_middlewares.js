@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
 
     // 전달받은 인증값이 Bearer로 시작하지 않으면 인증 실패
     if (authType !== "Bearer") {
-      throw Boom.badRequest("로그인 후 사용해주세요, Bearer 토큰이 아님");
+      throw Boom.badRequest("로그인 후 사용해주세요. Bearer 토큰이 아님.");
     }
 
     // 뒤쪽 'authToken'을 우리 MYSQL_KEY를 가지고 인증해보고 에러 없으면, user 정보를 토근으로 다음 next으로 넘겨줌
@@ -24,7 +24,7 @@ module.exports = (req, res, next) => {
           // 인증 결과 에러가 나타나면 클라이언트와 서버에 모두 에러를 던지고 미들웨어 종료
           if (error) {
             throw Boom.badRequest(
-              "이용에 문제가 있습니다. 관리자에게 문의해주세요, 토큰 인증 실패"
+              "토큰 인증 실패 - 이용에 문제가 있습니다. 관리자에게 문의해주세요."
             );
           }
 
