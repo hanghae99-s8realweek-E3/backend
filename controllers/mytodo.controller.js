@@ -34,7 +34,7 @@ class MyTodoController {
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
-      const { date } = req.body;
+      const { date } = await this.joi.dateSchema.validateAsync(req.body);
       const { todoId } = req.params;
       const { userId } = res.locals.user;
       await this.myTodoService.challengedTodoDelete(date, userId, todoId);
@@ -49,7 +49,7 @@ class MyTodoController {
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
   completeChallengedTodo = async (req, res, next) => {
     try {
-      const { date } = req.body;
+      const { date } = await this.joi.dateSchema.validateAsync(req.body);
       const { todoId } = req.params;
       const { userId } = res.locals.user;
       await this.myTodoService.challengedTodoComplete(date, userId, todoId);
@@ -64,7 +64,7 @@ class MyTodoController {
   // 오늘의 제안 todo 작성 [POST] /api/mytodos
   createTodo = async (req, res, next) => {
     try {
-      const { todo } = req.body;
+      const { todo } = await this.joi.todoSchema.validateAsync(req.body);
       const { userId } = res.locals.user;
       const { mbti } = res.locals.user;
       await this.myTodoService.todoCreate(todo, userId, mbti);
