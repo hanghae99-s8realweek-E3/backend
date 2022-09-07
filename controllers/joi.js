@@ -1,18 +1,20 @@
 const joi = require("joi");
 
 class Joi {
-  //댓글 작성 유효성
+  // 댓글 작성 유효성 검사
   createCommentSchema = joi.object({
     comment: joi.string().min(1).required(),
   });
-  //이메일 인증번호 보내기 유효성
+
+  // 이메일 인증번호 보내기 유효성 검사
   emailAuthSchema = joi.object({
     email: joi
       .string()
       .pattern(/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/)
       .required(),
   });
-  //이메일인증확인 유효성
+
+  // 이메일 인증 번호 확인 유효성 검사
   emailAuthCheckSchema = joi.object({
     email: joi
       .string()
@@ -21,7 +23,7 @@ class Joi {
     emailAuthNumber: joi.number().min(1).required(),
   });
 
-  //회원탈퇴 유효성
+  // 회원탈퇴 유효성 검사
   deleteUserInfoSchema = joi.object({
     password: joi
       .string()
@@ -31,7 +33,7 @@ class Joi {
       .required(),
   });
 
-  //회원가입 유효성
+  // 회원가입 유효성 검사
   signupSchema = joi.object({
     email: joi.string().required(),
     password: joi.string().required(),
@@ -39,12 +41,12 @@ class Joi {
     nickname: joi.string().min(1).required(),
   });
 
-  //mbti유효성
+  // mbti 등록 유효성 검사
   mbtiSchema = joi.object({
     mbti: joi.string().min(4).required(),
   });
 
-  //로그인 유효성
+  // 로그인 유효성 검사
   loginSchema = joi.object({
     email: joi
       .string()
@@ -58,13 +60,12 @@ class Joi {
       .required(),
   });
 
-  //date유효성
+  // date 유효성 검사
   dateSchema = joi.object({
     date: joi.string().required(),
   });
 
-
-  //todo유효성
+  // todo 유효성 검사
   todoSchema = joi.object({
     todo: joi.string().required(),
   });
