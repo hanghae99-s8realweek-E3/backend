@@ -1,4 +1,5 @@
-const logger = require("../logger");
+const { logger } = require("../logger");
+const Boom = require("@hapi/boom");
 
 module.exports = {
   errorHandler: (err, req, res, next) => {
@@ -10,10 +11,12 @@ module.exports = {
     });
   },
   routerError: (req, res, next) => {
-    const error = new Error(
-      `${req.method} ${req.originalUrl} 라우터 에러입니다.`
-    );
-    error.status = 404;
-    next(error);
+    try {
+      throw Boom.badRequest(
+        `${req.method} ${req.originalUrl} 라우터 에러입니다.`
+      );
+    } catch (err) {
+      next(err);
+    }
   },
 };
