@@ -1,5 +1,5 @@
 #!/bin/sh
-ssh ubuntu@3.36.126.158 <<EOF	f
+ssh ubuntu@3.36.126.158 <<EOF
     cd ~/backend		
     git pull origin main
     curl -o-   https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh    | bash
