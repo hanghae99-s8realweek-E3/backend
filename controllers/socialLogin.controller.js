@@ -10,7 +10,6 @@ exports.kakaologin = (req, res, next) => {
         (err, user, info) => {
             if (err) return next(err);
             const { userId, mbti, nickname } = user;
-
             const token = jwt.sign({ userId, mbti, nickname }, process.env.MYSECRET_KEY, {
                 expiresIn: '2d',
             });

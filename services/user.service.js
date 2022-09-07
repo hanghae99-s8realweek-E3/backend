@@ -10,20 +10,24 @@ const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
 //비밀번호 글자수 8~20 & 필수 포함 영어, 숫자, 특수문자 2개 이상 혼합
 const regexPassword =
   /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
+const regexNickname = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|]{1,}$/;
 
 class UserService {
   // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmPassword, nickname) => {
     const emailCheck = regexEmail.test(email);
     const passwordCheck = regexPassword.test(password);
+    const nicknameCheck = regexNickname.test(nickname);
     const duplicateCheck = await User.findOne({ where: { email: email } });
+    console.log(!passwordCheck);
 
     if (duplicateCheck) {
       throw Boom.badRequest("중복된 이메일 입니다.");
     }
-    if (!emailCheck && !passwordCheck) {
-      throw Boom.badRequest("이메일 비밀번호 형식이 알맞지 않습니다");
+    if (!emailCheck || !passwordCheck || !nicknameCheck) {
+      throw Boom.badRequest("이메일, 비밀번호, 닉네임 형식이 알맞지 않습니다");
     }
+
     if (password !== confirmPassword) {
       throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
@@ -82,21 +86,16 @@ class UserService {
   userLogin = async (email, password) => {
     const userData = await User.findOne({ where: { email: email } });
     if (!userData) {
-      throw Boom.badRequest("이메일 또는 비번을 잘못 입력하셨습니다.");
+      throw Boom.badRequest("회원정보가 없습니다.");
     }
-
-    const userId = userData.userId;
-    const nickname = userData.nickname;
-    const mbti = userData.mbti;
 
     if (!email || !password) {
       throw Boom.badRequest("빈칸을 채워주세요");
     }
 
-    if (!userData) {
-      throw Boom.badRequest("회원정보가 없습니다.");
-    }
-
+    const userId = userData.userId;
+    const nickname = userData.nickname;
+    const mbti = userData.mbti;
     const passwordSame = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
     if (!passwordSame) {
