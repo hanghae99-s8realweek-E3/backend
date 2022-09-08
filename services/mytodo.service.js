@@ -1,25 +1,25 @@
-const { ChallengedTodo, Todo, User, Follow } = require("../models");
+const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
-const { sequelize } = require("../models/index");
+// const { sequelize } = require("../models/index");
 const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 
 const KoreanTime = require("../advice/date");
-const todayDate = KoreanTime(); //YYYYMMDD
+const todayDate = KoreanTime(); //YYYY-MM-DD
 
 class myTodoController {
-  // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
+  // 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     //Todo 테이블에 isTodo가 false이면 이용불가===ok
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    if (!todoData.mbti) {
-      throw Boom.badRequest("MBTI 정보 등록바랍니다.");
-    }
-
     if (!todoData || !todoData.isTodo) {
       throw Boom.badRequest("존재 하지않거나 삭제된 todo 입니다.");
+    }
+    if (!todoData.mbti) {
+      console.log(todoData.mbti);
+      throw Boom.badRequest("MBTI 정보 등록바랍니다.");
     }
 
     const challengeTodoData = await ChallengedTodo.findOne({
@@ -31,21 +31,31 @@ class myTodoController {
         throw Boom.badRequest("이미 등록된 todo 입니다.");
       }
     }
+    // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
+    const t = await sequelize.transaction();
+    try {
+      await ChallengedTodo.create(
+        {
+          userId: userId,
+          challengedTodo: todoId,
+        },
+        { transaction: t }
+      );
 
-    await ChallengedTodo.create({
-      userId: userId,
-      challengedTodo: todoId,
-    });
+      const challengedTodo = await ChallengedTodo.findAll({
+        where: { challengedTodo: todoId },
+        transaction: t,
+      });
+      const challengCount = challengedTodo.length;
 
-    const challengedTodo = await ChallengedTodo.findAll({
-      where: { challengedTodo: todoId },
-    });
-    const challengCount = challengedTodo.length;
-
-    await Todo.update(
-      { challengedCounts: challengCount },
-      { where: { todoId: todoId } }
-    );
+      await Todo.update(
+        { challengedCounts: challengCount },
+        { where: { todoId: todoId }, transaction: t }
+      );
+      await t.commit();
+    } catch (err) {
+      await t.rollback();
+    }
   };
 
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
@@ -53,37 +63,47 @@ class myTodoController {
     if (date !== todayDate) {
       throw Boom.badRequest("오늘 날짜가 아닙니다.");
     }
-    //challengedTodos 테이블에서 <userId + 날짜 date>에 맞는 데이터 삭제
-    //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
-    const deleteQuery = `DELETE FROM challengedTodos
+    const t = await sequelize.transaction();
+    try {
+      //challengedTodos 테이블에서 <userId + 날짜 date>에 맞는 데이터 삭제
+      //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
+      const deleteQuery = `DELETE FROM challengedTodos
     WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND userId ='${userId}'`;
-    //사용자별로 먼저 범위를 찾는게 찾는 법위를 줄여서
-    await sequelize.query(deleteQuery, {
-      type: QueryTypes.DELETE,
-    });
+      //사용자별로 먼저 범위를 찾는게 찾는 법위를 줄여서
+      await sequelize.query(deleteQuery, {
+        type: QueryTypes.DELETE,
+        transaction: t,
+      });
 
-    const challengedTodo = await ChallengedTodo.findAll({
-      where: { challengedTodo: todoId },
-    });
+      const challengedTodo = await ChallengedTodo.findAll({
+        where: { challengedTodo: todoId },
+        transaction: t,
+      });
 
-    const challengCount = challengedTodo.length;
-    await Todo.update(
-      { challengedCounts: challengCount },
-      { where: { todoId: todoId } }
-    );
+      const challengCount = challengedTodo.length;
+      await Todo.update(
+        { challengedCounts: challengCount },
+        { where: { todoId: todoId }, transaction: t }
+      );
+      await t.commit();
+    } catch (err) {
+      await t.rollback();
+    }
   };
 
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
   challengedTodoComplete = async (date, userId, todoId) => {
-    if (date !== todayDate) {
-      throw Boom.badRequest("오늘 날짜가 아닙니다.");
-    }
     const query = `SELECT *
       FROM challengedTodos
       WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const checktodoId = await sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
+
+    if (date !== todayDate) {
+      // console.log(todayDate)
+      throw Boom.badRequest("오늘 날짜가 아닙니다.");
+    }
 
     if (!checktodoId.length) {
       throw Boom.badRequest("오늘 도전한 todo가 없습니다.");
