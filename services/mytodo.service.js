@@ -203,7 +203,7 @@ class myTodoController {
         followerCount: myfollower.length,
       },
       challengedTodo,
-      createdTodo: createdTodo[0],
+      createdTodo: createdTodo[0] ? createdTodo[0] : [],
       date,
     };
   };
