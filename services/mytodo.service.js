@@ -159,14 +159,14 @@ class myTodoController {
       where: { userIdFollowing: user.userId },
     });
 
-    const query = `SELECT *
+    const query = `SELECT todoId, userId, todo, mbti, nickname, commentCounts, challengedCounts
       FROM todos
       WHERE isTodo = true AND userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const createdTodo = await sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
 
-    const query2 = `SELECT challengedTodo,isCompleted
+    const query2 = `SELECT challengedTodo, isCompleted
       FROM challengedTodos
       WHERE userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const challenge = await sequelize.query(query2, {
@@ -203,7 +203,7 @@ class myTodoController {
         followerCount: myfollower.length,
       },
       challengedTodo,
-      createdTodo,
+      createdTodo: createdTodo[0],
       date,
     };
   };
