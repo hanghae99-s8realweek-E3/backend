@@ -38,7 +38,7 @@ class Joi {
       ),
     nickname: joi.string().min(1),
     profile: joi.string(),
-    mbti: joi.string().min(1).max(4),
+    mbti: joi.string().pattern(/[A-Z]{4}/),
   });
 
   // 회원탈퇴 유효성 검사
@@ -61,7 +61,10 @@ class Joi {
 
   // mbti 등록 유효성 검사
   mbtiSchema = joi.object({
-    mbti: joi.string().min(4).required(),
+    mbti: joi
+      .string()
+      .pattern(/[A-Z]{4}/)
+      .required(),
   });
 
   // 로그인 유효성 검사
