@@ -10,16 +10,16 @@ const winstonDaily = require("winston-daily-rotate-file");
 require("dotenv").config();
 
 const logDir = process.env.LOGDIR;
+const colorizer = format.colorize();
 
 const logger = createLogger({
   level: "info", // log, info, warn, error 순서 // info면은 info부터 기록됨 (info, warn, error)
   format: format.combine(
-    format.colorize(),
     format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
-    format.printf(
-      (info) =>
-        `${info.timestamp} [${info.level.toUpperCase()}] - ${info.message}`
-    )
+    format.printf((info) => {
+      const prefix = `[${info.level}] - ${info.timestamp}`;
+      return `${colorizer.colorize(info.level, prefix)} ${info.message}`;
+    })
   ),
 
   transports: [
