@@ -8,7 +8,8 @@ class UserController {
   // 로컬 회원가입 [POST] /api/accounts/signup
   signup = async (req, res, next) => {
     try {
-      const { email, password, confirmPassword, nickname } = await this.joi.signupSchema.validateAsync(req.body);
+      const { email, password, confirmPassword, nickname } =
+        await this.joi.signupSchema.validateAsync(req.body);
       const token = await this.userService.userSignup(
         email,
         password,
@@ -42,7 +43,9 @@ class UserController {
   // 로그인 [POST] /api/accounts/login
   login = async (req, res, next) => {
     try {
-      const { email, password } = await this.joi.loginSchema.validateAsync(req.body);
+      const { email, password } = await this.joi.loginSchema.validateAsync(
+        req.body
+      );
       const token = await this.userService.userLogin(email, password);
       res.status(200).json({
         token,
@@ -102,7 +105,7 @@ class UserController {
         nickname,
         profile,
         mbti,
-      } = req.body;
+      } = await this.joi.changeUserInfoSchema.validateAsync(req.body);
 
       const data = await this.userService.userInfoChange(
         userId,

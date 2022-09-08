@@ -23,6 +23,24 @@ class Joi {
     emailAuthNumber: joi.number().min(1).required(),
   });
 
+  // 회원 정보 변경 유효성 검사
+  changeUserInfoSchema = joi.object({
+    password: joi.string().min(1),
+    newPassword: joi
+      .string()
+      .pattern(
+        /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/
+      ),
+    confirmPassword: joi
+      .string()
+      .pattern(
+        /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/
+      ),
+    nickname: joi.string().min(1),
+    profile: joi.string(),
+    mbti: joi.string().min(1).max(4),
+  });
+
   // 회원탈퇴 유효성 검사
   deleteUserInfoSchema = joi.object({
     password: joi

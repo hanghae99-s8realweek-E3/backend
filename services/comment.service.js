@@ -1,4 +1,11 @@
-const { Comment, Todo, User, ChallengedTodo, Follow } = require("../models");
+const {
+  Comment,
+  Todo,
+  User,
+  ChallengedTodo,
+  Follow,
+  sequelize,
+} = require("../models");
 const Boom = require("@hapi/boom");
 
 class CommentService {
@@ -12,20 +19,36 @@ class CommentService {
       throw Boom.badRequest("이미 삭제된 todo입니다.");
     }
 
-    // 생성하고 commentCounts update 트렌젝션 걸기
-    await Comment.create({
-      userId: user.userId,
-      nickname: user.nickname,
-      todoId,
-      comment,
-    });
+    // 댓글 생성하고 댓글 개수 update하는 과정 트렌젝션 설정
+    const t = await sequelize.transaction();
+    try {
+      await Comment.create(
+        {
+          userId: user.userId,
+          nickname: user.nickname,
+          todoId,
+          comment,
+        },
+        { transaction: t }
+      );
+      await Todo.findOne({
+        where: { todoId },
+        transaction: t,
+      });
+      const commentCounts = todoInfo.Comments.length;
+      await Todo.update(
+        { commentCounts },
+        { where: { todoId }, transaction: t }
+      );
+      await t.commit();
+    } catch (err) {
+      await t.rollback();
+    }
+
     const todoInfo = await Todo.findOne({
       where: { todoId },
       include: [{ model: Comment }],
     });
-    const commentCounts = todoInfo.Comments.length;
-    await Todo.update({ commentCounts }, { where: { todoId } });
-
     const userInfo = await User.findOne({
       where: { userId: user.userId },
       include: [{ model: ChallengedTodo }],
@@ -46,7 +69,7 @@ class CommentService {
       todo: todoInfo.todo,
       mbti: todoInfo.mbti,
       nickname: todoInfo.nickname,
-      commentCounts,
+      commentCounts: todoInfo.commentCounts,
       challengedCounts: todoInfo.challengedCounts,
       isChallenged:
         userInfo.ChallengedTodos.findIndex(
