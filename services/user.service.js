@@ -1,4 +1,4 @@
-const { User, Follow, EmailAuth } = require("../models");
+const { User, Follow, EmailAuth, sequelize } = require("../models");
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
@@ -271,15 +271,20 @@ class UserService {
       throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
-    await User.destroy({ where: { userId } });
-    // follow 테이블에서 해당 userId 삭제
-    // 이건 관계설정 해서 자동으로 삭제되게 해야할듯
-    // 일단 트렌젝션 걸어서 동시 성공하게 하기
-    await Follow.destroy({
-      where: {
-        [Op.or]: [{ userIdFollowing: userId }, { userIdFollower: userId }],
-      },
-    });
+    // 회원탈퇴 후 follow DB에서 해당 userId 데이터 삭제하는 과정 트렌젝션 설정
+    const t = await sequelize.transaction();
+    try {
+      await User.destroy({ where: { userId }, transaction: t });
+      await Follow.destroy({
+        where: {
+          [Op.or]: [{ userIdFollowing: userId }, { userIdFollower: userId }],
+        },
+        transaction: t,
+      });
+      await t.commit();
+    } catch (err) {
+      await t.rollback();
+    }
   };
 }
 
