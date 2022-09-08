@@ -31,13 +31,14 @@ class CommentService {
         },
         { transaction: t }
       );
-      await Todo.findOne({
+      const todo = await Todo.findOne({
         where: { todoId },
+        include: [{ model: Comment }],
         transaction: t,
       });
-      const commentCounts = todoInfo.Comments.length;
+
       await Todo.update(
-        { commentCounts },
+        { commentCounts: todo.Comments.length },
         { where: { todoId }, transaction: t }
       );
       await t.commit();
@@ -103,16 +104,25 @@ class CommentService {
       throw Boom.unauthorized("본인 댓글만 삭제 가능합니다.");
     }
 
-    // 삭제하고 commentCounts update하는 거 트렌젝션 걸어서 동시에 성공하게 하기
-    await Comment.destroy({ where: { commentId } });
+    // 댓글 삭제하고 댓글 개수 update하는 과정 트렌젝션 설정
+    const t = await sequelize.transaction();
+    try {
+      await Comment.destroy({ where: { commentId }, transaction: t });
 
-    const todoInfo = await Todo.findOne({
-      where: { todoId: comment.todoId },
-      include: [{ model: Comment }],
-    });
+      const todo = await Todo.findOne({
+        where: { todoId: comment.todoId },
+        include: [{ model: Comment }],
+        transaction: t,
+      });
 
-    const commentCounts = todoInfo.Comments.length;
-    await Todo.update({ commentCounts }, { where: { todoId: comment.todoId } });
+      await Todo.update(
+        { commentCounts: todo.Comments.length },
+        { where: { todoId: comment.todoId }, transaction: t }
+      );
+      await t.commit();
+    } catch (err) {
+      await t.rollback();
+    }
   };
 }
 
