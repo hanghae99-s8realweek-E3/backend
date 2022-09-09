@@ -23,7 +23,7 @@ class MyTodoController {
   getMyTodo = async (req, res, next) => {
     try {
       const { user } = res.locals;
-      const { date } = req.query;
+      const { date } = await this.joi.dateSchema.validateAsync(req.query);
       const data = await this.myTodoService.getMyTodo(user, date);
       res.status(200).json({ message: "success", data });
     } catch (err) {

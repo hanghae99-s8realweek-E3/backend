@@ -22,15 +22,8 @@ class TodoListService {
       });
     }
 
-    // 전체조회 (최신 순)
-    if (!mbti && !filter) {
-      const todos = await Todo.findAll({
-        where: { isTodo: true },
-        order: [["createdAt", "DESC"]],
-        limit: 20,
-      });
-
-      return todos.map((t) => {
+    const result = (todos) =>
+      todos.map((t) => {
         return {
           todoId: t.todoId,
           todo: t.todo,
@@ -49,6 +42,16 @@ class TodoListService {
           updatedAt: t.updatedAt,
         };
       });
+
+    // 전체조회 (최신 순)
+    if (!mbti && !filter) {
+      const todos = await Todo.findAll({
+        where: { isTodo: true },
+        order: [["createdAt", "DESC"]],
+        limit: 20,
+      });
+
+      return result(todos);
     }
 
     // mbti별 최신 순
@@ -59,25 +62,7 @@ class TodoListService {
         limit: 20,
       });
 
-      return todos.map((t) => {
-        return {
-          todoId: t.todoId,
-          todo: t.todo,
-          mbti: t.mbti,
-          userId: t.userId,
-          nickname: t.nickname,
-          isChallenged:
-            userInfo.ChallengedTodos.findIndex(
-              (c) => c.challengedTodo === t.todoId
-            ) !== -1
-              ? true
-              : false,
-          commentCounts: t.commentCounts,
-          challengedCounts: t.challengedCounts,
-          createdAt: t.createdAt,
-          updatedAt: t.updatedAt,
-        };
-      });
+      return result(todos);
     }
 
     // 도전 순, 댓글 순
@@ -93,25 +78,7 @@ class TodoListService {
           limit: 20,
         });
 
-        return todos.map((t) => {
-          return {
-            todoId: t.todoId,
-            todo: t.todo,
-            mbti: t.mbti,
-            userId: t.userId,
-            nickname: t.nickname,
-            isChallenged:
-              userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === t.todoId
-              ) !== -1
-                ? true
-                : false,
-            commentCounts: t.commentCounts,
-            challengedCounts: t.challengedCounts,
-            createdAt: t.createdAt,
-            updatedAt: t.updatedAt,
-          };
-        });
+        return result(todos);
       }
       // 댓글 순
       if (filter === "commentCounts") {
@@ -124,25 +91,7 @@ class TodoListService {
           limit: 20,
         });
 
-        return todos.map((t) => {
-          return {
-            todoId: t.todoId,
-            todo: t.todo,
-            mbti: t.mbti,
-            userId: t.userId,
-            nickname: t.nickname,
-            isChallenged:
-              userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === t.todoId
-              ) !== -1
-                ? true
-                : false,
-            commentCounts: t.commentCounts,
-            challengedCounts: t.challengedCounts,
-            createdAt: t.createdAt,
-            updatedAt: t.updatedAt,
-          };
-        });
+        return result(todos);
       }
     }
 
@@ -159,25 +108,7 @@ class TodoListService {
           limit: 20,
         });
 
-        return todos.map((t) => {
-          return {
-            todoId: t.todoId,
-            todo: t.todo,
-            mbti: t.mbti,
-            userId: t.userId,
-            nickname: t.nickname,
-            isChallenged:
-              userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === t.todoId
-              ) !== -1
-                ? true
-                : false,
-            commentCounts: t.commentCounts,
-            challengedCounts: t.challengedCounts,
-            createdAt: t.createdAt,
-            updatedAt: t.updatedAt,
-          };
-        });
+        return result(todos);
       }
       // 댓글 순
       if (filter === "commentCounts") {
@@ -190,25 +121,7 @@ class TodoListService {
           limit: 20,
         });
 
-        return todos.map((t) => {
-          return {
-            todoId: t.todoId,
-            todo: t.todo,
-            mbti: t.mbti,
-            userId: t.userId,
-            nickname: t.nickname,
-            isChallenged:
-              userInfo.ChallengedTodos.findIndex(
-                (c) => c.challengedTodo === t.todoId
-              ) !== -1
-                ? true
-                : false,
-            commentCounts: t.commentCounts,
-            challengedCounts: t.challengedCounts,
-            createdAt: t.createdAt,
-            updatedAt: t.updatedAt,
-          };
-        });
+        return result(todos);
       }
     }
   };
