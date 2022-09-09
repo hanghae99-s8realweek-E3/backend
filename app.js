@@ -9,8 +9,7 @@ const hpp = require("hpp");
 const cors = require("cors");
 const kakaoPassport = require("./passport/index");
 const checkSchedule = require("./checkSchedule");
-// const { routerError, errorHandler } = require("./middlewares/error_handler");
-const { errorHandler } = require("./middlewares/error_handler");
+const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
@@ -57,7 +56,7 @@ app.use(cookieParser());
 app.use("/api", indexRouter);
 
 // errorHandler
-// app.use(routerError);
+app.use(routerError);
 app.use(errorHandler);
 
 http.listen(http_port, () => {
