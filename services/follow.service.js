@@ -1,5 +1,6 @@
 const { Follow } = require("../models");
 const { User } = require("../models");
+const Boom = require("@hapi/boom");
 
 class FollowService {
   // 팔로우 목록 조회 [GET] /api/follows/:userId
@@ -36,7 +37,7 @@ class FollowService {
         userId: user.userId,
       };
     });
-    const myfollowerCount = myFollowerlist.length;
+    // const myfollowerCount = myFollowerlist.length;
 
     //=====================================================
     //내가 팔로잉 하는  테이블 불러오기
@@ -62,7 +63,7 @@ class FollowService {
         userId: user.userId,
       };
     });
-    const myfollowingCount = myFollowinglist.length;
+    // const myfollowingCount = myFollowinglist.length;
 
     return {
       // followingCount: myfollowingCount,
