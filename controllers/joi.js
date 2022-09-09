@@ -90,6 +90,15 @@ class Joi {
   todoSchema = joi.object({
     todo: joi.string().required(),
   });
+
+  // todo 조회 쿼리스트링 유효성 검사
+  getTodoListsSchema = joi.object({
+    mbti: joi
+      .string()
+      .pattern(/[A-Z]{4}/)
+      .allow(null, ""),
+    filter: joi.string().allow(null, ""),
+  });
 }
 
 module.exports = Joi;
