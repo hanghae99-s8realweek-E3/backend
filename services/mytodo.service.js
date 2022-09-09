@@ -1,7 +1,6 @@
 const { ChallengedTodo, Todo, User, Follow } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { sequelize } = require("../models/index");
-const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 
 const KoreanTime = require("../advice/date");
