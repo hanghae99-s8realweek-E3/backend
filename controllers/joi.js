@@ -83,7 +83,10 @@ class Joi {
 
   // date 유효성 검사
   dateSchema = joi.object({
-    date: joi.string().required(),
+    date: joi
+      .string()
+      .pattern(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/)
+      .required(),
   });
 
   // todo 유효성 검사
