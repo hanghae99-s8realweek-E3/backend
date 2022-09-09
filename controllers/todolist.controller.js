@@ -5,11 +5,13 @@ class TodoListController {
   todoListService = new TodoListService();
   joi = new Joi();
 
-  // todo 피드 조회 [GET] /api/todolists
+  // todo 피드 조회 [GET] /api/todolists?
   getTodoLists = async (req, res, next) => {
     try {
       const { user } = res.locals;
-      const { mbti, filter } = req.query;
+      const { mbti, filter } = await this.joi.getTodoListsSchema.validateAsync(
+        req.query
+      );
 
       const data = await this.todoListService.todoListsGet(user, mbti, filter);
 
