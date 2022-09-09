@@ -10,13 +10,13 @@ module.exports = {
       errorMessage: err.message,
     });
   },
-  // routerError: (req, res, next) => {
-  //   try {
-  //     throw Boom.badRequest(
-  //       `${req.method} ${req.originalUrl} 라우터 에러입니다.`
-  //     );
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // },
+  routerError: (req, res, next) => {
+    try {
+      throw Boom.badRequest(
+        `${req.method} ${req.originalUrl} 라우터 에러입니다.`
+      );
+    } catch (err) {
+      next(err);
+    }
+  },
 };
