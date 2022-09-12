@@ -19,17 +19,22 @@ class UserService {
     const passwordCheck = regexPassword.test(password);
     const nicknameCheck = regexNickname.test(nickname);
     const duplicateCheck = await User.findOne({ where: { email: email } });
-    console.log(!passwordCheck);
+    const authResult = await EmailAuth.findOne({ where: { email } });
 
     if (duplicateCheck) {
       throw Boom.badRequest("중복된 이메일 입니다.");
     }
+
     if (!emailCheck || !passwordCheck || !nicknameCheck) {
       throw Boom.badRequest("이메일, 비밀번호, 닉네임 형식이 알맞지 않습니다");
     }
 
     if (password !== confirmPassword) {
       throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
+    }
+
+    if (!authResult.authCheck) {
+      throw new Error("이메일 인증이 완료되지 않았습니다.");
     }
 
     const bcr_password = bcrypt.hashSync(
