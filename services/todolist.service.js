@@ -11,33 +11,20 @@ const Boom = require("@hapi/boom");
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (user, mbti, filter) => {
-    let userInfo = "";
-    if (!user) {
-      userInfo = [];
-      userInfo.ChallengedTodos = [];
-    } else {
-      userInfo = await User.findOne({
-        where: { userId: user.userId },
-        include: [{ model: ChallengedTodo }],
-      });
-    }
-
     const result = (todos) =>
       todos.map((t) => {
         return {
           todoId: t.todoId,
           todo: t.todo,
-          mbti: t.mbti,
+          mbti: t.User.mbti,
           userId: t.userId,
-          nickname: t.nickname,
+          nickname: t.User.nickname,
           isChallenged:
-            userInfo.ChallengedTodos.findIndex(
-              (c) => c.challengedTodo === t.todoId
-            ) !== -1
+            t.ChallengedTodos.findIndex((c) => c.userId === user.userId) !== -1
               ? true
               : false,
-          commentCounts: t.commentCounts,
-          challengedCounts: t.challengedCounts,
+          commentCounts: t.Comments.length,
+          challengedCounts: t.ChallengedTodos.length,
           createdAt: t.createdAt,
           updatedAt: t.updatedAt,
         };
@@ -47,6 +34,7 @@ class TodoListService {
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true },
+        include: [User, Comment, ChallengedTodo],
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -57,12 +45,14 @@ class TodoListService {
     // mbti별 최신 순
     if (!filter) {
       const todos = await Todo.findAll({
-        where: { isTodo: true, mbti },
+        where: { isTodo: true },
+        include: [User, Comment, ChallengedTodo],
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
 
-      return result(todos);
+      const mbtiTodos = todos.filter((todo) => todo.User.mbti === mbti);
+      return result(mbtiTodos);
     }
 
     // 도전 순, 댓글 순
@@ -71,27 +61,25 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
-          order: [
-            ["challengedCounts", "DESC"],
-            ["createdAt", "DESC"],
-          ],
+          include: [User, Comment, ChallengedTodo],
           limit: 20,
         });
 
-        return result(todos);
+        return result(
+          todos.sort((a, b) => b.challengedCounts - a.challengedCounts)
+        );
       }
       // 댓글 순
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
-          order: [
-            ["commentCounts", "DESC"],
-            ["createdAt", "DESC"],
-          ],
+          include: [User, Comment, ChallengedTodo],
           limit: 20,
         });
 
-        return result(todos);
+        return result(
+          todos.sort((a, b) => b.challengedCounts - a.challengedCounts)
+        );
       }
     }
 
@@ -101,10 +89,7 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
-          order: [
-            ["challengedCounts", "DESC"],
-            ["createdAt", "DESC"],
-          ],
+          include: [User, Comment, ChallengedTodo],
           limit: 20,
         });
 
@@ -114,6 +99,7 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
+          include: [User, Comment, ChallengedTodo],
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
