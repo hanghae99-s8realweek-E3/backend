@@ -12,11 +12,7 @@ module.exports = class Comment extends Sequelize.Model {
         comment: {
           type: Sequelize.STRING(200),
           allowNull: false,
-        },
-        nickname: {
-          type: Sequelize.STRING(20),
-          allowNull: false,
-        },
+        }
       },
       {
         sequelize,
