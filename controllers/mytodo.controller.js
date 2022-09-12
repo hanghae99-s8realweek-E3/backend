@@ -31,6 +31,7 @@ class MyTodoController {
     }
   };
 
+  
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
