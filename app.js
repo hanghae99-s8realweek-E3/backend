@@ -5,7 +5,7 @@ const helmet = require("helmet");
 const hpp = require("hpp");
 const cors = require("cors");
 const kakaoPassport = require("./passport/index");
-const checkSchedule = require("./checkSchedule");
+const setSchedule = require("./setSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
@@ -14,7 +14,7 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT;
 kakaoPassport(app);
-checkSchedule();
+setSchedule();
 
 // sequelize 연결
 sequelize
