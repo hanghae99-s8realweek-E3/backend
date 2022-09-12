@@ -11,7 +11,7 @@ module.exports = async () => {
 
     // 30분 마다 스케쥴 실행
     schedule.scheduleJob("*/30 * * * *", async () => {
-      console.log(new Date(), "30분 마다 실행되나");
+      // console.log(new Date(), "30분 마다 실행되나");
 
       await EmailAuth.destroy({ where: { createdAt: { [Op.lte]: past } } });
     });

@@ -1,5 +1,5 @@
 const CommentService = require("../services/comment.service");
-const Joi = require("./joi");
+const Joi = require("../advice/joi");
 
 class CommentController {
   commentService = new CommentService();
