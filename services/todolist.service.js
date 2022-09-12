@@ -11,17 +11,6 @@ const Boom = require("@hapi/boom");
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (user, mbti, filter) => {
-    let userInfo = "";
-    if (!user) {
-      userInfo = [];
-      userInfo.ChallengedTodos = [];
-    } else {
-      userInfo = await User.findOne({
-        where: { userId: user.userId },
-        include: [{ model: ChallengedTodo }],
-      });
-    }
-
     const result = (todos) =>
       todos.map((t) => {
         return {
@@ -31,9 +20,7 @@ class TodoListService {
           userId: t.userId,
           nickname: t.nickname,
           isChallenged:
-            userInfo.ChallengedTodos.findIndex(
-              (c) => c.challengedTodo === t.todoId
-            ) !== -1
+            t.ChallengedTodos.findIndex((c) => c.userId === user.userId) !== -1
               ? true
               : false,
           commentCounts: t.commentCounts,
@@ -47,6 +34,7 @@ class TodoListService {
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true },
+        include: [ChallengedTodo],
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -58,6 +46,7 @@ class TodoListService {
     if (!filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true, mbti },
+        include: [ChallengedTodo],
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -71,6 +60,7 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
+          include: [ChallengedTodo],
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -84,6 +74,7 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
+          include: [ChallengedTodo],
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -101,6 +92,7 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
+          include: [ChallengedTodo],
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -114,6 +106,7 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
+          include: [ChallengedTodo],
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -128,17 +121,10 @@ class TodoListService {
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   todoGet = async (user, todoId) => {
-    let userInfo = "";
     let myfollowing = [];
     if (!user) {
-      userInfo = [];
-      userInfo.ChallengedTodos = [];
       myfollowing = [];
     } else {
-      userInfo = await User.findOne({
-        where: { userId: user.userId },
-        include: [{ model: ChallengedTodo }],
-      });
       myfollowing = await Follow.findAll({
         where: { userIdFollower: user.userId },
       });
@@ -146,7 +132,7 @@ class TodoListService {
 
     const todoInfo = await Todo.findOne({
       where: { todoId },
-      include: [{ model: Comment }],
+      include: [ChallengedTodo, Comment],
     });
 
     if (!todoInfo) {
@@ -172,9 +158,8 @@ class TodoListService {
       commentCounts: todoInfo.commentCounts,
       challengedCounts: todoInfo.challengedCounts,
       isChallenged:
-        userInfo.ChallengedTodos.findIndex(
-          (c) => c.challengedTodo === todoInfo.todoId
-        ) !== -1
+        todoInfo.ChallengedTodos.findIndex((c) => c.userId === user.userId) !==
+        -1
           ? true
           : false,
       createdAt: todoInfo.createdAt,
