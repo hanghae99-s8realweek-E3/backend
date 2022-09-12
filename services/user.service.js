@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const Boom = require("@hapi/boom");
-const schedule = require("node-schedule");
 
 //이메일 형식
 const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
@@ -162,14 +161,6 @@ class UserService {
     transporter.sendMail(emailForm);
 
     await EmailAuth.create({ email, authNumber });
-
-    // create 후 1시간 지나면 DB에서 삭제
-    const end = new Date();
-    end.setHours(end.getHours() + 1); // 1시간 후로 스케쥴링
-    schedule.scheduleJob(end, async () => {
-      // 1시간 후에 삭제
-      await EmailAuth.destroy({ where: { email } });
-    });
   };
 
   // 이메일 인증확인 [POST] /api/accounts/emailAuth/check
