@@ -19,7 +19,9 @@ class UserService {
     const passwordCheck = regexPassword.test(password);
     const nicknameCheck = regexNickname.test(nickname);
     const duplicateCheck = await User.findOne({ where: { email: email } });
-    const authResult = await EmailAuth.findOne({ where: { email } });
+    const authResult = await EmailAuth.findOne({
+      where: { email, authCheck: true },
+    });
 
     if (duplicateCheck) {
       throw Boom.badRequest("중복된 이메일 입니다.");
@@ -33,7 +35,7 @@ class UserService {
       throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
 
-    if (!authResult.authCheck) {
+    if (!authResult) {
       throw new Error("이메일 인증이 완료되지 않았습니다.");
     }
 
@@ -180,6 +182,8 @@ class UserService {
     if (authNumber.authNumber !== emailAuthNumber) {
       throw Boom.unauthorized("인증번호가 일치하지 않습니다.");
     }
+
+    await EmailAuth.update({ authCheck: true }, { where: { email } });
   };
 
   // 회원 정보 조회 [GET] /api/accounts
