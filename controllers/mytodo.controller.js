@@ -1,5 +1,5 @@
 const MyTodoService = require("../services/mytodo.service");
-const Joi = require("./joi");
+const Joi = require("../advice/joi");
 
 class MyTodoController {
   myTodoService = new MyTodoService();
@@ -31,7 +31,7 @@ class MyTodoController {
     }
   };
 
-  
+
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
