@@ -2,7 +2,6 @@ const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 
 const Boom = require("@hapi/boom");
-
 const KoreanTime = require("../advice/date");
 const todayDate = KoreanTime(); //YYYY-MM-DD
 
@@ -137,7 +136,7 @@ class myTodoController {
     }
     const query = `SELECT *
       FROM todos
-      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
+      WHERE isTodo = "1" AND userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
     const checkTodoData = await sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
@@ -154,11 +153,13 @@ class myTodoController {
   };
 
   // todo 삭제 [DELETE] /api/mytodos/:todoId
-  todoDelete = async (todoId) => {
+  todoDelete = async (todoId, userId) => {
     //====ok
     //todo테이블에 istodo false로 변경
 
-    const todoData = await Todo.findOne({ where: { todoId: todoId } });
+    const todoData = await Todo.findOne({ 
+      where: { todoId: todoId, userId: userId } 
+    });
 
     if (todoData !== null) {
       if (todoData.isTodo === false) {
