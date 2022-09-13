@@ -16,6 +16,7 @@ const port = process.env.PORT;
 kakaoPassport(app);
 setSchedule();
 
+
 // sequelize 연결
 sequelize
   .sync({ force: false })
