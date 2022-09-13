@@ -6,15 +6,14 @@ const fetch = require("node-fetch");
 module.exports = async () => {
   try {
     const body = {
-      registration_ids:[],
-      to: "f9cva60sylc:APA91bHRwkHHZOtoXE31yu55JbFqwzXpjRflYK-Dcjy6L09WU4g4PpCt2jDYv6r5tCqFdGENSMmyWD4XiMvYccuZfIRS-y-nDl-_jZC7YItRqSQkGmWWhxhyzGKV6mq9Oi7Op5RrO6h3",
+      to: "ep_0aZ7Mvtc:APA91bEZyYQB3i7raM78yy3MbdHzVkWnHiqHQug9ViDfsFe4OwHkd3BkQEp8BbQaC1HJHqIIDcgWNoBrFrKbsNDlSks73WSfPi3jhH_ttROEsoC58ml8_Ys0fgDRzcgJZRoO5g8vrgbt",
       data: {
         message: "New news story available.",
       },
     };
 
-    schedule.scheduleJob("*/3 * * * * *", async () => {
-      const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+    schedule.scheduleJob("*/10 * * * * *", async () => {
+      await fetch("https://fcm.googleapis.com/fcm/send", {
         method: "post",
         body: JSON.stringify(body),
         headers: {
@@ -23,8 +22,6 @@ module.exports = async () => {
             "key=AAAAx0Yh-pA:APA91bGNJMy7Oojg98fdS6jt9XUU69QSDBgPE7aCPJsSH6hLmJF1ozhiIg4RPjiBeX6s5Hi7cvagjUtu6CgbCaLHx0G4fKf9pj0rwZoq1GtdigiF3AKI1nysYT58VqbazlVflsSpw9Up",
         },
       });
-      const data = await response.json();
-      console.log(data);
     });
   } catch (err) {
     logger.error(err);
