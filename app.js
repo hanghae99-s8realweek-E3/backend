@@ -6,16 +6,17 @@ const hpp = require("hpp");
 const cors = require("cors");
 const kakaoPassport = require("./passport/index");
 const setSchedule = require("./setSchedule");
+const webpush = require("./pushtest/push.js");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
 
-
 const app = express();
 const port = process.env.PORT;
 kakaoPassport(app);
 setSchedule();
+webpush();
 
 const path = require('path');
 app.use(express.static(path.join(__dirname, 'src')));
