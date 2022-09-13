@@ -92,17 +92,16 @@ class myTodoController {
 
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
   challengedTodoComplete = async (date, userId, todoId) => {
-    const query = `SELECT *
-      FROM challengedTodos
-      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
-    const checktodoId = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
-    });
-
     if (date !== todayDate) {
-      // console.log(todayDate)
       throw Boom.badRequest("오늘 날짜가 아닙니다.");
     }
+
+    const query1 = `SELECT *
+      FROM challengedTodos
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+    const checktodoId = await sequelize.query(query1, {
+      type: QueryTypes.SELECT,
+    });
 
     if (!checktodoId.length) {
       throw Boom.badRequest("오늘 도전한 todo가 없습니다.");
@@ -113,6 +112,16 @@ class myTodoController {
     await sequelize.query(updateQuery, {
       type: QueryTypes.UPDATE,
     });
+
+    const query2 = `SELECT *
+    FROM challengedTodos
+    WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+    const challengedTodoData = await sequelize.query(query2, {
+      type: QueryTypes.SELECT,
+    });
+
+    let isCompleted = challengedTodoData[0].isCompleted;
+    return isCompleted;
   };
 
   // 오늘의 제안 todo 작성 [POST] /api/mytodos

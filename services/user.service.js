@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const Boom = require("@hapi/boom");
-const schedule = require("node-schedule");
 
 //이메일 형식
 const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
@@ -20,17 +19,22 @@ class UserService {
     const passwordCheck = regexPassword.test(password);
     const nicknameCheck = regexNickname.test(nickname);
     const duplicateCheck = await User.findOne({ where: { email: email } });
-    console.log(!passwordCheck);
+    const authResult = await EmailAuth.findOne({ where: { email } });
 
     if (duplicateCheck) {
       throw Boom.badRequest("중복된 이메일 입니다.");
     }
+
     if (!emailCheck || !passwordCheck || !nicknameCheck) {
       throw Boom.badRequest("이메일, 비밀번호, 닉네임 형식이 알맞지 않습니다");
     }
 
     if (password !== confirmPassword) {
       throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
+    }
+
+    if (!authResult.authCheck) {
+      throw new Error("이메일 인증이 완료되지 않았습니다.");
     }
 
     const bcr_password = bcrypt.hashSync(
@@ -162,14 +166,6 @@ class UserService {
     transporter.sendMail(emailForm);
 
     await EmailAuth.create({ email, authNumber });
-
-    // create 후 1시간 지나면 DB에서 삭제
-    const end = new Date();
-    end.setHours(end.getHours() + 1); // 1시간 후로 스케쥴링
-    schedule.scheduleJob(end, async () => {
-      // 1시간 후에 삭제
-      await EmailAuth.destroy({ where: { email } });
-    });
   };
 
   // 이메일 인증확인 [POST] /api/accounts/emailAuth/check

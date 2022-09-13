@@ -31,6 +31,7 @@ class MyTodoController {
     }
   };
 
+  
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
@@ -52,8 +53,9 @@ class MyTodoController {
       const { date } = await this.joi.dateSchema.validateAsync(req.body);
       const { todoId } = req.params;
       const { userId } = res.locals.user;
-      await this.myTodoService.challengedTodoComplete(date, userId, todoId);
+      const isCompleted = await this.myTodoService.challengedTodoComplete(date, userId, todoId);
       res.status(201).json({
+        isCompleted,
         message: "success",
       });
     } catch (err) {
