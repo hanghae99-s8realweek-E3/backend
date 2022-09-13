@@ -11,10 +11,14 @@ const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
 
+
 const app = express();
 const port = process.env.PORT;
 kakaoPassport(app);
 setSchedule();
+
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'src')));
 
 
 // sequelize 연결
@@ -36,12 +40,12 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev", { stream }));
 }
 
-const corsOption = {
-  origin: "https://mimic-hanghaee99team3.vercel.app",
-  credentials: true,
-};
+// const corsOption = {
+//   origin: "https://mimic-hanghaee99team3.vercel.app",
+//   credentials: true,
+// };
 
-app.use(cors(corsOption));
+// app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 

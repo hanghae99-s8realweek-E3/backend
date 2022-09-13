@@ -1,0 +1,5 @@
+{
+    "name": "My App",
+      "short_name": "my-app",
+      "start_url": "/"
+  }

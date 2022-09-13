@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Push Notifications Using Node</title>
+    <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
+    <script>
+      var config = {
+        apiKey: "AIzaSyAxCIYngrB5Gz0zHZfvJQdyoTCapNJsCVA",
+        authDomain: "mimictest-87e2d.firebaseapp.com",
+        projectId: "mimictest-87e2d",
+        storageBucket: "mimictest-87e2d.appspot.com",
+        messagingSenderId: "855875123856",
+      };
+      firebase.initializeApp(config);
+
+      const messaging = firebase.messaging();
+
+      //token값 알아내기
+      messaging
+        .requestPermission()
+        .then(function () {
+          console.log("Have permission");
+          return messaging.getToken();
+        })
+        .then(function (token) {
+          console.log(token);
+        })
+        .catch(function (arr) {
+          console.log("Error Occured");
+        });
+    </script>
+  </head>
+  <body>
+    <button id="button">Loading..</button>
+  </body>
+</html>
