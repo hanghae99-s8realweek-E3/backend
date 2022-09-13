@@ -194,9 +194,10 @@ class myTodoController {
       type: QueryTypes.SELECT,
     });
 
-    const query2 = `SELECT challengedTodo, isCompleted
+    const query2 = `SELECT *
       FROM challengedTodos
-      WHERE userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+      LEFT OUTER JOIN todos ON challengedTodos.challengedTodo = todos.todoId 
+      WHERE challengedTodos.userId = ${user.userId} AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const challenge = await sequelize.query(query2, {
       type: QueryTypes.SELECT,
     });
@@ -205,18 +206,14 @@ class myTodoController {
     if (challenge.length === 0) {
       challengedTodo = [];
     } else {
-      const getChall = await Todo.findOne({
-        where: { todoId: challenge[0].challengedTodo },
-        attributes: { exclude: ["isTodo"] },
-      });
       challengedTodo = {
-        todoId: getChall.todoId,
-        userId: getChall.userId,
-        todo: getChall.todo,
-        mbti: getChall.mbti,
-        nickname: getChall.nickname,
-        commentCounts: getChall.commentCounts,
-        challengedCounts: getChall.challengedCounts,
+        todoId: challenge[0].todoId,
+        userId: challenge[0].userId,
+        todo: challenge[0].todo,
+        mbti: challenge[0].mbti,
+        nickname: challenge[0].nickname,
+        commentCounts: challenge[0].commentCounts,
+        challengedCounts: challenge[0].challengedCounts,
         isCompleted: challenge[0].isCompleted,
       };
     }
@@ -290,6 +287,33 @@ class myTodoController {
       challengedTodos,
       createdTodo,
     };
+
+    // return {
+    //   userInfo: {
+    //     userId,
+    //     nickname: userInfo.nickname,
+    //     profile: userInfo.profile,
+    //     mbti: userInfo.mbti,
+    //     followingCount: following.length,
+    //     followerCount: follower.length,
+    //     isFollowed:
+    //       follower.findIndex((f) => f.userIdFollower === user.userId) !== -1
+    //         ? true
+    //         : false,
+    //   },
+    //   challengedTodos: challenges.map((c) => {
+    //     return {
+    //       todoId: c.Todo.todoId,
+    //       userId: c.Todo.userId,
+    //       todo: c.Todo.todo,
+    //       mbti: c.Todo.mbti,
+    //       nickname: c.Todo.nickname,
+    //       commentCounts: c.Todo.commentCounts,
+    //       challengCounts: c.Todo.challengCounts,
+    //     };
+    //   }),
+    //   createdTodo,
+    // };
   };
 }
 
