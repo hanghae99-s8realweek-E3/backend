@@ -16,7 +16,6 @@ const port = process.env.PORT;
 kakaoPassport(app);
 setSchedule();
 
-
 // sequelize 연결
 sequelize
   .sync({ force: false })
@@ -37,7 +36,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const corsOption = {
-  origin: "https://mimic-hanghaee99team3.vercel.app",
+  origin: ["https://mimic-hanghaee99team3.vercel.app", "http://localhost:3000"],
   credentials: true,
 };
 
