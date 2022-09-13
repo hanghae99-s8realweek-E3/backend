@@ -16,7 +16,7 @@ messaging.setBackgroundMessageHandler(function (payload) {
 
     const title = "Hello World";
     const options = {
-        body: payload.data.status
+        body: payload.data.status,
     };
 
     return self.registration.showNotification(title, options);
