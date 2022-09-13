@@ -9,10 +9,6 @@ module.exports = class ChallengedTodo extends Sequelize.Model {
           primaryKey: true,
           autoIncrement: true,
         },
-        challengedTodo: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
         isCompleted: {
           type: Sequelize.BOOLEAN,
           allowNull: true,
@@ -36,6 +32,10 @@ module.exports = class ChallengedTodo extends Sequelize.Model {
     db.ChallengedTodo.belongsTo(db.User, {
       foreignKey: "userId",
       targetKey: "userId",
+    });
+    db.ChallengedTodo.belongsTo(db.Todo, {
+      foreignKey: "challengedTodo",
+      targetKey: "todoId",
     });
   }
 };
