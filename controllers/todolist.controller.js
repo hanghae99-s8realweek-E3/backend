@@ -8,12 +8,16 @@ class TodoListController {
   // todo 피드 조회 [GET] /api/todolists?
   getTodoLists = async (req, res, next) => {
     try {
-      const { user } = res.locals;
+      const { userId } = res.locals.user;
       const { mbti, filter } = await this.joi.getTodoListsSchema.validateAsync(
         req.query
       );
 
-      const data = await this.todoListService.todoListsGet(user, mbti, filter);
+      const data = await this.todoListService.todoListsGet(
+        userId,
+        mbti,
+        filter
+      );
 
       res.status(200).json({ data });
     } catch (err) {
@@ -24,10 +28,10 @@ class TodoListController {
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   getTodo = async (req, res, next) => {
     try {
-      const { user } = res.locals;
+      const { userId } = res.locals.user;
       const { todoId } = req.params;
 
-      const data = await this.todoListService.todoGet(user, todoId);
+      const data = await this.todoListService.todoGet(userId, todoId);
 
       res.status(200).json({ message: "success", data });
     } catch (err) {
