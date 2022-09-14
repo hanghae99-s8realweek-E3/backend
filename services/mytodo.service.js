@@ -20,15 +20,18 @@ class myTodoController {
       throw Boom.badRequest("MBTI 정보 등록바랍니다.");
     }
 
-    const challengeTodoData = await ChallengedTodo.findOne({
-      where: { challengedTodo: todoId },
+    //오늘 날짜 + userId 
+    const query = `SELECT *
+      FROM challengedTodos
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
+    const challengeTodoData = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
     });
 
-    if (challengeTodoData !== null) {
-      if (challengeTodoData.userId === userId) {
-        throw Boom.badRequest("이미 등록된 todo 입니다.");
-      }
+    if (challengeTodoData.length) {
+      throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
     }
+    
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
     const t = await sequelize.transaction();
     try {
@@ -157,8 +160,8 @@ class myTodoController {
     //====ok
     //todo테이블에 istodo false로 변경
 
-    const todoData = await Todo.findOne({ 
-      where: { todoId: todoId, userId: userId } 
+    const todoData = await Todo.findOne({
+      where: { todoId: todoId, userId: userId },
     });
 
     if (todoData !== null) {
