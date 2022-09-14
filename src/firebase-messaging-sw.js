@@ -1,5 +1,34 @@
-importScripts('https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/4.8.1/firebase-messaging.js');
+importScripts("https://www.gstatic.com/firebasejs/4.8.1/firebase-app.js");
+importScripts("https://www.gstatic.com/firebasejs/4.8.1/firebase-messaging.js");
+
+var createNotificationWithLink = function (image, title, content, link) {
+  var notification = window.webkitNotifications.createNotification(
+    image,
+    title,
+    content
+  );
+
+  notification.onclose = function () {
+    alert(":(");
+  };
+
+  notification.onclick = function () {
+    window.location.href = link;
+  };
+
+  return notification;
+};
+
+
+var noti = createNotificationWithLink(
+  'http://funcook.com/img/favicon.png',
+  'HTML5 Notification',
+  'HTML5 Notification content...',
+  'http://mycustom.dynamic.link.com/'
+);
+
+noti.show();
+
 
 // Initialize Firebase
 var config = {
@@ -13,22 +42,11 @@ firebase.initializeApp(config);
 
 const messaging = firebase.messaging();
 messaging.setBackgroundMessageHandler(function (payload) {
+  const title = "Hello World";
+  const options = {
+    body: payload.data.status,
+    icon: '/firebase-logo.png'
+  };
 
-    const title = "Hello World";
-    const options = {
-        body: payload.data.status
-    };
-
-    return self.registration.showNotification(title, options);
+  return self.registration.showNotification(title, options);
 });
-
-
-// messaging.onMessage(function(payload){
-//   console.log('onMessage: ', payload);
-//   var title = "고라니 서비스";
-//   var options = {
-//           body: payload.notification.body
-//   };
-  
-//   var notification = new Notification(title, options);
-// });

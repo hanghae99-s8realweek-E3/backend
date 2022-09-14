@@ -10,7 +10,7 @@
     <script>
       var config = {
         apiKey: "AIzaSyAxCIYngrB5Gz0zHZfvJQdyoTCapNJsCVA",
-        authDomain: "mimictest-87e2d.firebaseapp.com",
+        authDomain: "mimictsest-87e2d.firebaseapp.com",
         projectId: "mimictest-87e2d",
         storageBucket: "mimictest-87e2d.appspot.com",
         messagingSenderId: "855875123856",
@@ -32,16 +32,17 @@
         .catch(function (arr) {
           console.log("Error Occured");
         });
-        //화면이 켜져있을 경우 메시지 모습
+      //화면이 켜져있을 경우 메시지 모습
 
       messaging.onMessage(function (payload) {
-        console.log("onMessage: ", payload);
-        var title = "고라니 서비스";
+        console.log(payload);
+        // var title = payload.notification.title;
+        var title = "페이지 온";
         var options = {
           body: payload.notification.body,
-          data: "https://www.notion.so/7755dad0378d4bc1aaa65094f1ce8abe?v=1268faa521184456b4708f4364a20f6a"
+          click_action: payload.notification.click_action,
+          icon: payload.notification.icon,
         };
-
         var notification = new Notification(title, options);
       });
     </script>
