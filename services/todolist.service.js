@@ -154,16 +154,6 @@ class TodoListService {
       throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
 
-    // 비회원일 경우
-    if (!userId) {
-      return {
-        todoInfo,
-        isFollowed: false,
-        isChallenged: false,
-        isTodayDone: false,
-      };
-    }
-
     // 도전한 적 있는지 체크
     const challenge = await ChallengedTodo.findOne({
       where: { userId, ChallengedTodo: todoId },
@@ -180,7 +170,7 @@ class TodoListService {
     });
 
     // 작성자 팔로우 여부 체크
-    const myfollowing = await Follow.findAll({
+    const myfollowing = await Follow.findOne({
       where: { userIdFollower: userId, userIdFollowing: todoInfo.userId },
     });
 
