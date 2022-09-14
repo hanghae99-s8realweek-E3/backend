@@ -21,7 +21,6 @@ setSchedule();
 const path = require('path');
 app.use(express.static(path.join(__dirname, 'src')));
 
-
 // sequelize 연결
 sequelize
   .sync({ force: false })
@@ -42,7 +41,10 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const corsOption = {
-  origin: "https://mimic-hanghaee99team3.vercel.app",
+  origin: [
+    "https://frontend-hanghaee99team3.vercel.app",
+    "http://localhost:3000",
+  ],
   credentials: true,
 };
 

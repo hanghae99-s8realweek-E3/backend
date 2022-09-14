@@ -45,53 +45,6 @@ class CommentService {
     } catch (err) {
       await t.rollback();
     }
-
-    const todoInfo = await Todo.findOne({
-      where: { todoId },
-      include: [{ model: Comment }],
-    });
-    const userInfo = await User.findOne({
-      where: { userId: user.userId },
-      include: [{ model: ChallengedTodo }],
-    });
-    const myfollowing = await Follow.findAll({
-      where: { userIdFollower: user.userId },
-    });
-
-    return {
-      todoId,
-      userId: todoInfo.userId,
-      isFollowed:
-        myfollowing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
-        -1
-          ? true
-          : false,
-      profile: todoInfo.profile,
-      todo: todoInfo.todo,
-      mbti: todoInfo.mbti,
-      nickname: todoInfo.nickname,
-      commentCounts: todoInfo.commentCounts,
-      challengedCounts: todoInfo.challengedCounts,
-      isChallenged:
-        userInfo.ChallengedTodos.findIndex(
-          (c) => c.challengedTodo === todoInfo.todoId
-        ) !== -1
-          ? true
-          : false,
-      createdAt: todoInfo.createdAt,
-      updatedAt: todoInfo.updatedAt,
-      comment: todoInfo.Comments.map((c) => {
-        return {
-          commentId: c.commentId,
-          userId: c.userId,
-          comment: c.comment,
-          nickname: c.nickname,
-          isCommented: c.userId === user.userId ? true : false,
-          createdAt: c.createdAt,
-          updatedAt: c.updatedAt,
-        };
-      }),
-    };
   };
 
   // 댓글 삭제 [DELETE] /api/comments/:commentId

@@ -1,5 +1,5 @@
 const CommentService = require("../services/comment.service");
-const Joi = require("./joi");
+const Joi = require("../advice/joi");
 
 class CommentController {
   commentService = new CommentService();
@@ -14,13 +14,9 @@ class CommentController {
         req.body
       );
 
-      const createComment = await this.commentService.createComment(
-        user,
-        todoId,
-        comment
-      );
+      await this.commentService.createComment(user, todoId, comment);
 
-      res.status(200).json({ message: "success", data: createComment });
+      res.status(200).json({ message: "success" });
     } catch (err) {
       next(err);
     }
