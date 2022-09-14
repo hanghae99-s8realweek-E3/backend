@@ -20,15 +20,18 @@ class myTodoController {
       throw Boom.badRequest("MBTI 정보 등록바랍니다.");
     }
 
-    const challengeTodoData = await ChallengedTodo.findOne({
-      where: { challengedTodo: todoId },
+    //오늘 날짜 + userId 
+    const query = `SELECT *
+      FROM challengedTodos
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
+    const challengeTodoData = await sequelize.query(query, {
+      type: QueryTypes.SELECT,
     });
 
-    if (challengeTodoData !== null) {
-      if (challengeTodoData.userId === userId) {
-        throw Boom.badRequest("이미 등록된 todo 입니다.");
-      }
+    if (challengeTodoData.length) {
+      throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
     }
+    
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
     const t = await sequelize.transaction();
     try {
@@ -157,8 +160,8 @@ class myTodoController {
     //====ok
     //todo테이블에 istodo false로 변경
 
-    const todoData = await Todo.findOne({ 
-      where: { todoId: todoId, userId: userId } 
+    const todoData = await Todo.findOne({
+      where: { todoId: todoId, userId: userId },
     });
 
     if (todoData !== null) {
@@ -195,9 +198,10 @@ class myTodoController {
       type: QueryTypes.SELECT,
     });
 
-    const query2 = `SELECT challengedTodo, isCompleted
+    const query2 = `SELECT *
       FROM challengedTodos
-      WHERE userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+      LEFT OUTER JOIN todos ON challengedTodos.challengedTodo = todos.todoId 
+      WHERE challengedTodos.userId = ${user.userId} AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const challenge = await sequelize.query(query2, {
       type: QueryTypes.SELECT,
     });
@@ -206,18 +210,14 @@ class myTodoController {
     if (challenge.length === 0) {
       challengedTodo = [];
     } else {
-      const getChall = await Todo.findOne({
-        where: { todoId: challenge[0].challengedTodo },
-        attributes: { exclude: ["isTodo"] },
-      });
       challengedTodo = {
-        todoId: getChall.todoId,
-        userId: getChall.userId,
-        todo: getChall.todo,
-        mbti: getChall.mbti,
-        nickname: getChall.nickname,
-        commentCounts: getChall.commentCounts,
-        challengedCounts: getChall.challengedCounts,
+        todoId: challenge[0].todoId,
+        userId: challenge[0].userId,
+        todo: challenge[0].todo,
+        mbti: challenge[0].mbti,
+        nickname: challenge[0].nickname,
+        commentCounts: challenge[0].commentCounts,
+        challengedCounts: challenge[0].challengedCounts,
         isCompleted: challenge[0].isCompleted,
       };
     }
@@ -291,6 +291,33 @@ class myTodoController {
       challengedTodos,
       createdTodo,
     };
+
+    // return {
+    //   userInfo: {
+    //     userId,
+    //     nickname: userInfo.nickname,
+    //     profile: userInfo.profile,
+    //     mbti: userInfo.mbti,
+    //     followingCount: following.length,
+    //     followerCount: follower.length,
+    //     isFollowed:
+    //       follower.findIndex((f) => f.userIdFollower === user.userId) !== -1
+    //         ? true
+    //         : false,
+    //   },
+    //   challengedTodos: challenges.map((c) => {
+    //     return {
+    //       todoId: c.Todo.todoId,
+    //       userId: c.Todo.userId,
+    //       todo: c.Todo.todo,
+    //       mbti: c.Todo.mbti,
+    //       nickname: c.Todo.nickname,
+    //       commentCounts: c.Todo.commentCounts,
+    //       challengCounts: c.Todo.challengCounts,
+    //     };
+    //   }),
+    //   createdTodo,
+    // };
   };
 }
 
