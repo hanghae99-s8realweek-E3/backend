@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const TodoListController = require("../controllers/todolist.controller");
+const todoListController = new TodoListController();
+
 const authMiddleware = require("../middlewares/auth_middlewares");
 const nonUserMiddleware = require("../middlewares/nonUser_middlewares");
-const todoListController = new TodoListController();
 
 // mbti 알고리즘 [GET] /api/todolists/mbtialgo
 router.get("/mbti", nonUserMiddleware, todoListController.getMbti);
