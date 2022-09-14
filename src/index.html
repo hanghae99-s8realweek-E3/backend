@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="manifest" href="/manifest.json" />
     <title>Push Notifications Using Node</title>
+    <!--FireBase와 연결 -->
     <script src="https://www.gstatic.com/firebasejs/5.5.9/firebase.js"></script>
     <script>
       var config = {
@@ -32,8 +33,8 @@
         .catch(function (arr) {
           console.log("Error Occured");
         });
-      //화면이 켜져있을 경우 메시지 모습
 
+      //화면이 켜져있을 경우 메시지 모습(forground)메세지 동작 
       messaging.onMessage(function (payload) {
         console.log(payload);
         // var title = payload.notification.title;
