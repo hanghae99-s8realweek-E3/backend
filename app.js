@@ -36,7 +36,10 @@ if (process.env.NODE_ENV === "production") {
 }
 
 const corsOption = {
-  origin: ["https://mimic-hanghaee99team3.vercel.app", "http://localhost:3000"],
+  origin: [
+    "https://frontend-hanghaee99team3.vercel.app",
+    "http://localhost:3000",
+  ],
   credentials: true,
 };
 
