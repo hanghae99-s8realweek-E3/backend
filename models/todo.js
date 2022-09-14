@@ -17,10 +17,6 @@ module.exports = class Todo extends Sequelize.Model {
           type: Sequelize.STRING(4),
           allowNull: false,
         },
-        nickname: {
-          type: Sequelize.STRING(20),
-          allowNull: false,
-        },
         commentCounts: {
           type: Sequelize.INTEGER,
           allowNull: true,

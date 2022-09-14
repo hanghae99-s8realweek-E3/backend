@@ -11,23 +11,15 @@ const { Op } = require("sequelize");
 
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
-  todoListsGet = async (user, mbti, filter) => {
+  todoListsGet = async (userId, mbti, filter) => {
     const result = (todos) =>
       todos.map((t) => {
         return {
-          todoId: t.todoId,
-          todo: t.todo,
-          mbti: t.mbti,
-          userId: t.userId,
-          nickname: t.nickname,
+          todoInfo: t,
           isChallenged:
-            t.ChallengedTodos.findIndex((c) => c.userId === user.userId) !== -1
+            t.ChallengedTodos.findIndex((c) => c.userId === userId) !== -1
               ? true
               : false,
-          commentCounts: t.commentCounts,
-          challengedCounts: t.challengedCounts,
-          createdAt: t.createdAt,
-          updatedAt: t.updatedAt,
         };
       });
 
@@ -35,7 +27,11 @@ class TodoListService {
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true },
-        include: [ChallengedTodo],
+        include: [
+          { model: ChallengedTodo, attributes: ["userId"] },
+          { model: User, attributes: ["nickname", "profile"] },
+        ],
+        attributes: { exclude: ["isTodo"] },
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -47,7 +43,11 @@ class TodoListService {
     if (!filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true, mbti },
-        include: [ChallengedTodo],
+        include: [
+          { model: ChallengedTodo, attributes: ["userId"] },
+          { model: User, attributes: ["nickname", "profile"] },
+        ],
+        attributes: { exclude: ["isTodo"] },
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -61,7 +61,11 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
-          include: [ChallengedTodo],
+          include: [
+            { model: ChallengedTodo, attributes: ["userId"] },
+            { model: User, attributes: ["nickname", "profile"] },
+          ],
+          attributes: { exclude: ["isTodo"] },
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -75,7 +79,11 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
-          include: [ChallengedTodo],
+          include: [
+            { model: ChallengedTodo, attributes: ["userId"] },
+            { model: User, attributes: ["nickname", "profile"] },
+          ],
+          attributes: { exclude: ["isTodo"] },
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -93,7 +101,11 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
-          include: [ChallengedTodo],
+          include: [
+            { model: ChallengedTodo, attributes: ["userId"] },
+            { model: User, attributes: ["nickname", "profile"] },
+          ],
+          attributes: { exclude: ["isTodo"] },
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -107,7 +119,11 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
-          include: [ChallengedTodo],
+          include: [
+            { model: ChallengedTodo, attributes: ["userId"] },
+            { model: User, attributes: ["nickname", "profile"] },
+          ],
+          attributes: { exclude: ["isTodo"] },
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -121,22 +137,13 @@ class TodoListService {
   };
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
-  todoGet = async (user, todoId) => {
-    let myfollowing = [];
-    let userId = "";
-    if (!user) {
-      myfollowing = [];
-      userId = "";
-    } else {
-      myfollowing = await Follow.findAll({
-        where: { userIdFollower: user.userId },
-      });
-      userId = user.userId;
-    }
-
+  todoGet = async (userId, todoId) => {
     const todoInfo = await Todo.findOne({
       where: { todoId },
-      include: [ChallengedTodo, Comment],
+      include: [
+        { model: User, attributes: ["nickname", "profile"] },
+        { model: Comment },
+      ],
     });
 
     if (!todoInfo) {
@@ -146,6 +153,21 @@ class TodoListService {
     if (!todoInfo.isTodo) {
       throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
+
+    // 비회원일 경우
+    if (!userId) {
+      return {
+        todoInfo,
+        isFollowed: false,
+        isChallenged: false,
+        isTodayDone: false,
+      };
+    }
+
+    // 도전한 적 있는지 체크
+    const challenge = await ChallengedTodo.findOne({
+      where: { userId, ChallengedTodo: todoId },
+    });
 
     // 오늘 도전한 todo 있는지 체크
     const today = new Date();
@@ -157,39 +179,16 @@ class TodoListService {
       },
     });
 
+    // 작성자 팔로우 여부 체크
+    const myfollowing = await Follow.findAll({
+      where: { userIdFollower: userId, userIdFollowing: todoInfo.userId },
+    });
+
     return {
-      todoId,
-      userId: todoInfo.userId,
-      isFollowed:
-        myfollowing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
-        -1
-          ? true
-          : false,
-      profile: todoInfo.profile,
-      todo: todoInfo.todo,
-      mbti: todoInfo.mbti,
-      nickname: todoInfo.nickname,
-      commentCounts: todoInfo.commentCounts,
-      challengedCounts: todoInfo.challengedCounts,
-      isChallenged:
-        todoInfo.ChallengedTodos.findIndex((c) => c.userId === user.userId) !==
-        -1
-          ? true
-          : false,
+      todoInfo,
+      isFollowed: myfollowing ? true : false,
+      isChallenged: challenge ? true : false,
       isTodayDone: todayChall ? true : false,
-      createdAt: todoInfo.createdAt,
-      updatedAt: todoInfo.updatedAt,
-      comment: todoInfo.Comments.map((c) => {
-        return {
-          commentId: c.commentId,
-          userId: c.userId,
-          comment: c.comment,
-          nickname: c.nickname,
-          isCommented: c.userId === user.userId ? true : false,
-          createdAt: c.createdAt,
-          updatedAt: c.updatedAt,
-        };
-      }),
     };
   };
 
