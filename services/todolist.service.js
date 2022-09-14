@@ -11,7 +11,7 @@ const { Op } = require("sequelize");
 
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
-  todoListsGet = async (user, mbti, filter) => {
+  todoListsGet = async (userId, mbti, filter) => {
     const result = (todos) =>
       todos.map((t) => {
         return {
@@ -20,14 +20,14 @@ class TodoListService {
           mbti: t.mbti,
           userId: t.userId,
           nickname: t.nickname,
-          isChallenged:
-            t.ChallengedTodos.findIndex((c) => c.userId === user.userId) !== -1
-              ? true
-              : false,
           commentCounts: t.commentCounts,
           challengedCounts: t.challengedCounts,
           createdAt: t.createdAt,
           updatedAt: t.updatedAt,
+          isChallenged:
+            t.ChallengedTodos.findIndex((c) => c.userId === userId) !== -1
+              ? true
+              : false,
         };
       });
 
@@ -121,22 +121,13 @@ class TodoListService {
   };
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
-  todoGet = async (user, todoId) => {
-    let myfollowing = [];
-    let userId = "";
-    if (!user) {
-      myfollowing = [];
-      userId = "";
-    } else {
-      myfollowing = await Follow.findAll({
-        where: { userIdFollower: user.userId },
-      });
-      userId = user.userId;
-    }
-
+  todoGet = async (userId, todoId) => {
     const todoInfo = await Todo.findOne({
       where: { todoId },
-      include: [ChallengedTodo, Comment],
+      include: [
+        { model: User, attributes: ["nickname", "profile"] },
+        { model: Comment },
+      ],
     });
 
     if (!todoInfo) {
@@ -146,6 +137,11 @@ class TodoListService {
     if (!todoInfo.isTodo) {
       throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
+
+    // 도전한 적 있는지 체크
+    const challenge = await ChallengedTodo.findOne({
+      where: { userId, ChallengedTodo: todoId },
+    });
 
     // 오늘 도전한 todo 있는지 체크
     const today = new Date();
@@ -157,39 +153,16 @@ class TodoListService {
       },
     });
 
+    // 작성자 팔로우 여부 체크
+    const myfollowing = await Follow.findOne({
+      where: { userIdFollower: userId, userIdFollowing: todoInfo.userId },
+    });
+
     return {
-      todoId,
-      userId: todoInfo.userId,
-      isFollowed:
-        myfollowing.findIndex((f) => f.userIdFollowing === todoInfo.userId) !==
-        -1
-          ? true
-          : false,
-      profile: todoInfo.profile,
-      todo: todoInfo.todo,
-      mbti: todoInfo.mbti,
-      nickname: todoInfo.nickname,
-      commentCounts: todoInfo.commentCounts,
-      challengedCounts: todoInfo.challengedCounts,
-      isChallenged:
-        todoInfo.ChallengedTodos.findIndex((c) => c.userId === user.userId) !==
-        -1
-          ? true
-          : false,
+      todoInfo,
+      isFollowed: myfollowing ? true : false,
+      isChallenged: challenge ? true : false,
       isTodayDone: todayChall ? true : false,
-      createdAt: todoInfo.createdAt,
-      updatedAt: todoInfo.updatedAt,
-      comment: todoInfo.Comments.map((c) => {
-        return {
-          commentId: c.commentId,
-          userId: c.userId,
-          comment: c.comment,
-          nickname: c.nickname,
-          isCommented: c.userId === user.userId ? true : false,
-          createdAt: c.createdAt,
-          updatedAt: c.updatedAt,
-        };
-      }),
     };
   };
 
