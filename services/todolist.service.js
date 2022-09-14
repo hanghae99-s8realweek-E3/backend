@@ -7,6 +7,7 @@ const {
   Mbti,
 } = require("../models");
 const Boom = require("@hapi/boom");
+const { Op } = require("sequelize");
 
 class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
@@ -122,12 +123,15 @@ class TodoListService {
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   todoGet = async (user, todoId) => {
     let myfollowing = [];
+    let userId = "";
     if (!user) {
       myfollowing = [];
+      userId = "";
     } else {
       myfollowing = await Follow.findAll({
         where: { userIdFollower: user.userId },
       });
+      userId = user.userId;
     }
 
     const todoInfo = await Todo.findOne({
@@ -142,6 +146,16 @@ class TodoListService {
     if (!todoInfo.isTodo) {
       throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
+
+    // 오늘 도전한 todo 있는지 체크
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // 오늘 (과거의) 자정
+    const todayChall = await ChallengedTodo.findOne({
+      where: {
+        userId,
+        createdAt: { [Op.gte]: today },
+      },
+    });
 
     return {
       todoId,
@@ -162,6 +176,7 @@ class TodoListService {
         -1
           ? true
           : false,
+      isTodayDone: todayChall ? true : false,
       createdAt: todoInfo.createdAt,
       updatedAt: todoInfo.updatedAt,
       comment: todoInfo.Comments.map((c) => {
