@@ -9,10 +9,22 @@ module.exports = class ChallengedTodo extends Sequelize.Model {
           primaryKey: true,
           autoIncrement: true,
         },
+        mbti: {
+          type: Sequelize.STRING(4),
+          allowNull: false,
+        },
+        challengedTodo: {
+          type: Sequelize.STRING(140),
+          allowNull: false,
+        },
         isCompleted: {
           type: Sequelize.BOOLEAN,
           allowNull: true,
           defaultValue: false,
+        },
+        originTodoId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
         },
       },
       {
@@ -22,8 +34,8 @@ module.exports = class ChallengedTodo extends Sequelize.Model {
         modelName: "ChallengedTodo",
         tableName: "challengedTodos",
         paranoid: false,
-        charset: "utf8",
-        collate: "utf8_general_ci",
+        charset: "utf8mb4",
+        collate: "utf8mb4_general_ci",
       }
     );
   }
@@ -32,10 +44,7 @@ module.exports = class ChallengedTodo extends Sequelize.Model {
     db.ChallengedTodo.belongsTo(db.User, {
       foreignKey: "userId",
       targetKey: "userId",
-    });
-    db.ChallengedTodo.belongsTo(db.Todo, {
-      foreignKey: "challengedTodo",
-      targetKey: "todoId",
+      onDelete: "CASCADE",
     });
   }
 };

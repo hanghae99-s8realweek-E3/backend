@@ -14,13 +14,13 @@ module.exports = class User extends Sequelize.Model {
           allowNull: false,
           unique: true,
         },
-        nickname: {
-          type: Sequelize.STRING(20),
-          allowNull: false,
-        },
         password: {
           type: Sequelize.STRING(150),
           allowNull: true,
+        },
+        nickname: {
+          type: Sequelize.STRING(20),
+          allowNull: false,
         },
         mbti: {
           type: Sequelize.STRING(4),
@@ -29,15 +29,16 @@ module.exports = class User extends Sequelize.Model {
         profile: {
           type: Sequelize.STRING(200),
           allowNull: true,
+          defaultValue: "none",
+        },
+        snsId: {
+          type: Sequelize.STRING(50),
+          allowNull: true,
         },
         provider: {
           type: Sequelize.STRING(10),
           allowNull: false,
           defaultValue: "local",
-        },
-        snsId: {
-          type: Sequelize.STRING(50),
-          allowNull: true,
         },
       },
       {
@@ -57,24 +58,16 @@ module.exports = class User extends Sequelize.Model {
     db.User.hasMany(db.Todo, {
       foreignKey: "userId",
       sourceKey: "userId",
+      onDelete: "CASCADE",
     });
     db.User.hasMany(db.ChallengedTodo, {
       foreignKey: "userId",
       sourceKey: "userId",
+      onDelete: "CASCADE",
     });
     db.User.hasMany(db.Comment, {
       foreignKey: "userId",
       sourceKey: "userId",
     });
-    // db.User.belongsToMany(db.User, {
-    //   foreignKey: "userIdFollowing",
-    //   as: "Followers",
-    //   through: "Follow",
-    // });
-    // db.User.belongsToMany(db.User, {
-    //   foreignKey: "userIdFollower",
-    //   as: "Followings",
-    //   through: "Follow",
-    // });
   }
 };
