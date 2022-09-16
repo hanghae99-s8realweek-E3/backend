@@ -16,7 +16,7 @@ exports.kakaologin = (req, res, next) => {
         { expiresIn: "2d" }
       );
       res.redirect(
-        `https://mimic-hanghaee99team3.vercel.app/mbti?token=${token}`
+        `https://frontend-hanghaee99team3.vercel.app/mbti?token=${token}`
       );
     }
   )(req, res, next);

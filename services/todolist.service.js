@@ -13,19 +13,21 @@ class TodoListService {
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (userId, mbti, filter) => {
     const result = (todos) =>
-      todos.map((t) => {
+      todos.map((todo) => {
         return {
-          todoId: t.todoId,
-          todo: t.todo,
-          mbti: t.mbti,
-          userId: t.userId,
-          nickname: t.nickname,
-          commentCounts: t.commentCounts,
-          challengedCounts: t.challengedCounts,
-          createdAt: t.createdAt,
-          updatedAt: t.updatedAt,
+          todoId: todo.todoId,
+          todo: todo.todo,
+          mbti: todo.mbti,
+          userId: todo.userId,
+          nickname: todo.nickname,
+          commentCounts: todo.commentCounts,
+          challengedCounts: todo.challengedCounts,
+          createdAt: todo.createdAt,
+          updatedAt: todo.updatedAt,
           isChallenged:
-            t.ChallengedTodos.findIndex((c) => c.userId === userId) !== -1
+            todo.ChallengedTodos.findIndex(
+              (challengedTodo) => challengedTodo.userId === userId
+            ) !== -1
               ? true
               : false,
         };
@@ -35,7 +37,7 @@ class TodoListService {
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true },
-        include: [ChallengedTodo],
+        include: [{ model: ChallengedTodo, attributes: ["userId"] }],
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -47,7 +49,7 @@ class TodoListService {
     if (!filter) {
       const todos = await Todo.findAll({
         where: { isTodo: true, mbti },
-        include: [ChallengedTodo],
+        include: [{ model: ChallengedTodo, attributes: ["userId"] }],
         order: [["createdAt", "DESC"]],
         limit: 20,
       });
@@ -61,7 +63,7 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
-          include: [ChallengedTodo],
+          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -75,7 +77,7 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true },
-          include: [ChallengedTodo],
+          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -93,7 +95,7 @@ class TodoListService {
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
-          include: [ChallengedTodo],
+          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -107,7 +109,7 @@ class TodoListService {
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
           where: { isTodo: true, mbti },
-          include: [ChallengedTodo],
+          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
@@ -126,7 +128,10 @@ class TodoListService {
       where: { todoId },
       include: [
         { model: User, attributes: ["nickname", "profile"] },
-        { model: Comment },
+        {
+          model: Comment,
+          include: [{ model: User, attributes: ["nickname", "profile"] }],
+        },
       ],
     });
 

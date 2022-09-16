@@ -17,10 +17,6 @@ module.exports = class Todo extends Sequelize.Model {
           type: Sequelize.STRING(4),
           allowNull: false,
         },
-        nickname: {
-          type: Sequelize.STRING(20),
-          allowNull: false,
-        },
         commentCounts: {
           type: Sequelize.INTEGER,
           allowNull: true,
@@ -30,11 +26,6 @@ module.exports = class Todo extends Sequelize.Model {
           type: Sequelize.INTEGER,
           allowNull: true,
           defaultValue: 0,
-        },
-        isTodo: {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-          defaultValue: true,
         },
       },
       {
@@ -54,15 +45,12 @@ module.exports = class Todo extends Sequelize.Model {
     db.Todo.belongsTo(db.User, {
       foreignKey: "userId",
       targetKey: "userId",
+      onDelete: "CASCADE",
     });
     db.Todo.hasMany(db.Comment, {
       foreignKey: "todoId",
       sourceKey: "todoId",
       onDelete: "CASCADE",
-    });
-    db.Todo.hasMany(db.ChallengedTodo, {
-      foreignKey: "challengedTodo",
-      sourceKey: "todoId",
     });
   }
 };
