@@ -9,12 +9,15 @@ const setSchedule = require("./setSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger-output");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT;
 kakaoPassport(app);
 setSchedule();
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // sequelize 연결
 sequelize
