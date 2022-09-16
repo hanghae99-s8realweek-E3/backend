@@ -9,8 +9,9 @@ class MyTodoController {
   createChallengedTodo = async (req, res, next) => {
     try {
       const { todoId } = req.params;
+      const { todo } = await this.joi.todoSchema.validateAsync(req.body);
       const { userId } = res.locals.user;
-      await this.myTodoService.challengedTodoCreate(todoId, userId);
+      await this.myTodoService.challengedTodoCreate(todoId, userId, todo);
       res.status(201).json({
         message: "success",
       });

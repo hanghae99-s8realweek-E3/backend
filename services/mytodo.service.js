@@ -7,19 +7,14 @@ const todayDate = KoreanTime(); //YYYY-MM-DD
 
 class myTodoController {
   // 도전 todo 등록 [POST] /:todoId/challenged
-  challengedTodoCreate = async (todoId, userId) => {
+  challengedTodoCreate = async (todo, todoId, userId) => {
     //Todo 테이블에 isTodo가 false이면 이용불가===ok
     //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    if (!todoData || !todoData.isTodo) {
-      throw Boom.badRequest("존재 하지않거나 삭제된 todo 입니다.");
+    if (!todoData) {
+      throw Boom.badRequest("삭제된 todo 입니다.");
     }
-    if (!todoData.mbti) {
-      console.log(todoData.mbti);
-      throw Boom.badRequest("MBTI 정보 등록바랍니다.");
-    }
-
     //오늘 날짜 + userId 
     const query = `SELECT *
       FROM challengedTodos
@@ -38,7 +33,8 @@ class myTodoController {
       await ChallengedTodo.create(
         {
           userId: userId,
-          challengedTodo: todoId,
+          originTodoId: todoId,
+          challengedTodo: todo
         },
         { transaction: t }
       );
@@ -135,7 +131,7 @@ class myTodoController {
       throw Boom.badRequest("사용자 정보가 없습니다.");
     }
     if (!UserData.mbti) {
-      throw Boom.badRequest("mbti 정보를 입렵후 사용바랍니다.");
+      throw Boom.badRequest("mbti 정보를 등록후 작성바랍니다.");
     }
     const query = `SELECT *
       FROM todos
