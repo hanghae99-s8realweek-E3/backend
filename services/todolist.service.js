@@ -1,4 +1,3 @@
-
 const { Todo, ChallengedTodo, Follow, Mbti, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
@@ -108,31 +107,36 @@ class TodoListService {
       throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
     }
 
-    const todoInfo = await sequelize.query(this.query.todoInfoQuery(todoId), {
-      type: QueryTypes.SELECT,
-    });
-
-    const comments = await sequelize.query(this.query.commentsQuery(todoId), {
-      type: QueryTypes.SELECT,
-    });
-
-    // 도전한 적 있는지 체크
-    const ischallenged = await ChallengedTodo.findOne({
-      where: { userId, originTodoId: todoId },
-    });
-    // 오늘 도전한 todo 있는지 체크
+    // 오늘 (과거의) 자정 시간 세팅
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // 오늘 (과거의) 자정
-    const todaysChallenge = await ChallengedTodo.findOne({
-      where: {
-        userId,
-        createdAt: { [Op.gte]: today },
-      },
-    });
-    // 작성자 팔로우 여부 체크
-    const isFollowed = await Follow.findOne({
-      where: { userIdFollower: userId, userIdFollowing: todoInfo[0].userId },
-    });
+    today.setHours(0, 0, 0, 0);
+
+    const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
+      await Promise.all([
+        sequelize.query(this.query.todoInfoQuery(todoId), {
+          type: QueryTypes.SELECT,
+        }),
+        sequelize.query(this.query.commentsQuery(todoId), {
+          type: QueryTypes.SELECT,
+        }),
+        ChallengedTodo.findOne({
+          where: { userId, originTodoId: todoId },
+        }),
+        ChallengedTodo.findOne({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: today },
+          },
+        }),
+        Follow.findOne({
+          where: { userIdFollower: userId, userIdFollowing: todo.userId },
+        }),
+      ]);
+
+    if (!todo) {
+      throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
+    }
+
     return {
       todoInfo,
       comments: comments.map((comment) => {

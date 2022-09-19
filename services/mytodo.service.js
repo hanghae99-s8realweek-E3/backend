@@ -188,29 +188,24 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (user, date) => {
-    const userInfo = await User.findOne({
-      where: { userId: user.userId },
-    });
-    const myfolloing = await Follow.findAll({
-      where: { userIdFollower: user.userId },
-    });
-    const myfollower = await Follow.findAll({
-      where: { userIdFollowing: user.userId },
-    });
-
-    const createdTodo = await sequelize.query(
-      this.query.createdTodoQuery(user, date),
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
-
-    const challengedTodo = await sequelize.query(
-      this.query.challengedTodoQuery(user, date),
-      {
-        type: QueryTypes.SELECT,
-      }
-    );
+    const [userInfo, myfolloing, myfollower, createdTodo, challengedTodo] =
+      await Promise.all([
+        User.findOne({
+          where: { userId: user.userId },
+        }),
+        Follow.findAll({
+          where: { userIdFollower: user.userId },
+        }),
+        Follow.findAll({
+          where: { userIdFollowing: user.userId },
+        }),
+        sequelize.query(this.query.createdTodoQuery(user, date), {
+          type: QueryTypes.SELECT,
+        }),
+        sequelize.query(this.query.challengedTodoQuery(user, date), {
+          type: QueryTypes.SELECT,
+        }),
+      ]);
 
     return {
       userInfo: {
@@ -229,32 +224,32 @@ class myTodoController {
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (user, userId) => {
-    const userInfo = await User.findOne({
-      where: { userId },
-      include: [{ model: ChallengedTodo }],
-    });
+    const [userInfo, following, follower, createdTodos, challengedTodos] =
+      await Promise.all([
+        User.findOne({
+          where: { userId },
+        }),
+        Follow.findAll({
+          where: { userIdFollower: userId },
+        }),
+        Follow.findAll({
+          where: { userIdFollowing: userId },
+        }),
+        Todo.findAll({
+          where: { userId },
+          order: [["createdAt", "DESC"]],
+          limit: 20,
+        }),
+        ChallengedTodo.findAll({
+          where: { userId },
+          order: [["createdAt", "DESC"]],
+          limit: 20,
+        }),
+      ]);
+
     if (!userInfo) {
       throw Boom.badRequest("존재하지 않거나 탈퇴한 회원입니다.");
     }
-
-    const following = await Follow.findAll({
-      where: { userIdFollower: userId },
-    });
-    const follower = await Follow.findAll({
-      where: { userIdFollowing: userId },
-    });
-    // 제안 todo 최신 20개
-    const createdTodos = await Todo.findAll({
-      where: { userId },
-      order: [["createdAt", "DESC"]],
-      limit: 20,
-    });
-    // 도전 todo 최신 20개
-    const challengedTodos = await ChallengedTodo.findAll({
-      where: { userId },
-      order: [["createdAt", "DESC"]],
-      limit: 20,
-    });
 
     return {
       userInfo: {
