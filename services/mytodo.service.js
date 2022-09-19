@@ -13,9 +13,10 @@ class myTodoController {
     //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
     if (!todoData) {
-      throw Boom.badRequest("삭제된 todo 입니다.");
+      throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
-    //내가 오늘 날짜에 작성한게 있는지 체크 
+    //내가 오늘 날짜에 작성한게 있는지 체크
+    //userId + 오늘 날짜가 필요함
     const query = `SELECT *
       FROM challengedTodos
       WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
