@@ -87,10 +87,6 @@ class UserService {
       throw Boom.badRequest("회원정보가 없습니다.");
     }
 
-    if (!email || !password) {
-      throw Boom.badRequest("빈칸을 채워주세요");
-    }
-
     const userId = userData.userId;
     const nickname = userData.nickname;
     const mbti = userData.mbti;
