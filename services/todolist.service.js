@@ -1,32 +1,25 @@
-const {
-  Comment,
-  Todo,
-  User,
-  ChallengedTodo,
-  Follow,
-  Mbti,
-} = require("../models");
-const Boom = require("@hapi/boom");
+const { Todo, ChallengedTodo, Follow, Mbti, sequelize } = require("../models");
+const { QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
+const Query = require("../advice/query");
+const Boom = require("@hapi/boom");
 
 class TodoListService {
+  query = new Query();
+
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (userId, mbti, filter) => {
-    const result = (todos) =>
+    const myChallengedTodos = await ChallengedTodo.findAll({
+      where: { userId },
+    });
+    const result = (todos, myChallengedTodos) =>
       todos.map((todo) => {
         return {
-          todoId: todo.todoId,
-          todo: todo.todo,
-          mbti: todo.mbti,
-          userId: todo.userId,
-          nickname: todo.nickname,
-          commentCounts: todo.commentCounts,
-          challengedCounts: todo.challengedCounts,
-          createdAt: todo.createdAt,
-          updatedAt: todo.updatedAt,
+          todoInfo: todo,
           isChallenged:
-            todo.ChallengedTodos.findIndex(
-              (challengedTodo) => challengedTodo.userId === userId
+            myChallengedTodos.findIndex(
+              (myChallengedTodo) =>
+                myChallengedTodo.originTodoId === todo.todoId
             ) !== -1
               ? true
               : false,
@@ -36,25 +29,20 @@ class TodoListService {
     // 전체조회 (최신 순)
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
-        where: { isTodo: true },
-        include: [{ model: ChallengedTodo, attributes: ["userId"] }],
         order: [["createdAt", "DESC"]],
-        limit: 20,
       });
 
-      return result(todos);
+      return result(todos, myChallengedTodos);
     }
 
     // mbti별 최신 순
     if (!filter) {
       const todos = await Todo.findAll({
-        where: { isTodo: true, mbti },
-        include: [{ model: ChallengedTodo, attributes: ["userId"] }],
+        where: { mbti },
         order: [["createdAt", "DESC"]],
-        limit: 20,
       });
 
-      return result(todos);
+      return result(todos, myChallengedTodos);
     }
 
     // 도전 순, 댓글 순
@@ -62,30 +50,24 @@ class TodoListService {
       // 도전 순
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
-          where: { isTodo: true },
-          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
         });
 
-        return result(todos);
+        return result(todos, myChallengedTodos);
       }
       // 댓글 순
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
-          where: { isTodo: true },
-          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
         });
 
-        return result(todos);
+        return result(todos, myChallengedTodos);
       }
     }
 
@@ -94,86 +76,89 @@ class TodoListService {
       // 도전 순
       if (filter === "challengedCounts") {
         const todos = await Todo.findAll({
-          where: { isTodo: true, mbti },
-          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
+          where: { mbti },
           order: [
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
         });
 
-        return result(todos);
+        return result(todos, myChallengedTodos);
       }
       // 댓글 순
       if (filter === "commentCounts") {
         const todos = await Todo.findAll({
-          where: { isTodo: true, mbti },
-          include: [{ model: ChallengedTodo, attributes: ["userId"] }],
+          where: { mbti },
           order: [
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
         });
 
-        return result(todos);
+        return result(todos, myChallengedTodos);
       }
     }
   };
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   todoGet = async (userId, todoId) => {
-    const todoInfo = await Todo.findOne({
-      where: { todoId },
-      include: [
-        { model: User, attributes: ["nickname", "profile"] },
-        {
-          model: Comment,
-          include: [{ model: User, attributes: ["nickname", "profile"] }],
-        },
-      ],
-    });
-
-    if (!todoInfo) {
-      throw Boom.badRequest("존재하지 않는 Todo입니다.");
+    const todo = await Todo.findByPk(todoId);
+    if (!todo) {
+      throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
     }
 
-    if (!todoInfo.isTodo) {
-      throw Boom.badRequest("이미 삭제된 Todo입니다.");
-    }
-
-    // 도전한 적 있는지 체크
-    const challenge = await ChallengedTodo.findOne({
-      where: { userId, ChallengedTodo: todoId },
-    });
-
-    // 오늘 도전한 todo 있는지 체크
+    // 오늘 (과거의) 자정 시간 세팅
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // 오늘 (과거의) 자정
-    const todayChall = await ChallengedTodo.findOne({
-      where: {
-        userId,
-        createdAt: { [Op.gte]: today },
-      },
-    });
+    today.setHours(0, 0, 0, 0);
 
-    // 작성자 팔로우 여부 체크
-    const myfollowing = await Follow.findOne({
-      where: { userIdFollower: userId, userIdFollowing: todoInfo.userId },
-    });
+    const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
+      await Promise.all([
+        sequelize.query(this.query.todoInfoQuery(todoId), {
+          type: QueryTypes.SELECT,
+        }),
+        sequelize.query(this.query.commentsQuery(todoId), {
+          type: QueryTypes.SELECT,
+        }),
+        ChallengedTodo.findOne({
+          where: { userId, originTodoId: todoId },
+        }),
+        ChallengedTodo.findOne({
+          where: {
+            userId,
+            createdAt: { [Op.gte]: today },
+          },
+        }),
+        Follow.findOne({
+          where: { userIdFollower: userId, userIdFollowing: todo.userId },
+        }),
+      ]);
+
+    if (!todo) {
+      throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
+    }
 
     return {
       todoInfo,
-      isFollowed: myfollowing ? true : false,
-      isChallenged: challenge ? true : false,
-      isTodayDone: todayChall ? true : false,
+      comments: comments.map((comment) => {
+        return {
+          commentId: comment.commentId,
+          comment: comment.comment,
+          userId: comment.userId ? comment.userId : "none",
+          nickname: comment.nickname ? comment.nickname : "(알수없음)",
+          profile: comment.profile ? comment.profile : "none",
+          createdAt: comment.createdAt,
+          updatedAt: comment.updatedAt,
+        };
+      }),
+      isFollowed: isFollowed ? true : false,
+      isChallenged: ischallenged ? true : false,
+      isTodayDone: todaysChallenge ? true : false,
     };
   };
 
   // mbti 알고리즘 [GET] /api/todolists/mbti/:mbti
   mbtiGet = async (user) => {
-    if (!user) {
+    if (user.userId === "none") {
       return {
         mbti: null,
       };

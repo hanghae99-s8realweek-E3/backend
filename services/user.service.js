@@ -5,30 +5,16 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const Boom = require("@hapi/boom");
 
-//이메일 형식
-const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
-//비밀번호 글자수 8~20 & 필수 포함 영어, 숫자, 특수문자 2개 이상 혼합
-const regexPassword =
-  /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
-const regexNickname = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|]{1,}$/;
-
 class UserService {
   // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmPassword, nickname) => {
-    const emailCheck = regexEmail.test(email);
-    const passwordCheck = regexPassword.test(password);
-    const nicknameCheck = regexNickname.test(nickname);
-    const duplicateCheck = await User.findOne({ where: { email: email } });
+    const checkEamilDuplicate = await User.findOne({ where: { email: email } });
     const authResult = await EmailAuth.findOne({
       where: { email, authCheck: true },
     });
 
-    if (duplicateCheck) {
+    if (checkEamilDuplicate) {
       throw Boom.badRequest("중복된 이메일 입니다.");
-    }
-
-    if (!emailCheck || !passwordCheck || !nicknameCheck) {
-      throw Boom.badRequest("이메일, 비밀번호, 닉네임 형식이 알맞지 않습니다");
     }
 
     if (password !== confirmPassword) {
@@ -39,25 +25,27 @@ class UserService {
       throw new Error("이메일 인증이 완료되지 않았습니다.");
     }
 
-    const bcr_password = bcrypt.hashSync(
+    const bcrPassword = bcrypt.hashSync(
       password,
       parseInt(parseInt(process.env.SALT))
     ); //비밀번호 암호화
 
     await User.create({
       email,
-      password: bcr_password,
+      password: bcrPassword,
       nickname,
     });
 
     const userData = await User.findOne({ where: { email: email } });
     const userId = userData.userId;
     const mbti = userData.mbti;
+    const provider = userData.provider;
 
     const payload = {
       userId: userId,
       nickname: nickname,
       mbti: mbti,
+      provider: provider,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -75,11 +63,13 @@ class UserService {
     const updaetedUserId = userData.userId;
     const updatedMbti = userData.mbti;
     const nickname = userData.nickname;
+    const provider = userData.provider;
 
     const payload = {
       userId: updaetedUserId,
       nickname: nickname,
       mbti: updatedMbti,
+      provider: provider,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -96,16 +86,13 @@ class UserService {
       throw Boom.badRequest("회원정보가 없습니다.");
     }
 
-    if (!email || !password) {
-      throw Boom.badRequest("빈칸을 채워주세요");
-    }
-
     const userId = userData.userId;
     const nickname = userData.nickname;
     const mbti = userData.mbti;
-    const passwordSame = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
+    const provider = userData.provider;
+    const bcrCompareResult = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
-    if (!passwordSame) {
+    if (!bcrCompareResult) {
       throw Boom.badRequest("아이디나 비번이 올바르지 않습니다.");
     }
 
@@ -113,6 +100,7 @@ class UserService {
       userId: userId,
       nickname: nickname,
       mbti: mbti,
+      provider: provider,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -186,18 +174,19 @@ class UserService {
     await EmailAuth.update({ authCheck: true }, { where: { email } });
   };
 
-  // 회원 정보 조회 [GET] /api/accounts
+  //회원 정보 조회 [GET] /api/accounts
   userInfoGet = async (userId) => {
-    const userData = await User.findByPk(userId);
+    const [userData, myfolloing, myfollower] = await Promise.all([
+      User.findByPk(userId),
 
-    const myfolloing = await Follow.findAll({
-      where: { userIdFollower: userId },
-    });
+      Follow.findAll({
+        where: { userIdFollower: userId },
+      }),
 
-    const myfollower = await Follow.findAll({
-      where: { userIdFollowing: userId },
-    });
-
+      Follow.findAll({
+        where: { userIdFollowing: userId },
+      }),
+    ]);
     return {
       userId: userData.userId,
       mbti: userData.mbti,
@@ -221,8 +210,12 @@ class UserService {
     const userData = await User.findByPk(userId);
 
     if (password) {
-      const compareResult = await bcrypt.compare(password, userData.password);
-      if (!compareResult) {
+      const bcrCompareResult = await bcrypt.compare(
+        password,
+        userData.password
+      );
+
+      if (!bcrCompareResult) {
         throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
       if (newPassword !== confirmPassword) {
@@ -230,8 +223,12 @@ class UserService {
           "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
         );
       }
-      const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
-      await User.update({ password: hash }, { where: { userId } });
+
+      const bcrPassword = bcrypt.hashSync(
+        newPassword,
+        parseInt(process.env.SALT)
+      );
+      await User.update({ password: bcrPassword }, { where: { userId } });
     }
 
     if (nickname) {
@@ -253,6 +250,7 @@ class UserService {
       userId: changedData.userId,
       nickname: changedData.nickname,
       mbti: changedData.mbti,
+      provider: changedData.provider,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -266,24 +264,24 @@ class UserService {
   userInfoDelete = async (userId, password) => {
     const userData = await User.findByPk(userId);
 
-    const compareResult = await bcrypt.compare(password, userData.password);
-    if (!compareResult) {
+    const bcrCompareResult = await bcrypt.compare(password, userData.password);
+    if (!bcrCompareResult) {
       throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
 
     // 회원탈퇴 후 follow DB에서 해당 userId 데이터 삭제하는 과정 트렌젝션 설정
-    const t = await sequelize.transaction();
+    const onTransaction = await sequelize.transaction();
     try {
-      await User.destroy({ where: { userId }, transaction: t });
+      await User.destroy({ where: { userId }, transaction: onTransaction });
       await Follow.destroy({
         where: {
           [Op.or]: [{ userIdFollowing: userId }, { userIdFollower: userId }],
         },
-        transaction: t,
+        transaction: onTransaction,
       });
-      await t.commit();
+      await onTransaction.commit();
     } catch (err) {
-      await t.rollback();
+      await onTransaction.rollback();
     }
   };
 }

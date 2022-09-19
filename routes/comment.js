@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/auth_middlewares");
+
 const CommentController = require("../controllers/comment.controller");
 const commentController = new CommentController();
+
+const authMiddleware = require("../middlewares/auth_middlewares");
 
 // 댓글 작성 [POST] /api/comments/:todoId
 router.post("/:todoId", authMiddleware, commentController.createComment);
