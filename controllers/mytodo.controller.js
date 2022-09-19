@@ -9,10 +9,8 @@ class MyTodoController {
   createChallengedTodo = async (req, res, next) => {
     try {
       const { todoId } = req.params;
-      const { todo } = await this.joi.todoSchema.validateAsync(req.body);
-      const { mbti } = await this.joi.mbtiSchema.validateAsync(req.body);
       const { userId } = res.locals.user;
-      await this.myTodoService.challengedTodoCreate(todoId, todo, mbti, userId);
+      await this.myTodoService.challengedTodoCreate(todoId, userId);
       res.status(201).json({
         message: "success",
       });
@@ -47,7 +45,7 @@ class MyTodoController {
       const { userId } = res.locals.user;
       const isCompleted = await this.myTodoService.challengedTodoComplete(
         challengedTodoId,
-        userId,
+        userId
       );
       res.status(201).json({
         isCompleted,
