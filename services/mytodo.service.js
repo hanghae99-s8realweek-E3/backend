@@ -224,28 +224,18 @@ class myTodoController {
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (user, userId) => {
-    const [userInfo, following, follower, createdTodos, challengedTodos] =
-      await Promise.all([
-        User.findOne({
-          where: { userId },
-        }),
-        Follow.findAll({
-          where: { userIdFollower: userId },
-        }),
-        Follow.findAll({
-          where: { userIdFollowing: userId },
-        }),
-        Todo.findAll({
-          where: { userId },
-          order: [["createdAt", "DESC"]],
-          limit: 20,
-        }),
-        ChallengedTodo.findAll({
-          where: { userId },
-          order: [["createdAt", "DESC"]],
-          limit: 20,
-        }),
-      ]);
+    const [userInfo, following, follower] = await Promise.all([
+      User.findOne({
+        where: { userId },
+        include: ["Todos", "ChallengedTodos"],
+      }),
+      Follow.findAll({
+        where: { userIdFollower: userId },
+      }),
+      Follow.findAll({
+        where: { userIdFollowing: userId },
+      }),
+    ]);
 
     if (!userInfo) {
       throw Boom.badRequest("존재하지 않거나 탈퇴한 회원입니다.");
@@ -264,8 +254,8 @@ class myTodoController {
             ? true
             : false,
       },
-      challengedTodos,
-      createdTodos,
+      challengedTodos: userInfo.ChallengedTodos,
+      createdTodos: userInfo.Todos,
     };
   };
 }
