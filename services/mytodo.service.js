@@ -80,9 +80,8 @@ class myTodoController {
   challengedTodoComplete = async (challengedTodoId, userId) => {
     //이용자가 오늘 등록한 challengedTodoId를 진행완료 했는지 못했는지 반영
     //isCompleted boolean값을 변경시켜주어야함
-
-    //이용자가 오늘 도전한 todo가 있는 없는지 수언 체크
-    const selectQuery = `SELECT *
+    //이용자가 오늘 도전한 todo가 있는 없는지 체크
+    const selectQuery = `SELECT isCompleted
       FROM challengedTodos
       WHERE challengedTodoId = ${challengedTodoId} 
       AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
@@ -90,6 +89,7 @@ class myTodoController {
     const challengedTodoData = await sequelize.query(selectQuery, {
       type: QueryTypes.SELECT,
     });
+    
 
     if (!challengedTodoData.length) {
       throw Boom.badRequest("오늘 도전한 todo가 없습니다.");
@@ -101,16 +101,16 @@ class myTodoController {
     WHERE challengedTodoId = ${challengedTodoId} 
     AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
     AND userId = ${userId};`;
-    const updatedChallengedTodoData = await sequelize.query(updateQuery, {
+    await sequelize.query(updateQuery, {
       type: QueryTypes.UPDATE,
     });
 
-    //최종 challengedTodos안에
-    // const updatedChallengedTodoData = await sequelize.query(selectQuery, {
-    //   type: QueryTypes.SELECT,
-    // });
+    const updatedChallengedTodoData = await sequelize.query(selectQuery, {
+      type: QueryTypes.SELECT,
+    });
 
     let isCompleted = updatedChallengedTodoData[0].isCompleted;
+    console.log(isCompleted);
     return isCompleted;
   };
 
