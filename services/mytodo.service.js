@@ -1,29 +1,28 @@
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 
+const dayjs = require("dayjs");
 const Boom = require("@hapi/boom");
-const KoreanTime = require("../advice/date");
-const todayDate = KoreanTime(); //YYYY-MM-DD
+const localDate = dayjs().format("YYYY-MM-DD");
 
 class myTodoController {
   // 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, todo, mbti, userId) => {
-    //Todo 테이블에 isTodo가 false이면 이용불가===ok
-    //my todo테이블 ChallengeTodo에 <userId+ 날짜 date + todoId >입력===ok
-    //todo테이블 challengcount count는 mytodo 테이블에서 challengedtodo 갯수로 보내주기====ok
+    //todoId가 Todos테이블에 존재하는건지 유효성 체크
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
     //내가 오늘 날짜에 작성한게 있는지 체크
-    //userId + 오늘 날짜가 필요함
+    //userId + 오늘 날짜가 필요
     const query = `SELECT *
       FROM challengedTodos
-      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
+      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
     const challengeTodoData = await sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
 
+    //이미 오늘 도전을 답았는지 challengedtodo 데이터 체크
     if (challengeTodoData.length) {
       throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
     }
@@ -31,6 +30,7 @@ class myTodoController {
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
     const t = await sequelize.transaction();
     try {
+      //ChallengedTodo애 들어갈내용(userId,mbti,challengedTodo,originTodoId)생성
       await ChallengedTodo.create(
         {
           userId: userId,
@@ -41,8 +41,9 @@ class myTodoController {
         { transaction: t }
       );
 
+      //Todos의 todoId가 몇번 도전되었는지 체크 하여 업데이트
       const challengedTodo = await ChallengedTodo.findAll({
-        where: { challengedTodo: todoId },
+        where: { originTodoId: todoId },
         transaction: t,
       });
       const challengCount = challengedTodo.length;
@@ -61,14 +62,10 @@ class myTodoController {
   challengedTodoDelete = async (date, userId, todoId) => {
     const t = await sequelize.transaction();
     try {
-
-      
-
       const challengedTodo = await ChallengedTodo.findAll({
         where: { challengedTodo: todoId },
         transaction: t,
       });
-
       const challengCount = challengedTodo.length;
       await Todo.update(
         { challengedCounts: challengCount },
@@ -81,7 +78,7 @@ class myTodoController {
   };
 
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
-  challengedTodoComplete = async ( userId, challengedTodoId) => {
+  challengedTodoComplete = async (userId, challengedTodoId) => {
     const selectQuery = `SELECT *
       FROM challengedTodos
       WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')AND challengedTodoId = ${challengedTodoId};`;
@@ -120,7 +117,7 @@ class myTodoController {
     }
     const query = `SELECT *
       FROM todos
-      WHERE isTodo = "1" AND userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${todayDate}', '%Y-%m-%d');`;
+      WHERE isTodo = "1" AND userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
     const checkTodoData = await sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
