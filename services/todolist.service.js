@@ -138,7 +138,7 @@ class TodoListService {
     }
 
     return {
-      todoInfo,
+      todoInfo: todoInfo[0],
       comments: comments.map((comment) => {
         return {
           commentId: comment.commentId,
