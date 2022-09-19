@@ -19,7 +19,7 @@ module.exports = class EmailAuth extends Sequelize.Model {
         },
         authCheck: {
           type: Sequelize.BOOLEAN,
-          allowNull: true,
+          allowNull: false,
           defaultValue: false,
         },
       },

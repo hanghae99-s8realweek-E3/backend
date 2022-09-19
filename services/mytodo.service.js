@@ -13,8 +13,12 @@ class myTodoController {
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
-    //내가 오늘 날짜에 작성한게 있는지 체크
-    //userId + 오늘 날짜가 필요
+    if (!todoData.mbti) {
+      console.log(todoData.mbti);
+      throw Boom.badRequest("MBTI 정보 등록바랍니다.");
+    }
+
+    //오늘 날짜 + userId
     const query = `SELECT *
       FROM challengedTodos
       WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
@@ -182,12 +186,8 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (user, date) => {
-    if (!date) {
-      throw Boom.badRequest("날짜를 입력해 주세요.");
-    }
     const userInfo = await User.findOne({
       where: { userId: user.userId },
-      include: [{ model: ChallengedTodo }],
     });
     const myfolloing = await Follow.findAll({
       where: { userIdFollower: user.userId },
@@ -196,36 +196,23 @@ class myTodoController {
       where: { userIdFollowing: user.userId },
     });
 
-    const query = `SELECT todoId, userId, todo, mbti, nickname, commentCounts, challengedCounts
+    const query = `SELECT *,
+                    (SELECT nickname FROM users WHERE users.userId = todos.userId) AS nickname, 
+                    (SELECT profile FROM users WHERE users.userId = todos.userId) AS profile
       FROM todos
-      WHERE isTodo = true AND userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+      WHERE userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
     const createdTodo = await sequelize.query(query, {
       type: QueryTypes.SELECT,
     });
 
-    const query2 = `SELECT *
-      FROM challengedTodos
-      LEFT OUTER JOIN todos ON challengedTodos.challengedTodo = todos.todoId 
-      WHERE challengedTodos.userId = ${user.userId} AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
-    const challenge = await sequelize.query(query2, {
+    const query2 = `SELECT *,
+                    (SELECT nickname FROM users WHERE users.userId = challengedTodos.userId) AS nickname, 
+                    (SELECT profile FROM users WHERE users.userId = challengedTodos.userId) AS profile
+      FROM challengedTodos 
+      WHERE userId = ${user.userId} AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
+    const challengedTodo = await sequelize.query(query2, {
       type: QueryTypes.SELECT,
     });
-
-    let challengedTodo = "";
-    if (challenge.length === 0) {
-      challengedTodo = [];
-    } else {
-      challengedTodo = {
-        todoId: challenge[0].todoId,
-        userId: challenge[0].userId,
-        todo: challenge[0].todo,
-        mbti: challenge[0].mbti,
-        nickname: challenge[0].nickname,
-        commentCounts: challenge[0].commentCounts,
-        challengedCounts: challenge[0].challengedCounts,
-        isCompleted: challenge[0].isCompleted,
-      };
-    }
 
     return {
       userInfo: {
@@ -236,7 +223,7 @@ class myTodoController {
         followingCount: myfolloing.length,
         followerCount: myfollower.length,
       },
-      challengedTodo,
+      challengedTodo: challengedTodo[0] ? challengedTodo[0] : [],
       createdTodo: createdTodo[0] ? createdTodo[0] : [],
       date,
     };
@@ -259,24 +246,15 @@ class myTodoController {
       where: { userIdFollowing: userId },
     });
     // 제안 todo 최신 20개
-    const createdTodo = await Todo.findAll({
-      where: { isTodo: true, userId },
+    const createdTodos = await Todo.findAll({
+      where: { userId },
       order: [["createdAt", "DESC"]],
-      attributes: { exclude: ["isTodo"] },
       limit: 20,
     });
     // 도전 todo 최신 20개
-    const challenges = await ChallengedTodo.findAll({
+    const challengedTodos = await ChallengedTodo.findAll({
       where: { userId },
-      attributes: ["challengedTodo"],
       order: [["createdAt", "DESC"]],
-      limit: 20,
-    });
-    const challengesArr = challenges.map((c) => c.challengedTodo);
-    const challengedTodos = await Todo.findAll({
-      where: { todoId: challengesArr },
-      order: [["createdAt", "DESC"]],
-      attributes: { exclude: ["isTodo"] },
       limit: 20,
     });
 
@@ -294,35 +272,8 @@ class myTodoController {
             : false,
       },
       challengedTodos,
-      createdTodo,
+      createdTodos,
     };
-
-    // return {
-    //   userInfo: {
-    //     userId,
-    //     nickname: userInfo.nickname,
-    //     profile: userInfo.profile,
-    //     mbti: userInfo.mbti,
-    //     followingCount: following.length,
-    //     followerCount: follower.length,
-    //     isFollowed:
-    //       follower.findIndex((f) => f.userIdFollower === user.userId) !== -1
-    //         ? true
-    //         : false,
-    //   },
-    //   challengedTodos: challenges.map((c) => {
-    //     return {
-    //       todoId: c.Todo.todoId,
-    //       userId: c.Todo.userId,
-    //       todo: c.Todo.todo,
-    //       mbti: c.Todo.mbti,
-    //       nickname: c.Todo.nickname,
-    //       commentCounts: c.Todo.commentCounts,
-    //       challengCounts: c.Todo.challengCounts,
-    //     };
-    //   }),
-    //   createdTodo,
-    // };
   };
 }
 

@@ -36,7 +36,7 @@ module.exports = (req, res, next) => {
         }
       );
     } else {
-      res.locals.user = "";
+      res.locals.user = { userId: "none" };
       next();
     }
   } catch (err) {

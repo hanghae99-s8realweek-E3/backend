@@ -210,7 +210,11 @@ class UserService {
     const userData = await User.findByPk(userId);
 
     if (password) {
-      const bcrCompareResult = await bcrypt.compare(password, userData.password);
+      const bcrCompareResult = await bcrypt.compare(
+        password,
+        userData.password
+      );
+
       if (!bcrCompareResult) {
         throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
@@ -219,8 +223,11 @@ class UserService {
           "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
         );
       }
-      const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
-      await User.update({ password: hash }, { where: { userId } });
+      const bcrPassword = bcrypt.hashSync(
+        newPassword,
+        parseInt(process.env.SALT)
+      );
+      await User.update({ password: bcrPassword }, { where: { userId } });
     }
 
     if (nickname) {
@@ -262,18 +269,18 @@ class UserService {
     }
 
     // 회원탈퇴 후 follow DB에서 해당 userId 데이터 삭제하는 과정 트렌젝션 설정
-    const onTranscation = await sequelize.transaction();
+    const onTransaction = await sequelize.transaction();
     try {
-      await User.destroy({ where: { userId }, transaction: onTranscation });
+      await User.destroy({ where: { userId }, transaction: onTransaction });
       await Follow.destroy({
         where: {
           [Op.or]: [{ userIdFollowing: userId }, { userIdFollower: userId }],
         },
-        transaction: onTranscation,
+        transaction: onTransaction,
       });
-      await onTranscation.commit();
+      await onTransaction.commit();
     } catch (err) {
-      await onTranscation.rollback();
+      await onTransaction.rollback();
     }
   };
 }
