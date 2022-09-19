@@ -57,26 +57,46 @@ class myTodoController {
     }
   };
 
-  // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
-  challengedTodoDelete = async (date, userId, todoId) => {
-    const t = await sequelize.transaction();
+  // 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
+  challengedTodoDelete = async (challengedTodoId) => {
+    const onTranscation = await sequelize.transaction();
     try {
-      const challengedTodo = await ChallengedTodo.findAll({
-        where: { challengedTodo: todoId },
-        transaction: t,
+      const challengedTodoData = await ChallengedTodo.findOne({
+        where: { challengedTodoId: challengedTodoId },
+        transaction: onTranscation,
       });
-      const challengCount = challengedTodo.length;
+      if (challengedTodoData === null) {
+        throw Boom.badRequest("삭제되었거나 존재하지 않는 todo 입니다.");
+      }
+
+      //삭제되어지는 todoId
+      const deletedTodoId = challengedTodoData.originTodoId;
+
+      //challengedTodoId를 기준으로 데이터 삭제
+      await ChallengedTodo.destroy({
+        where: { challengedTodoId: challengedTodoId },
+        transaction: onTranscation,
+      });
+
+      //삭제된 todoId의 갯수
+      const deletedTodoData = await ChallengedTodo.findAll({
+        where: { originTodoId: deletedTodoId },
+        transaction: onTranscation,
+      });
+      const deletedTodoIdCount = deletedTodoData.length;
+
+      //Todos테이블에 도전갯수 업데이트
       await Todo.update(
-        { challengedCounts: challengCount },
-        { where: { todoId: todoId }, transaction: t }
+        { challengedCounts: deletedTodoIdCount },
+        { where: { todoId: deletedTodoId }, transaction: onTranscation }
       );
-      await t.commit();
+      await onTranscation.commit();
     } catch (err) {
-      await t.rollback();
+      await onTranscation.rollback();
     }
   };
 
-  // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
+  // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:challengedTodoId/challenged
   challengedTodoComplete = async (challengedTodoId, userId) => {
     //이용자가 오늘 등록한 challengedTodoId를 진행완료 했는지 못했는지 반영
     //isCompleted boolean값을 변경시켜주어야함
@@ -89,7 +109,6 @@ class myTodoController {
     const challengedTodoData = await sequelize.query(selectQuery, {
       type: QueryTypes.SELECT,
     });
-    
 
     if (!challengedTodoData.length) {
       throw Boom.badRequest("오늘 도전한 todo가 없습니다.");
