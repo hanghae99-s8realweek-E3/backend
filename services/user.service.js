@@ -25,14 +25,14 @@ class UserService {
       throw new Error("이메일 인증이 완료되지 않았습니다.");
     }
 
-    const bcrPassword = bcrypt.hashSync(
+    const bcr_password = bcrypt.hashSync(
       password,
       parseInt(parseInt(process.env.SALT))
     ); //비밀번호 암호화
 
     await User.create({
       email,
-      password: bcrPassword,
+      password: bcr_password,
       nickname,
     });
 
@@ -174,49 +174,54 @@ class UserService {
     await EmailAuth.update({ authCheck: true }, { where: { email } });
   };
 
-  // 회원 정보 조회 [GET] /api/accounts
-  // userInfoGet = async (userId) => {
-  //   const userData = await User.findByPk(userId);
+  //회원 정보 조회 [GET] /api/accounts
+  userInfoGet = async (userId) => {
+    const userData = await User.findByPk(userId);
 
-  //   const myfolloing = await Follow.findAll({
-  //     where: { userIdFollower: userId },
-  //   });
-
-  //   const myfollower = await Follow.findAll({
-  //     where: { userIdFollowing: userId },
-  //   });
-
-  //   return {
-  //     userId: userData.userId,
-  //     mbti: userData.mbti,
-  //     nickname: userData.nickname,
-  //     profile: userData.profile,
-  //     following: myfolloing.length,
-  //     follower: myfollower.length,
-  //   };
-  // };
-  userInfoGet(userId) {
-    const userData = User.findByPk(userId);
-    const myfolloing = Follow.findAll({
+    const myfolloing = await Follow.findAll({
       where: { userIdFollower: userId },
     });
-    const myfollower = Follow.findAll({
+
+    const myfollower = await Follow.findAll({
       where: { userIdFollowing: userId },
     });
-    const result = Promise.all([userData, myfolloing, myfollower]).then(
-      function (data) {
-        return {
-          userId: data[0].userId,
-          mbti: data[0].mbti,
-          nickname: data[0].nickname,
-          profile: data[0].profile,
-          following: data[1].length,
-          follower: data[2].length,
-        };
-      }
-    );
-    return result;
-  }
+
+    return {
+      userId: userData.userId,
+      mbti: userData.mbti,
+      nickname: userData.nickname,
+      profile: userData.profile,
+      following: myfolloing.length,
+      follower: myfollower.length,
+    };
+  };
+
+
+
+  // userInfoGet(userId) {
+  //   const userData = User.findByPk(userId);
+
+  //   const myfolloing = Follow.findAll({
+  //     where: { userIdFollower: userId },
+  //   });
+  //   const myfollower = Follow.findAll({
+  //     where: { userIdFollowing: userId },
+  //   });
+  //   const result = Promise.all([userData, myfolloing, myfollower]).then(
+  //     function (data) {
+  //       return {
+  //         userId: data[0].userId,
+  //         mbti: data[0].mbti,
+  //         nickname: data[0].nickname,
+  //         profile: data[0].profile,
+  //         following: data[1].length,
+  //         follower: data[2].length,
+  //       };
+  //     }
+  //   );
+
+  //   return result;
+  // }
 
   // 회원 정보 변경 [PUT] /api/accounts
   userInfoChange = async (
