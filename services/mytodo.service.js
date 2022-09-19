@@ -103,8 +103,7 @@ class myTodoController {
     //이용자가 오늘 도전한 todo가 있는 없는지 체크
     const selectQuery = `SELECT isCompleted
       FROM challengedTodos
-      WHERE challengedTodoId = ${challengedTodoId} 
-      AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
+      WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
       AND userId = ${userId};`;
     const challengedTodoData = await sequelize.query(selectQuery, {
       type: QueryTypes.SELECT,
@@ -120,16 +119,21 @@ class myTodoController {
     WHERE challengedTodoId = ${challengedTodoId} 
     AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
     AND userId = ${userId};`;
-    await sequelize.query(updateQuery, {
+    const check = await sequelize.query(updateQuery, {
       type: QueryTypes.UPDATE,
     });
+
+    //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 cchallengedTodoId가 올바르지 않는경우 에러처리
+    if (check[1] === 0) {
+      throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
+    }
 
     const updatedChallengedTodoData = await sequelize.query(selectQuery, {
       type: QueryTypes.SELECT,
     });
 
     let isCompleted = updatedChallengedTodoData[0].isCompleted;
-    console.log(isCompleted);
+    // console.log(isCompleted);
     return isCompleted;
   };
 
@@ -164,22 +168,17 @@ class myTodoController {
 
   // todo 삭제 [DELETE] /api/mytodos/:todoId
   todoDelete = async (todoId, userId) => {
-    //====ok
-    //todo테이블에 istodo false로 변경
-
     const todoData = await Todo.findOne({
       where: { todoId: todoId, userId: userId },
     });
 
-    if (todoData !== null) {
-      if (todoData.isTodo === false) {
-        throw Boom.badRequest("이미 삭제된 todo입니다.");
-      }
-    } else {
-      throw Boom.badRequest("삭제할 todo가 없습니다.");
+    if (todoData === null) {
+      throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
 
-    await Todo.update({ isTodo: false }, { where: { todoId: todoId } });
+    await Todo.destroy({
+      where: { todoId: todoId },
+    });
   };
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
