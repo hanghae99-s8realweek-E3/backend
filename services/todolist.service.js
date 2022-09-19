@@ -134,20 +134,16 @@ class TodoListService {
         },
       ],
     });
-
     if (!todoInfo) {
       throw Boom.badRequest("존재하지 않는 Todo입니다.");
     }
-
     if (!todoInfo.isTodo) {
       throw Boom.badRequest("이미 삭제된 Todo입니다.");
     }
-
     // 도전한 적 있는지 체크
     const challenge = await ChallengedTodo.findOne({
       where: { userId, ChallengedTodo: todoId },
     });
-
     // 오늘 도전한 todo 있는지 체크
     const today = new Date();
     today.setHours(0, 0, 0, 0); // 오늘 (과거의) 자정
@@ -157,12 +153,10 @@ class TodoListService {
         createdAt: { [Op.gte]: today },
       },
     });
-
     // 작성자 팔로우 여부 체크
     const myfollowing = await Follow.findOne({
       where: { userIdFollower: userId, userIdFollowing: todoInfo.userId },
     });
-
     return {
       todoInfo,
       isFollowed: myfollowing ? true : false,

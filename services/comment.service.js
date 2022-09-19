@@ -1,9 +1,6 @@
 const {
   Comment,
   Todo,
-  User,
-  ChallengedTodo,
-  Follow,
   sequelize,
 } = require("../models");
 const Boom = require("@hapi/boom");
@@ -20,7 +17,7 @@ class CommentService {
     }
 
     // 댓글 생성하고 댓글 개수 update하는 과정 트렌젝션 설정
-    const t = await sequelize.transaction();
+    const onTransaction = await sequelize.transaction();
     try {
       await Comment.create(
         {
@@ -29,21 +26,20 @@ class CommentService {
           todoId,
           comment,
         },
-        { transaction: t }
+        { transaction: onTransaction }
       );
       const todo = await Todo.findOne({
         where: { todoId },
         include: [{ model: Comment }],
-        transaction: t,
+        transaction: onTransaction,
       });
-
       await Todo.update(
         { commentCounts: todo.Comments.length },
-        { where: { todoId }, transaction: t }
+        { where: { todoId }, transaction: onTransaction }
       );
-      await t.commit();
+      await onTransaction.commit();
     } catch (err) {
-      await t.rollback();
+      await onTransaction.rollback();
     }
   };
 
@@ -58,23 +54,26 @@ class CommentService {
     }
 
     // 댓글 삭제하고 댓글 개수 update하는 과정 트렌젝션 설정
-    const t = await sequelize.transaction();
+    const onTransaction = await sequelize.transaction();
     try {
-      await Comment.destroy({ where: { commentId }, transaction: t });
+      await Comment.destroy({
+        where: { commentId },
+        transaction: onTransaction,
+      });
 
       const todo = await Todo.findOne({
         where: { todoId: comment.todoId },
         include: [{ model: Comment }],
-        transaction: t,
+        transaction: onTransaction,
       });
 
       await Todo.update(
         { commentCounts: todo.Comments.length },
-        { where: { todoId: comment.todoId }, transaction: t }
+        { where: { todoId: comment.todoId }, transaction: onTransaction }
       );
-      await t.commit();
+      await onTransaction.commit();
     } catch (err) {
-      await t.rollback();
+      await onTransaction.rollback();
     }
   };
 }

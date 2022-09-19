@@ -26,14 +26,14 @@ class UserService {
       throw new Error("이메일 인증이 완료되지 않았습니다.");
     }
 
-    const bcr_password = bcrypt.hashSync(
+    const bcrPassword = bcrypt.hashSync(
       password,
       parseInt(parseInt(process.env.SALT))
     ); //비밀번호 암호화
 
     await User.create({
       email,
-      password: bcr_password,
+      password: bcrPassword,
       nickname,
     });
 
@@ -219,8 +219,8 @@ class UserService {
           "비밀번호와 비밀번호 확인값이 일치 하지 않습니다."
         );
       }
-      const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
-      await User.update({ password: hash }, { where: { userId } });
+      const bcrPassword = bcrypt.hashSync(newPassword, parseInt(process.env.SALT));
+      await User.update({ password: bcrPassword }, { where: { userId } });
     }
 
     if (nickname) {
