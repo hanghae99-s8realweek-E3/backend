@@ -21,12 +21,12 @@ class myTodoController {
     }
 
     //오늘 날짜 + userId
-    const query = `SELECT *
-      FROM challengedTodos
-      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
-    const challengeTodoData = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
-    });
+    const challengeTodoData = await sequelize.query(
+      this.query.challengedTodoSelectQuery(localDate, userId),
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     //이미 오늘 도전을 답았는지 challengedtodo 데이터 체크
     if (challengeTodoData.length) {
@@ -107,36 +107,37 @@ class myTodoController {
     //이용자가 오늘 등록한 challengedTodoId를 진행완료 했는지 못했는지 반영
     //isCompleted boolean값을 변경시켜주어야함
     //이용자가 오늘 도전한 todo가 있는 없는지 체크
-    const selectQuery = `SELECT isCompleted
-      FROM challengedTodos
-      WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
-      AND userId = ${userId};`;
-    const challengedTodoData = await sequelize.query(selectQuery, {
-      type: QueryTypes.SELECT,
-    });
+
+    const challengedTodoData = await sequelize.query(
+      this.query.todayMyChallengedTodoSelectQuery(localDate, userId),
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (!challengedTodoData.length) {
       throw Boom.badRequest("오늘 도전한 todo가 없습니다.");
     }
 
     //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
-    const updateQuery = `UPDATE challengedTodos 
-    SET isCompleted = IF (isCompleted = true ,false ,true) 
-    WHERE challengedTodoId = ${challengedTodoId} 
-    AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
-    AND userId = ${userId};`;
-    const check = await sequelize.query(updateQuery, {
-      type: QueryTypes.UPDATE,
-    });
+    const checkIscompleted = await sequelize.query(
+      this.query.updateIsCompletedQuery(challengedTodoId, localDate, userId),
+      {
+        type: QueryTypes.UPDATE,
+      }
+    );
 
-    //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 cchallengedTodoId가 올바르지 않는경우 에러처리
-    if (check[1] === 0) {
+    //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 challengedTodoId가 올바르지 않는경우 에러처리
+    if (checkIscompleted[1] === 0) {
       throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
     }
 
-    const updatedChallengedTodoData = await sequelize.query(selectQuery, {
-      type: QueryTypes.SELECT,
-    });
+    const updatedChallengedTodoData = await sequelize.query(
+      this.query.todayMyChallengedTodoSelectQuery(localDate, userId),
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     const isCompleted = updatedChallengedTodoData[0].isCompleted;
     return isCompleted;
@@ -153,12 +154,13 @@ class myTodoController {
     if (!userData.mbti) {
       throw Boom.badRequest("mbti 정보를 등록후 작성바랍니다.");
     }
-    const query = `SELECT *
-      FROM todos
-      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
-    const checkTodoData = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
-    });
+
+    const checkTodoData = await sequelize.query(
+      this.query.todosSelectquery(localDate, userId),
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (checkTodoData.length) {
       throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
