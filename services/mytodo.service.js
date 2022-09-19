@@ -1,11 +1,13 @@
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
-
-const dayjs = require("dayjs");
+const Query = require("../advice/query");
 const Boom = require("@hapi/boom");
+const dayjs = require("dayjs");
 const localDate = dayjs().format("YYYY-MM-DD");
 
 class myTodoController {
+  query = new Query();
+
   // 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
@@ -196,23 +198,19 @@ class myTodoController {
       where: { userIdFollowing: user.userId },
     });
 
-    const query = `SELECT *,
-                    (SELECT nickname FROM users WHERE users.userId = todos.userId) AS nickname, 
-                    (SELECT profile FROM users WHERE users.userId = todos.userId) AS profile
-      FROM todos
-      WHERE userId = ${user.userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
-    const createdTodo = await sequelize.query(query, {
-      type: QueryTypes.SELECT,
-    });
+    const createdTodo = await sequelize.query(
+      this.query.createdTodoQuery(user, date),
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
-    const query2 = `SELECT *,
-                    (SELECT nickname FROM users WHERE users.userId = challengedTodos.userId) AS nickname, 
-                    (SELECT profile FROM users WHERE users.userId = challengedTodos.userId) AS profile
-      FROM challengedTodos 
-      WHERE userId = ${user.userId} AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d');`;
-    const challengedTodo = await sequelize.query(query2, {
-      type: QueryTypes.SELECT,
-    });
+    const challengedTodo = await sequelize.query(
+      this.query.challengedTodoQuery(user, date),
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     return {
       userInfo: {
