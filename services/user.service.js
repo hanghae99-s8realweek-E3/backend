@@ -5,30 +5,17 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const Boom = require("@hapi/boom");
 
-//이메일 형식
-const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
-//비밀번호 글자수 8~20 & 필수 포함 영어, 숫자, 특수문자 2개 이상 혼합
-const regexPassword =
-  /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
-const regexNickname = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|]{1,}$/;
 
 class UserService {
   // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmPassword, nickname) => {
-    const emailCheck = regexEmail.test(email);
-    const passwordCheck = regexPassword.test(password);
-    const nicknameCheck = regexNickname.test(nickname);
-    const duplicateCheck = await User.findOne({ where: { email: email } });
+    const checkEamilDuplicate = await User.findOne({ where: { email: email } });
     const authResult = await EmailAuth.findOne({
       where: { email, authCheck: true },
     });
 
-    if (duplicateCheck) {
+    if (checkEamilDuplicate) {
       throw Boom.badRequest("중복된 이메일 입니다.");
-    }
-
-    if (!emailCheck || !passwordCheck || !nicknameCheck) {
-      throw Boom.badRequest("이메일, 비밀번호, 닉네임 형식이 알맞지 않습니다");
     }
 
     if (password !== confirmPassword) {
@@ -53,11 +40,13 @@ class UserService {
     const userData = await User.findOne({ where: { email: email } });
     const userId = userData.userId;
     const mbti = userData.mbti;
+    const provider = userData.provider;
 
     const payload = {
       userId: userId,
       nickname: nickname,
       mbti: mbti,
+      provider: provider
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -75,11 +64,13 @@ class UserService {
     const updaetedUserId = userData.userId;
     const updatedMbti = userData.mbti;
     const nickname = userData.nickname;
+    const provider = userData.provider;
 
     const payload = {
       userId: updaetedUserId,
       nickname: nickname,
       mbti: updatedMbti,
+      provider: provider
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -96,16 +87,13 @@ class UserService {
       throw Boom.badRequest("회원정보가 없습니다.");
     }
 
-    if (!email || !password) {
-      throw Boom.badRequest("빈칸을 채워주세요");
-    }
-
     const userId = userData.userId;
     const nickname = userData.nickname;
     const mbti = userData.mbti;
-    const passwordSame = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
+    const provider = userData.provider;
+    const bcrCompareResult = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
-    if (!passwordSame) {
+    if (!bcrCompareResult) {
       throw Boom.badRequest("아이디나 비번이 올바르지 않습니다.");
     }
 
@@ -113,6 +101,7 @@ class UserService {
       userId: userId,
       nickname: nickname,
       mbti: mbti,
+      provider:provider
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -225,6 +214,7 @@ class UserService {
         password,
         userData.password
       );
+
       if (!bcrCompareResult) {
         throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
       }
@@ -259,6 +249,7 @@ class UserService {
       userId: changedData.userId,
       nickname: changedData.nickname,
       mbti: changedData.mbti,
+      provider: changedData.provider,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {

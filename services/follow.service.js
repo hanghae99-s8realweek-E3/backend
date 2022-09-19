@@ -20,15 +20,12 @@ class FollowService {
     const myFollowerTable = await Follow.findAll({
       where: { userIdFollowing: userId },
     });
-    // console.log(myFollowerTable)
     const myFollowerUserId = myFollowerTable.map(
       (table) => table.userIdFollower
     );
-    // console.log(myFollowerUserId)
     const myFollowerData = await User.findAll({
       where: { userId: myFollowerUserId },
     });
-    //  console.log(myFollowerData)
     const myFollowerlist = await myFollowerData.map((user) => {
       return {
         nickname: user.nickname,

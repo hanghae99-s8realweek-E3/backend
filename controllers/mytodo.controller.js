@@ -19,26 +19,13 @@ class MyTodoController {
     }
   };
 
-  // 나의 todo 피드 조회 [GET] /api/mytodos
-  getMyTodo = async (req, res, next) => {
-    try {
-      const { user } = res.locals;
-      const { date } = await this.joi.dateSchema.validateAsync(req.query);
-      const data = await this.myTodoService.getMyTodo(user, date);
-      res.status(200).json({ message: "success", data });
-    } catch (err) {
-      next(err);
-    }
-  };
-
-
   // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
-      const { date } = await this.joi.dateSchema.validateAsync(req.body);
-      const { todoId } = req.params;
-      const { userId } = res.locals.user;
-      await this.myTodoService.challengedTodoDelete(date, userId, todoId);
+      const { challengedTodoId } = req.params;
+      await this.myTodoService.challengedTodoDelete(
+        challengedTodoId
+      );
       res.status(201).json({
         message: "success",
       });
@@ -50,10 +37,12 @@ class MyTodoController {
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
   completeChallengedTodo = async (req, res, next) => {
     try {
-      const { date } = await this.joi.dateSchema.validateAsync(req.body);
-      const { todoId } = req.params;
+      const { challengedTodoId } = req.params;
       const { userId } = res.locals.user;
-      const isCompleted = await this.myTodoService.challengedTodoComplete(date, userId, todoId);
+      const isCompleted = await this.myTodoService.challengedTodoComplete(
+        challengedTodoId,
+        userId
+      );
       res.status(201).json({
         isCompleted,
         message: "success",
@@ -87,6 +76,18 @@ class MyTodoController {
       res.status(201).json({
         message: "success",
       });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 나의 todo 피드 조회 [GET] /api/mytodos
+  getMyTodo = async (req, res, next) => {
+    try {
+      const { user } = res.locals;
+      const { date } = await this.joi.dateSchema.validateAsync(req.query);
+      const data = await this.myTodoService.getMyTodo(user, date);
+      res.status(200).json({ message: "success", data });
     } catch (err) {
       next(err);
     }
