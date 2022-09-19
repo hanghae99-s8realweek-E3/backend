@@ -1,24 +1,26 @@
-const {
-  Todo,
-  ChallengedTodo,
-  Follow,
-  Mbti,
-  sequelize,
-} = require("../models");
-const Boom = require("@hapi/boom");
-const { Op } = require("sequelize");
+
+const { Todo, ChallengedTodo, Follow, Mbti, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
+const { Op } = require("sequelize");
+const Query = require("../advice/query");
+const Boom = require("@hapi/boom");
 
 class TodoListService {
+  query = new Query();
+
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (userId, mbti, filter) => {
+    const myChallengedTodos = await ChallengedTodo.findAll({
+      where: { userId },
+    });
     const result = (todos, myChallengedTodos) =>
       todos.map((todo) => {
         return {
           todoInfo: todo,
           isChallenged:
             myChallengedTodos.findIndex(
-              (myChallengedTodo) => myChallengedTodo.todoId === todo.todoId
+              (myChallengedTodo) =>
+                myChallengedTodo.originTodoId === todo.todoId
             ) !== -1
               ? true
               : false,
@@ -29,10 +31,6 @@ class TodoListService {
     if (!mbti && !filter) {
       const todos = await Todo.findAll({
         order: [["createdAt", "DESC"]],
-        limit: 20,
-      });
-      const myChallengedTodos = await ChallengedTodo.findAll({
-        where: { userId },
       });
 
       return result(todos, myChallengedTodos);
@@ -43,10 +41,6 @@ class TodoListService {
       const todos = await Todo.findAll({
         where: { mbti },
         order: [["createdAt", "DESC"]],
-        limit: 20,
-      });
-      const myChallengedTodos = await ChallengedTodo.findAll({
-        where: { userId },
       });
 
       return result(todos, myChallengedTodos);
@@ -61,10 +55,6 @@ class TodoListService {
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
-        });
-        const myChallengedTodos = await ChallengedTodo.findAll({
-          where: { userId },
         });
 
         return result(todos, myChallengedTodos);
@@ -76,10 +66,6 @@ class TodoListService {
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
-        });
-        const myChallengedTodos = await ChallengedTodo.findAll({
-          where: { userId },
         });
 
         return result(todos, myChallengedTodos);
@@ -96,10 +82,6 @@ class TodoListService {
             ["challengedCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
-        });
-        const myChallengedTodos = await ChallengedTodo.findAll({
-          where: { userId },
         });
 
         return result(todos, myChallengedTodos);
@@ -112,10 +94,6 @@ class TodoListService {
             ["commentCounts", "DESC"],
             ["createdAt", "DESC"],
           ],
-          limit: 20,
-        });
-        const myChallengedTodos = await ChallengedTodo.findAll({
-          where: { userId },
         });
 
         return result(todos, myChallengedTodos);
@@ -125,30 +103,22 @@ class TodoListService {
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   todoGet = async (userId, todoId) => {
-    const query = `SELECT *, 
-                    (SELECT nickname FROM users WHERE users.userId = todos.userId) AS nickname, 
-                    (SELECT profile FROM users WHERE users.userId = todos.userId) AS profile
-      FROM todos
-      WHERE todoId = ${todoId}`;
-    const todoInfo = await sequelize.query(query, {
+    const todo = await Todo.findByPk(todoId);
+    if (!todo) {
+      throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
+    }
+
+    const todoInfo = await sequelize.query(this.query.todoInfoQuery(todoId), {
       type: QueryTypes.SELECT,
     });
 
-    const query2 = `SELECT *, 
-                    (SELECT nickname FROM users WHERE users.userId = comments.userId) AS nickname, 
-                    (SELECT profile FROM users WHERE users.userId = comments.userId) AS profile
-      FROM comments
-      WHERE todoId = ${todoId}`;
-    const comments = await sequelize.query(query2, {
+    const comments = await sequelize.query(this.query.commentsQuery(todoId), {
       type: QueryTypes.SELECT,
     });
-    if (!todoInfo) {
-      throw Boom.badRequest("존재하지 않는 Todo입니다.");
-    }
 
     // 도전한 적 있는지 체크
     const ischallenged = await ChallengedTodo.findOne({
-      where: { userId, ChallengedTodo: todoId },
+      where: { userId, originTodoId: todoId },
     });
     // 오늘 도전한 todo 있는지 체크
     const today = new Date();
