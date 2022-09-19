@@ -19,6 +19,9 @@ class myTodoController {
       console.log(todoData.mbti);
       throw Boom.badRequest("MBTI 정보 등록바랍니다.");
     }
+    if (todoData.userId === userId) {
+      throw Boom.badRequest("본인 글은 도전할 수 없습니다.");
+    }
 
     //오늘 날짜 + userId
     const challengeTodoData = await sequelize.query(
