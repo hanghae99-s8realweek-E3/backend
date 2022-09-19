@@ -2,7 +2,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(
-      "ChallengedTodos",
+      "challengedTodos",
       {
         challengedTodoId: {
           type: Sequelize.INTEGER,

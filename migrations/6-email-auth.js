@@ -2,7 +2,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable(
-      "EmailAuths",
+      "emailAuths",
       {
         emailAuthId: {
           type: Sequelize.INTEGER,
