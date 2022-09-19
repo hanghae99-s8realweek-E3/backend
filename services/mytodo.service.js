@@ -188,36 +188,35 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (user, date) => {
-    const [userInfo, myfolloing, myfollower, createdTodo, challengedTodo] =
-      await Promise.all([
-        User.findOne({
-          where: { userId: user.userId },
-        }),
-        Follow.findAll({
-          where: { userIdFollower: user.userId },
-        }),
-        Follow.findAll({
-          where: { userIdFollowing: user.userId },
-        }),
-        sequelize.query(this.query.createdTodoQuery(user, date), {
-          type: QueryTypes.SELECT,
-        }),
-        sequelize.query(this.query.challengedTodoQuery(user, date), {
-          type: QueryTypes.SELECT,
-        }),
-      ]);
+    const myTodos = await sequelize.query(this.query.myTodosQuery(user, date), {
+      type: QueryTypes.SELECT,
+    });
 
     return {
       userInfo: {
-        userId: user.userId,
-        nickname: userInfo.nickname,
-        profile: userInfo.profile,
-        mbti: userInfo.mbti,
-        followingCount: myfolloing.length,
-        followerCount: myfollower.length,
+        userId: myTodos[0].userId,
+        nickname: myTodos[0].nickname,
+        profile: myTodos[0].profile,
+        mbti: myTodos[0].mbti,
+        followingCount: myTodos[0].followingCount,
+        followerCount: myTodos[0].followerCount,
       },
-      challengedTodo: challengedTodo[0] ? challengedTodo[0] : [],
-      createdTodo: createdTodo[0] ? createdTodo[0] : [],
+      challengedTodo: myTodos[0].challengedTodoId
+        ? {
+            challengedTodoId: myTodos[0].challengedTodoId,
+            challengedTodo: myTodos[0].challengedTodo,
+            isCompleted: myTodos[0].isCompleted,
+            originTodoId: myTodos[0].originTodoId,
+          }
+        : [],
+      createdTodo: myTodos[0].todoId
+        ? {
+            todoId: myTodos[0].todoId,
+            todo: myTodos[0].todo,
+            commentCounts: myTodos[0].commentCounts,
+            challengedCounts: myTodos[0].challengedCounts,
+          }
+        : [],
       date,
     };
   };
