@@ -19,7 +19,8 @@ class TodoListService {
           isChallenged:
             myChallengedTodos.findIndex(
               (myChallengedTodo) =>
-                myChallengedTodo.originTodoId === todo.todoId
+                myChallengedTodo.originTodoId === todo.todoId &&
+                myChallengedTodo.isCompleted === true
             ) !== -1
               ? true
               : false,
