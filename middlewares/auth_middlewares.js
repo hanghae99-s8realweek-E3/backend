@@ -6,7 +6,6 @@ module.exports = (req, res, next) => {
   try {
     // Client 요청의 cookies 객체 중 토큰을 authorization으로 읽어들여서, 공백을 기준으로 두 조각으로 나눔
     const { authorization } = req.headers;
-    // console.log(authorization, "인증확인");
     const [authType, authToken] = (authorization || "").split(" ");
 
     // 전달받은 인증값이 Bearer로 시작하지 않으면 인증 실패

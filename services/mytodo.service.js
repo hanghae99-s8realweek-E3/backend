@@ -133,7 +133,6 @@ class myTodoController {
     });
 
     const isCompleted = updatedChallengedTodoData[0].isCompleted;
-    // console.log(isCompleted);
     return isCompleted;
   };
 
