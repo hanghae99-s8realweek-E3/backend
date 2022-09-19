@@ -132,7 +132,7 @@ class myTodoController {
       type: QueryTypes.SELECT,
     });
 
-    let isCompleted = updatedChallengedTodoData[0].isCompleted;
+    const isCompleted = updatedChallengedTodoData[0].isCompleted;
     // console.log(isCompleted);
     return isCompleted;
   };
