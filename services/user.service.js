@@ -5,30 +5,17 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const Boom = require("@hapi/boom");
 
-//이메일 형식
-const regexEmail = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
-//비밀번호 글자수 8~20 & 필수 포함 영어, 숫자, 특수문자 2개 이상 혼합
-const regexPassword =
-  /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
-const regexNickname = /^[ㄱ-ㅎ|가-힣|a-z|A-Z|0-9|]{1,}$/;
 
 class UserService {
   // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmPassword, nickname) => {
-    const emailCheck = regexEmail.test(email);
-    const passwordCheck = regexPassword.test(password);
-    const nicknameCheck = regexNickname.test(nickname);
-    const duplicateCheck = await User.findOne({ where: { email: email } });
+    const checkEamilDuplicate = await User.findOne({ where: { email: email } });
     const authResult = await EmailAuth.findOne({
       where: { email, authCheck: true },
     });
 
-    if (duplicateCheck) {
+    if (checkEamilDuplicate) {
       throw Boom.badRequest("중복된 이메일 입니다.");
-    }
-
-    if (!emailCheck || !passwordCheck || !nicknameCheck) {
-      throw Boom.badRequest("이메일, 비밀번호, 닉네임 형식이 알맞지 않습니다");
     }
 
     if (password !== confirmPassword) {
