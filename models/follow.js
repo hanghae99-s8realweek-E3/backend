@@ -1,33 +1,28 @@
-const Sequelize = require("sequelize");
-
-module.exports = class Follow extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        followId: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        userIdFollowing: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-        userIdFollower: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "Follow",
-        tableName: "follows",
-        paranoid: false,
-        charset: "utf8",
-        collate: "utf8_general_ci",
-      }
-    );
+"use strict";
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Follow extends Model {
   }
+  Follow.init(
+    {
+      followId:{
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
+        type: DataTypes.INTEGER
+      },
+      userIdFollowing: DataTypes.INTEGER,
+      userIdFollower: DataTypes.INTEGER,
+      createdAt:DataTypes.DATE,
+      updatedAt:DataTypes.DATE
+    },
+    {
+      sequelize,
+      modelName: "Follow",
+    }
+  );
+  return Follow;
 };

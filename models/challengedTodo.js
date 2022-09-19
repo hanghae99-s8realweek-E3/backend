@@ -1,50 +1,30 @@
-const Sequelize = require("sequelize");
-
-module.exports = class ChallengedTodo extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        challengedTodoId: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        mbti: {
-          type: Sequelize.STRING(4),
-          allowNull: false,
-        },
-        challengedTodo: {
-          type: Sequelize.STRING(140),
-          allowNull: false,
-        },
-        isCompleted: {
-          type: Sequelize.BOOLEAN,
-          allowNull: true,
-          defaultValue: false,
-        },
-        originTodoId: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "ChallengedTodo",
-        tableName: "challengedTodos",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
-      }
-    );
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class ChallengedTodo extends Model {
+    static associate(models) {
+      this.belongsTo(models.User);
+    }
   }
-
-  static associate(db) {
-    db.ChallengedTodo.belongsTo(db.User, {
-      foreignKey: "userId",
-      targetKey: "userId",
-      onDelete: "CASCADE",
-    });
-  }
+  ChallengedTodo.init({
+    challengedTodoId: {
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER
+    },
+    userId: DataTypes.INTEGER,
+    mbti: DataTypes.STRING,
+    challengedTodo: DataTypes.STRING,
+    isCompleted: DataTypes.BOOLEAN,
+    originTodoId: DataTypes.INTEGER,
+    createdAt:DataTypes.DATE,
+    updatedAt:DataTypes.DATE
+  }, {
+    sequelize,
+    modelName: 'ChallengedTodo',
+  });
+  return ChallengedTodo;
 };

@@ -57,8 +57,8 @@ class UserService {
 
   // mbti 등록 [POST] /api/accounts/mbti
   userMbti = async (mbti, userId) => {
-    await User.update({ mbti: mbti }, { where: { userId: userId } });
-
+    await User.update({ mbti }, { where: { userId: userId } });
+    
     const userData = await User.findOne({ where: { userId: userId } });
     const updaetedUserId = userData.userId;
     const updatedMbti = userData.mbti;

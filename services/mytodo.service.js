@@ -150,6 +150,7 @@ class myTodoController {
     if (!userData) {
       throw Boom.badRequest("사용자 정보가 없습니다.");
     }
+    console.log(userData.mbti);
     if (!userData.mbti) {
       throw Boom.badRequest("mbti 정보를 등록후 작성바랍니다.");
     }

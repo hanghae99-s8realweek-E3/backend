@@ -1,41 +1,29 @@
-const Sequelize = require("sequelize");
-
-module.exports = class Comment extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        commentId: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        comment: {
-          type: Sequelize.STRING(200),
-          allowNull: false,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "Comment",
-        tableName: "comments",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
-      }
-    );
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Comment extends Model {
+    static associate(models) {
+      this.belongsTo(models.User);
+      this.belongsTo(models.Todo);
+    }
   }
-
-  static associate(db) {
-    db.Comment.belongsTo(db.User, {
-      foreignKey: "userId",
-      targetKey: "userId",
-    });
-    db.Comment.belongsTo(db.Todo, {
-      foreignKey: "todoId",
-      targetKey: "todoId",
-      onDelete: "CASCADE",
-    });
-  }
+  Comment.init({
+    commentId: {
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER
+    },
+    userId: DataTypes.INTEGER,
+    todoId: DataTypes.INTEGER,
+    comment: DataTypes.STRING,
+    createdAt:DataTypes.DATE,
+    updatedAt:DataTypes.DATE
+  }, {
+    sequelize,
+    modelName: 'Comment',
+  });
+  return Comment;
 };

@@ -73,6 +73,7 @@ class UserController {
     try {
       const { email, emailAuthNumber } =
         await this.joi.emailAuthCheckSchema.validateAsync(req.body);
+        console.log(email);
 
       await this.userService.checkEmailAuth(email, emailAuthNumber);
 

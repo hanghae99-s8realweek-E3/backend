@@ -1,56 +1,31 @@
-const Sequelize = require("sequelize");
-
-module.exports = class Todo extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        todoId: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        todo: {
-          type: Sequelize.STRING(140),
-          allowNull: false,
-        },
-        mbti: {
-          type: Sequelize.STRING(4),
-          allowNull: false,
-        },
-        commentCounts: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-          defaultValue: 0,
-        },
-        challengedCounts: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-          defaultValue: 0,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "Todo",
-        tableName: "todos",
-        paranoid: false,
-        charset: "utf8mb4",
-        collate: "utf8mb4_general_ci",
-      }
-    );
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class Todo extends Model {
+    static associate(models) {
+      this.belongsTo(models.User);
+      this.hasMany(models.Comment);
+    }
   }
-
-  static associate(db) {
-    db.Todo.belongsTo(db.User, {
-      foreignKey: "userId",
-      targetKey: "userId",
-      onDelete: "CASCADE",
-    });
-    db.Todo.hasMany(db.Comment, {
-      foreignKey: "todoId",
-      sourceKey: "todoId",
-      onDelete: "CASCADE",
-    });
-  }
+  Todo.init({
+    todoId:{
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER
+    },
+    userId: DataTypes.INTEGER,
+    todo: DataTypes.STRING,
+    mbti: DataTypes.STRING,
+    commentCounts: DataTypes.INTEGER,
+    challengedCounts: DataTypes.INTEGER,
+    createdAt:DataTypes.DATE,
+    updatedAt:DataTypes.DATE
+  }, {
+    sequelize,
+    modelName: 'Todo',
+  });
+  return Todo;
 };

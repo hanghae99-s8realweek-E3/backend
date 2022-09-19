@@ -1,38 +1,26 @@
-const Sequelize = require("sequelize");
-
-module.exports = class EmailAuth extends Sequelize.Model {
-  static init(sequelize) {
-    return super.init(
-      {
-        emailAuthId: {
-          type: Sequelize.INTEGER,
-          primaryKey: true,
-          autoIncrement: true,
-        },
-        email: {
-          type: Sequelize.STRING(50),
-          allowNull: false,
-        },
-        authNumber: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-        authCheck: {
-          type: Sequelize.BOOLEAN,
-          allowNull: false,
-          defaultValue: false,
-        },
-      },
-      {
-        sequelize,
-        timestamps: true,
-        underscored: false,
-        modelName: "EmailAuth",
-        tableName: "emailAuth",
-        paranoid: false,
-        charset: "utf8",
-        collate: "utf8_general_ci",
-      }
-    );
+'use strict';
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class EmailAuth extends Model {
   }
+  EmailAuth.init({
+    emailAuthId: {
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+      type: DataTypes.INTEGER
+    },
+    email: DataTypes.STRING,
+    authNumber: DataTypes.INTEGER,
+    authCheck: DataTypes.BOOLEAN,
+    createdAt:DataTypes.DATE,
+    updatedAt:DataTypes.DATE
+  }, {
+    sequelize,
+    modelName: 'EmailAuth',
+  });
+  return EmailAuth;
 };
