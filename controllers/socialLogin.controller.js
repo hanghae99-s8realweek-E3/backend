@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const passport = require("passport");
 require("dotenv").config();
 
-//Kakao callback Controller======ok
+// Kakao callback Controller
 exports.kakaoLogin = (req, res, next) => {
   passport.authenticate(
     "kakao",
@@ -26,7 +26,6 @@ exports.kakaoLogin = (req, res, next) => {
 exports.deleteKakao = async (req, res, next) => {
   try {
     const { user_id } = req.query;
-    console.log(user_id);
 
     await User.destroy({ where: { snsId: user_id } });
   } catch (err) {
