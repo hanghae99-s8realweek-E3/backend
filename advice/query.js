@@ -29,6 +29,15 @@ class Query {
     WHERE users.userId = ${user.userId}`;
   };
 
+  // mytodo.service 타인의 todo 피드 조회 - challengedTodos
+  challengedTodosQuery = (userId) => {
+    return `SELECT *, 
+    (SELECT commentCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
+    (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
+    FROM challengedTodos 
+    WHERE userId = ${userId} LIMIT 20`;
+  };
+
   //mytodo.service 오늘 도전한 todo 등록 -challengedTodo
   challengedTodoSelectQuery = (localDate, userId) => {
     return `SELECT *
