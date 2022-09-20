@@ -2,13 +2,12 @@ const { Count } = require("./models");
 const schedule = require("node-schedule");
 const logger = require("./logger");
 const dayjs = require("dayjs");
-const redisClient = require("./services/redis.service");
-// const redisClient = require("./app");
+const redisClient = require("./redisconnect");
 const localDate = dayjs().format("YYYY-MM-DD");
 
 
 const redisCli = redisClient.v4;
-console.log(redisCli);
+console.log(redisClient);
 
 module.exports = async () => {
   try {
