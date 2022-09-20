@@ -5,12 +5,12 @@ const MyTodoController = require("../controllers/mytodo.controller");
 const myTodoController = new MyTodoController();
 
 const authMiddleware = require("../middlewares/auth_middlewares");
-const vistorCountMiddleware = require("../middlewares/vistorCount_middleware");
+
 
 // 나의 todo 피드 조회 [GET] /api/mytodos?date=
-router.get("/", authMiddleware,vistorCountMiddleware, myTodoController.getMyTodo);
+router.get("/", authMiddleware, myTodoController.getMyTodo);
 // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
-router.get("/:userId", authMiddleware,vistorCountMiddleware, myTodoController.getUserTodo);
+router.get("/:userId", authMiddleware, myTodoController.getUserTodo);
 // 오늘의 제안 todo 작성 [POST] /api/mytodos
 router.post("/", authMiddleware, myTodoController.createTodo);
 // todo 삭제 [DELETE] /api/mytodos/:todoId
