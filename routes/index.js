@@ -5,7 +5,7 @@ const Follow = require("./follow");
 const TodoList = require("./todolist");
 const Comment = require("./comment");
 const MyTodo = require("./mytodo");
-// const Redis = require("./redis");//redis
+
 
 const router = express.Router();
 
@@ -15,6 +15,6 @@ router.use("/follows", Follow);
 router.use("/todolists", TodoList);
 router.use("/mytodos", MyTodo);
 router.use("/comments", Comment);
-// router.use("/check", Redis);//redis
+
 
 module.exports = router;
