@@ -7,14 +7,28 @@ const cors = require("cors");
 const kakaoPassport = require("./passport/index");
 const setSchedule = require("./setSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
+const redis = require("redis");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT;
+
 kakaoPassport(app);
 setSchedule();
+
+const redisClient = redis.createClient({
+  url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
+  legacyMode: true, // 반드시 설정 !!
+});
+redisClient.on('connect', () => console.info('🟢 Redis 연결 성공!'));
+redisClient.on('error', (err) => console.error('Redis Client Error', err.message));
+
+redisClient.connect();
+
+exports.redisCli = redisClient;
+
 
 // sequelize 연결
 sequelize
@@ -35,6 +49,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev", { stream }));
 }
 
+//cors관리
 const corsOption = {
   origin: [
     "https://frontend-hanghaee99team3.vercel.app",
