@@ -1,8 +1,6 @@
 const dotenv = require("dotenv");
 const redis = require("redis");
-const dayjs = require("dayjs");
 
-const localDate = dayjs().format("YYYY-MM-DD");
 dotenv.config(); // env환경변수 파일 가져오기
 
 const redisClient = redis.createClient({
@@ -15,10 +13,4 @@ redisClient.on("error", (err) =>
 );
 redisClient.connect();
 
-const redisCli = redisClient.v4;
-
-visitorsCount = async (clientIp) => {
-  await redisCli.PFADD(localDate, clientIp);
-};
-
-module.exports =  redisClient;
+module.exports = redisClient;

@@ -7,6 +7,7 @@ const todoListController = new TodoListController();
 const authMiddleware = require("../middlewares/auth_middlewares");
 const nonUserMiddleware = require("../middlewares/nonUser_middlewares");
 
+
 // mbti 알고리즘 [GET] /api/todolists/mbti
 router.get("/mbti", nonUserMiddleware, todoListController.getMbti);
 // todo 피드 조회 [GET] /api/todolists
