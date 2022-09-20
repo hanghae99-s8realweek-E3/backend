@@ -5,10 +5,12 @@ const redisCli = redisClient.v4;
 
 // GET
 router.get("/get", async (req, res, next) => {
-  await redisCli.set("name", "nyong");
-  const asd = await redisCli.get("name"); // nyong
+  const clientIp = req.ip
+  console.log(clientIp);
+  await redisCli.set("name", clientIp);
+  const ip = await redisCli.get("name"); // nyong
   res.json({
-    asd,
+    ip,
   });
 });
 

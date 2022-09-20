@@ -57,6 +57,6 @@ app.use("/api", indexRouter);
 app.use(routerError);
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port,'0.0.0.0',() => {
   console.log(`🟢 ${port} 포트로 서버가 열렸어요!`);
 });
