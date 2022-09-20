@@ -7,7 +7,7 @@ const cors = require("cors");
 const kakaoPassport = require("./passport/index");
 const setSchedule = require("./setSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
-const redis = require("./redisconnect");
+const redis = require("./services/redis.service");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
