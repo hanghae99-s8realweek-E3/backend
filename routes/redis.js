@@ -1,15 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const redisCli = require("../app");
-
+const redisClient = require("../redisconnect");
+const redisCli = redisClient.v4;
 
 // GET
-router.get("/asd", async (req, res, next) => {
-console.log(redisCli.);
-  const papers = await redisCli.get('username');
+router.get("/get", async (req, res, next) => {
+  await redisCli.set("name", "nyong");
+  const asd = await redisCli.get("name"); // nyong
   res.json({
-    papers,
-
+    asd,
   });
 });
 
