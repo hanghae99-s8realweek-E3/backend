@@ -1,9 +1,8 @@
 const dotenv = require("dotenv");
 const redis = require("redis");
 const dayjs = require("dayjs");
-const { Count } = require("../models");
+
 const localDate = dayjs().format("YYYY-MM-DD");
-const schedule = require("node-schedule");
 dotenv.config(); // env환경변수 파일 가져오기
 
 const redisClient = redis.createClient({
@@ -20,18 +19,6 @@ const redisCli = redisClient.v4;
 
 visitorsCount = async (clientIp) => {
   await redisCli.PFADD(localDate, clientIp);
-  console.log(redisCli);
-  console.log(1);
-
-  schedule.scheduleJob("* * */6 * * *", async () => {
-    const todayCount = await redisCli.PFCOUNT(localDate);
-    console.log(todayCount);
-    await Count.create({
-      date: localDate,
-      Count: todayCount,
-    });
-    await redisCli.DEL(localDate);
-  });
 };
 
-module.exports = visitorsCount;
+module.exports =  redisClient;
