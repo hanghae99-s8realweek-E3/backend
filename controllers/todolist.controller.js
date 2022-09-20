@@ -29,9 +29,7 @@ class TodoListController {
   getTodo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
-      const { todoId } = await this.joi.parameterSchema.validateAsync(
-        req.params
-      );
+      const { todoId } = await this.joi.idSchema.validateAsync(req.params);
 
       const data = await this.todoListService.todoGet(userId, todoId);
 
