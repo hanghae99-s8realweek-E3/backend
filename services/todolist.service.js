@@ -151,9 +151,9 @@ class TodoListService {
           updatedAt: comment.updatedAt,
         };
       }),
-      isFollowed: isFollowed ? true : false,
       isChallenged: ischallenged ? true : false,
       isTodayDone: todaysChallenge ? true : false,
+      isFollowed: isFollowed ? true : false,
     };
   };
 
