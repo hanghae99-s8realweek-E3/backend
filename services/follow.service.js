@@ -7,7 +7,7 @@ class FollowService {
   followListGet = async (userId) => {
     const checkUserId = await User.findOne({ where: { userId: userId } });
     if (!checkUserId) {
-      throw Boom.badRequest ("존재하지 않는 사용자 입니다.");
+      throw Boom.badRequest("존재하지 않는 사용자 입니다.");
     }
     //======================================
     //follower:나를 팔로우 하는 사람
@@ -22,17 +22,11 @@ class FollowService {
     const myFollowerUserId = myFollowerTable.map(
       (table) => table.userIdFollower
     );
-    const myFollowerData = await User.findAll({
+    const myFollowerlist = await User.findAll({
       where: { userId: myFollowerUserId },
+      attributes: ["userId", "nickname", "mbti", "profile"],
     });
-    const myFollowerlist = await myFollowerData.map((user) => {
-      return {
-        nickname: user.nickname,
-        mbti: user.mbti,
-        profile: user.profile,
-        userId: user.userId,
-      };
-    });
+
     //=====================================================
     //내가 팔로잉 하는  테이블 불러오기
     //팔로잉 테이블에서 userId 가져오기
@@ -46,17 +40,11 @@ class FollowService {
     const myFollowingUserId = myFollowingTable.map(
       (table) => table.userIdFollowing
     );
-    const myFollowingData = await User.findAll({
+    const myFollowinglist = await User.findAll({
       where: { userId: myFollowingUserId },
+      attributes: ["userId", "nickname", "mbti", "profile"],
     });
-    const myFollowinglist = await myFollowingData.map((user) => {
-      return {
-        nickname: user.nickname,
-        mbti: user.mbti,
-        profile: user.profile,
-        userId: user.userId,
-      };
-    });
+
     return {
       following: myFollowinglist,
       follower: myFollowerlist,
@@ -91,7 +79,9 @@ class FollowService {
         userIdFollower: userId,
       });
     } else {
-      await Follow.destroy({ where: { userIdFollowing: elseUserId } });
+      await Follow.destroy({
+        where: { userIdFollowing: elseUserId, userIdFollower: userId },
+      });
     }
     return;
   };

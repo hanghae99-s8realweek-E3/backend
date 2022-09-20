@@ -8,7 +8,9 @@ class MyTodoController {
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   createChallengedTodo = async (req, res, next) => {
     try {
-      const { todoId } = req.params;
+      const { todoId } = await this.joi.parameterSchema.validateAsync(
+        req.params
+      );
       const { userId } = res.locals.user;
       await this.myTodoService.challengedTodoCreate(todoId, userId);
       res.status(201).json({
@@ -19,13 +21,13 @@ class MyTodoController {
     }
   };
 
-  // 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
+  // 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
-      const { challengedTodoId } = req.params;
-      await this.myTodoService.challengedTodoDelete(
-        challengedTodoId
+      const { challengedTodoId } = await this.joi.parameterSchema.validateAsync(
+        req.params
       );
+      await this.myTodoService.challengedTodoDelete(challengedTodoId);
       res.status(201).json({
         message: "success",
       });
@@ -34,10 +36,12 @@ class MyTodoController {
     }
   };
 
-  // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
+  // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:challengedTodoId/challenged
   completeChallengedTodo = async (req, res, next) => {
     try {
-      const { challengedTodoId } = req.params;
+      const { challengedTodoId } = await this.joi.parameterSchema.validateAsync(
+        req.params
+      );
       const { userId } = res.locals.user;
       const isCompleted = await this.myTodoService.challengedTodoComplete(
         challengedTodoId,
@@ -70,7 +74,9 @@ class MyTodoController {
   // todo 삭제 [DELETE] /api/mytodos/:todoId
   deleteTodo = async (req, res, next) => {
     try {
-      const { todoId } = req.params;
+      const { todoId } = await this.joi.parameterSchema.validateAsync(
+        req.params
+      );
       const { userId } = res.locals.user;
       await this.myTodoService.todoDelete(todoId, userId);
       res.status(201).json({
@@ -97,7 +103,9 @@ class MyTodoController {
   getUserTodo = async (req, res, next) => {
     try {
       const { user } = res.locals;
-      const { userId } = req.params;
+      const { userId } = await this.joi.parameterSchema.validateAsync(
+        req.params
+      );
       const data = await this.myTodoService.getUserTodo(user, userId);
 
       res.status(200).json({ message: "success", data });

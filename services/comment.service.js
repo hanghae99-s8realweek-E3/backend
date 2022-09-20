@@ -5,7 +5,7 @@ class CommentService {
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (user, todoId, comment) => {
     const getTodo = await Todo.findOne({ where: { todoId } });
-    if (!getTodo || getTodo.isTodo === false) {
+    if (!getTodo) {
       throw Boom.badRequest("존재하지 않거나 이미 삭제된 todo입니다.");
     }
 

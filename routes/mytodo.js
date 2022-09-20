@@ -20,13 +20,13 @@ router.post(
   authMiddleware,
   myTodoController.createChallengedTodo
 );
-// 오늘의 도전 todo 완료/진행중 처리 [PUT] /:todoId/challenged
+// 오늘의 도전 todo 완료/진행중 처리 [PUT] /:challengedTodoId/challenged
 router.put(
   "/:challengedTodoId/challenged",
   authMiddleware,
   myTodoController.completeChallengedTodo
 );
-// 오늘의 도전 todo 등록 취소 [DELETE] /:todoId/challenged
+// 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
 router.delete(
   "/:challengedTodoId/challenged",
   authMiddleware,

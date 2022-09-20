@@ -19,7 +19,8 @@ class TodoListService {
           isChallenged:
             myChallengedTodos.findIndex(
               (myChallengedTodo) =>
-                myChallengedTodo.originTodoId === todo.todoId
+                myChallengedTodo.originTodoId === todo.todoId &&
+                myChallengedTodo.isCompleted === true
             ) !== -1
               ? true
               : false,
@@ -138,7 +139,7 @@ class TodoListService {
     }
 
     return {
-      todoInfo,
+      todoInfo: todoInfo[0],
       comments: comments.map((comment) => {
         return {
           commentId: comment.commentId,
@@ -150,9 +151,9 @@ class TodoListService {
           updatedAt: comment.updatedAt,
         };
       }),
-      isFollowed: isFollowed ? true : false,
       isChallenged: ischallenged ? true : false,
       isTodayDone: todaysChallenge ? true : false,
+      isFollowed: isFollowed ? true : false,
     };
   };
 
