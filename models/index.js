@@ -9,6 +9,7 @@ const ChallengedTodo = require("./challengedTodo");
 const Comment = require("./comment");
 const EmailAuth = require("./emailAuth");
 const Mbti = require("./mbti");
+const Count = require("./count");
 
 const db = {};
 
@@ -27,6 +28,7 @@ db.ChallengedTodo = ChallengedTodo;
 db.Comment = Comment;
 db.EmailAuth = EmailAuth;
 db.Mbti = Mbti;
+db.Count = Count;
 
 User.init(sequelize);
 Follow.init(sequelize);
@@ -35,6 +37,7 @@ ChallengedTodo.init(sequelize);
 Comment.init(sequelize);
 EmailAuth.init(sequelize);
 Mbti.init(sequelize);
+Count.init(sequelize);
 
 User.associate(db);
 Todo.associate(db);
