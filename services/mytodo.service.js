@@ -228,18 +228,22 @@ class myTodoController {
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (user, userId) => {
-    const [userInfo, following, follower] = await Promise.all([
-      User.findOne({
-        where: { userId },
-        include: ["Todos", "ChallengedTodos"],
-      }),
-      Follow.findAll({
-        where: { userIdFollower: userId },
-      }),
-      Follow.findAll({
-        where: { userIdFollowing: userId },
-      }),
-    ]);
+    const [userInfo, followings, followers, challengedTodos] =
+      await Promise.all([
+        User.findOne({
+          where: { userId },
+          include: [{ model: Todo, limit: 20 }],
+        }),
+        Follow.findAll({
+          where: { userIdFollower: userId },
+        }),
+        Follow.findAll({
+          where: { userIdFollowing: userId },
+        }),
+        sequelize.query(this.query.challengedTodosQuery(userId), {
+          type: QueryTypes.SELECT,
+        }),
+      ]);
 
     if (!userInfo) {
       throw Boom.badRequest("존재하지 않거나 탈퇴한 회원입니다.");
@@ -251,14 +255,16 @@ class myTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
-        followingCount: following.length,
-        followerCount: follower.length,
+        followingCount: followings.length,
+        followerCount: followers.length,
         isFollowed:
-          follower.findIndex((f) => f.userIdFollower === user.userId) !== -1
+          followers.findIndex(
+            (follower) => follower.userIdFollower === user.userId
+          ) !== -1
             ? true
             : false,
       },
-      challengedTodos: userInfo.ChallengedTodos,
+      challengedTodos,
       createdTodos: userInfo.Todos,
     };
   };
