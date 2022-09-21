@@ -1,5 +1,5 @@
 #!/bin/sh
-    npm install	
+    cd ~/backend	
     sudo git pull origin main
     curl -o-   https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh    | bash
     . ~/.nvm/nvm.sh 
@@ -8,12 +8,12 @@
 
 
 
-# #!/bin/sh
-# ssh ubuntu@3.36.78.105 <<EOF
-#     cd ~/backend		
-#     sudo git pull origin main
-#     curl -o-   https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh    | bash
-#     . ~/.nvm/nvm.sh 
-#     sudo pm2 restart app.js
-#     exit
-# EOF
+#!/bin/sh
+ssh ubuntu@3.36.78.105 <<EOF
+    cd ~/backend		
+    sudo git pull origin main
+    curl -o-   https://raw.githubusercontent.com/creationix/nvm/v0.33.8/install.sh    | bash
+    . ~/.nvm/nvm.sh 
+    sudo pm2 restart app.js
+    exit
+EOF
