@@ -6,7 +6,6 @@ const myTodoController = new MyTodoController();
 
 const authMiddleware = require("../middlewares/auth_middlewares");
 
-
 // 나의 todo 피드 조회 [GET] /api/mytodos?date=
 router.get("/", authMiddleware, myTodoController.getMyTodo);
 // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
