@@ -1,7 +1,6 @@
 const { User } = require("../models");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
-const Joi = require("../advice/joi");
 const Boom = require("@hapi/boom");
 require("dotenv").config();
 
@@ -27,9 +26,8 @@ exports.kakaoLogin = (req, res, next) => {
 
 // passport-kakao 연결끊기 콜백 API
 exports.deleteKakao = async (req, res, next) => {
-  const joi = new Joi();
   try {
-    const { user_id } = await joi.idSchema.validateAsync(req.query);
+    const { user_id } = req.query;
     const user = await User.findOne({ where: { snsId: user_id } });
     if (!user) {
       throw Boom.badRequest("존재하지 않는 카카오 로그인 회원입니다");

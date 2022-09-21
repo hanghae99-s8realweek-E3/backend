@@ -9,7 +9,9 @@ class CommentController {
   createComment = async (req, res, next) => {
     try {
       const { user } = res.locals;
-      const { todoId } = await this.joi.idSchema.validateAsync(req.params);
+      const { todoId } = await this.joi.parameterSchema.validateAsync(
+        req.params
+      );
       const { comment } = await this.joi.createCommentSchema.validateAsync(
         req.body
       );
@@ -26,7 +28,9 @@ class CommentController {
   deleteComment = async (req, res, next) => {
     try {
       const { user } = res.locals;
-      const { commentId } = await this.joi.idSchema.validateAsync(req.params);
+      const { commentId } = await this.joi.parameterSchema.validateAsync(
+        req.params
+      );
 
       await this.commentService.deleteComment(user, commentId);
 
