@@ -51,6 +51,17 @@ class TodoListController {
       next(err);
     }
   };
+
+  // 현재 인기있는 피드 top5 [GET] /api/todolists/ranking
+  getRanking = async (req, res, next) => {
+    try {
+      const data = await this.todoListService.rankingGet();
+
+      res.status(200).json({ message: "success", data });
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 
 module.exports = TodoListController;
