@@ -12,7 +12,7 @@ module.exports = {
   },
   routerError: (req, res, next) => {
     try {
-      throw Boom.badRequest(
+      throw Boom.badGateway(
         `${req.method} ${req.originalUrl} 라우터 에러입니다.`
       );
     } catch (err) {

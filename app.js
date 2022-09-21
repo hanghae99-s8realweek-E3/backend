@@ -30,14 +30,10 @@ sequelize
     console.error(err);
   });
 
-// morgan(로그 관리), hpp(중복된 파라미터 처리 -> production 모드에서만 사용)
-if (process.env.NODE_ENV === "production") {
-  app.use(morgan("combined", { stream }));
-  app.use(helmet());
-  app.use(hpp());
-} else {
-  app.use(morgan("dev", { stream }));
-}
+// morgan(로그 관리), hpp(중복된 파라미터 처리)
+app.use(morgan("combined", { stream }));
+app.use(helmet());
+app.use(hpp());
 
 //cors관리
 const corsOption = {
