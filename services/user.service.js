@@ -37,15 +37,13 @@ class UserService {
     });
 
     const userData = await User.findOne({ where: { email: email } });
-    const userId = userData.userId;
-    const mbti = userData.mbti;
-    const provider = userData.provider;
 
     const payload = {
-      userId: userId,
-      nickname: nickname,
-      mbti: mbti,
-      provider: provider,
+      userId: userData.userId,
+      nickname: userData.nickname,
+      mbti: userData.mbti,
+      provider: userData.provider,
+      profile: userData.profile,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -60,16 +58,13 @@ class UserService {
     await User.update({ mbti: mbti }, { where: { userId: userId } });
 
     const userData = await User.findOne({ where: { userId: userId } });
-    const updaetedUserId = userData.userId;
-    const updatedMbti = userData.mbti;
-    const nickname = userData.nickname;
-    const provider = userData.provider;
 
     const payload = {
-      userId: updaetedUserId,
-      nickname: nickname,
-      mbti: updatedMbti,
-      provider: provider,
+      userId: userData.userId,
+      nickname: userData.nickname,
+      mbti: userData.mbti,
+      provider: userData.provider,
+      profile: userData.profile,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -86,10 +81,6 @@ class UserService {
       throw Boom.badRequest("회원정보가 없습니다.");
     }
 
-    const userId = userData.userId;
-    const nickname = userData.nickname;
-    const mbti = userData.mbti;
-    const provider = userData.provider;
     const bcrCompareResult = await bcrypt.compare(password, userData.password); //비밀번호 암호화 비교
 
     if (!bcrCompareResult) {
@@ -97,10 +88,11 @@ class UserService {
     }
 
     const payload = {
-      userId: userId,
-      nickname: nickname,
-      mbti: mbti,
-      provider: provider,
+      userId: userData.userId,
+      nickname: userData.nickname,
+      mbti: userData.mbti,
+      provider: userData.provider,
+      profile: userData.profile,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
@@ -251,6 +243,7 @@ class UserService {
       nickname: changedData.nickname,
       mbti: changedData.mbti,
       provider: changedData.provider,
+      profile: changedData.profile,
     };
 
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
