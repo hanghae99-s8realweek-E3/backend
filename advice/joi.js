@@ -1,13 +1,12 @@
 const joi = require("joi");
 
 class Joi {
-  // parameter 및 query로 들어오는 id 값 유효성 검사
-  idSchema = joi.object({
+  // parameter primaryKey 유효성 검사
+  parameterSchema = joi.object({
     userId: joi.string().pattern(/^[0-9]+$/),
     todoId: joi.string().pattern(/^[0-9]+$/),
     commentId: joi.string().pattern(/^[0-9]+$/),
     challengedTodoId: joi.string().pattern(/^[0-9]+$/),
-    user_id: joi.string().pattern(/^[0-9]+$/),
   });
 
   // 댓글 작성 유효성 검사
