@@ -11,9 +11,9 @@ exports.kakaoLogin = (req, res, next) => {
     { failureRedirect: "/" },
     (err, user, info) => {
       if (err) return next(err);
-      const { userId, mbti, nickname, provider } = user;
+      const { userId, mbti, nickname, provider, profile } = user;
       const token = jwt.sign(
-        { userId, mbti, nickname, provider },
+        { userId, mbti, nickname, provider, profile },
         process.env.MYSECRET_KEY,
         { expiresIn: "2d" }
       );
