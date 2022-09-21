@@ -11,7 +11,7 @@ const redisCli = redisClient.v4;
 module.exports = async () => {
   try {
     //6시간마다 redis data DB에 저장
-    schedule.scheduleJob("* * */6 * * *", async () => {
+    schedule.scheduleJob(" */6 * * *", async () => {
       const todayCount = await redisCli.PFCOUNT(localDate);
       console.log(todayCount);
       await Count.create({
