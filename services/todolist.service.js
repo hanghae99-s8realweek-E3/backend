@@ -169,6 +169,33 @@ class TodoListService {
       attributes: { exclude: ["mbtiId"] },
     });
   };
+
+  // 현재 인기있는 피드 top5 [GET] /api/todolists/ranking
+  rankingGet = async () => {
+    // 어제 날짜 - 자정으로 세팅
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
+    console.log("어제 자정: ", yesterday);
+
+    const challenge = await Todo.findAll({
+      where: {
+        createdAt: { [Op.gte]: yesterday },
+      },
+      order: [["challengedCounts", "DESC"]],
+      limit: 5,
+    });
+
+    const comment = await Todo.findAll({
+      where: {
+        createdAt: { [Op.gte]: yesterday },
+      },
+      order: [["commentCounts", "DESC"]],
+      limit: 5,
+    });
+
+    return { challenge, comment };
+  };
 }
 
 module.exports = TodoListService;

@@ -29,9 +29,7 @@ class TodoListController {
   getTodo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
-      const { todoId } = await this.joi.parameterSchema.validateAsync(
-        req.params
-      );
+      const { todoId } = await this.joi.idSchema.validateAsync(req.params);
 
       const data = await this.todoListService.todoGet(userId, todoId);
 
@@ -49,6 +47,17 @@ class TodoListController {
       const mbtiData = await this.todoListService.mbtiGet(user);
 
       res.status(200).json({ message: "success", mbtiData });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 현재 인기있는 피드 top5 [GET] /api/todolists/ranking
+  getRanking = async (req, res, next) => {
+    try {
+      const data = await this.todoListService.rankingGet();
+
+      res.status(200).json({ message: "success", data });
     } catch (err) {
       next(err);
     }

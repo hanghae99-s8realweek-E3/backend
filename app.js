@@ -6,14 +6,18 @@ const hpp = require("hpp");
 const cors = require("cors");
 const kakaoPassport = require("./passport/index");
 const setSchedule = require("./setSchedule");
+const setVisitorsCouSchedule = require("./setVisitorsCouSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
+// const redis = require("redis");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT;
+
 kakaoPassport(app);
+setVisitorsCouSchedule();
 setSchedule();
 
 // sequelize 연결
@@ -35,6 +39,7 @@ if (process.env.NODE_ENV === "production") {
   app.use(morgan("dev", { stream }));
 }
 
+//cors관리
 const corsOption = {
   origin: [
     "https://frontend-hanghaee99team3.vercel.app",
@@ -53,6 +58,6 @@ app.use("/api", indexRouter);
 app.use(routerError);
 app.use(errorHandler);
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`🟢 ${port} 포트로 서버가 열렸어요!`);
 });
