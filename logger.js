@@ -1,11 +1,4 @@
-const {
-  createLogger,
-  format,
-  transports,
-  colorize,
-  printf,
-  combine,
-} = require("winston");
+const { createLogger, format, transports } = require("winston");
 const winstonDaily = require("winston-daily-rotate-file");
 require("dotenv").config();
 
@@ -49,27 +42,24 @@ const logger = createLogger({
 
 const stream = {
   write: (message) => {
-    const state = Number(message.split(" ")[2].replace(/\x1b\[[0-9;]*m/g, ""));
-    if (state < 400) {
-      //status code가 400보다 아래면
+    const status = Number(message.split(" ")[8]);
+    if (status < 400) {
       logger.info(message); //level info
-    } else if (400 <= state && state < 500) {
-      //status code가 400이상 500 미만이면
+    } else if (400 <= status && status < 500) {
       logger.warn(message); //level warn
-    } else if (state >= 500) {
-      //status code가 500이상이면
+    } else if (status >= 500) {
       logger.error(message); //level error
     }
   },
 };
+// stream으로 morgan이랑 결합해서 사용
 
-if (process.env.NODE_ENV !== "production") {
-  logger.add(
-    new transports.Console({
-      format: format.combine(format.colorize(), format.simple()),
-    })
-  );
-}
+logger.add(
+  new transports.Console({
+    level: process.env.NODE_ENV === "production" ? "warn" : "info",
+    format: format.combine(format.colorize(), format.simple()),
+  })
+);
 // simple이면 말그대로 간단하게 메시지 나옴 - json()보다 간단
 // production이 아닐 때(개발용일땐) 콘솔에만 표시하기.
 // 참고) 콘솔에만 표시할 수도 있고, 파일에 저장할 수도 있고, DB에 넣을 수도 있음
