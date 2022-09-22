@@ -199,10 +199,10 @@ class myTodoController {
 
     return {
       userInfo: {
-        userId: myTodos[0].userId,
+        userId: myTodos[0].id,
         nickname: myTodos[0].nickname,
         profile: myTodos[0].profile,
-        mbti: myTodos[0].mbti,
+        mbti: myTodos[0].userMbti,
         followingCount: myTodos[0].followingCount,
         followerCount: myTodos[0].followerCount,
       },
