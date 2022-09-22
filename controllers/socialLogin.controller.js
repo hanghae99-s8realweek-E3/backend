@@ -1,4 +1,5 @@
-const { User, Follow } = require("../models");
+const { User, Follow, sequelize } = require("../models");
+const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const Boom = require("@hapi/boom");
