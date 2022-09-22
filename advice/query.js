@@ -19,7 +19,7 @@ class Query {
 
   // mytodo.service 나의 todo 피드 조회
   myTodosQuery = (user, date) => {
-    return `SELECT users.userId, nickname, profile, users.mbti,
+    return `SELECT users.userId AS id, nickname, profile, users.mbti AS userMbti,
     (SELECT COUNT(*) FROM follows WHERE follows.userIdFollower = users.userId ) AS followingCount,
     (SELECT COUNT(*) FROM follows WHERE follows.userIdFollowing = users.userId ) AS followerCount, 
     todos.*, challengedTodos.*
