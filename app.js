@@ -14,6 +14,14 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT;
+const corsOption = {
+  origin: [
+    "https://www.todaysmimic.today",
+    "https://todaysmimic.today",
+    "http://localhost:3000",
+  ],
+  credentials: true,
+};
 
 kakaoPassport(app);
 setVisitorsCouSchedule();
@@ -29,25 +37,18 @@ sequelize
     console.error(err);
   });
 
+// ip 주소가 프록시 서버로 등록 되는 것 방지
+app.set("trust proxy", true);
+
 // morgan(로그 관리), hpp(중복된 파라미터 처리)
 app.use(morgan("combined", { stream }));
 app.use(helmet());
 app.use(hpp());
-
-//cors관리
-const corsOption = {
-  origin: [
-    "https://www.todaysmimic.today",
-    "https://todaysmimic.today",
-    "http://localhost:3000",
-  ],
-  credentials: true,
-};
-
 app.use(cors(corsOption));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+// router
 app.use("/api", indexRouter);
 
 // errorHandler

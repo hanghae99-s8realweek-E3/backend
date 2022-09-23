@@ -6,7 +6,7 @@ const redisCli = redisClient.v4;
 
 module.exports = (req, res, next) => {
   try {
-    const clientIp = req.headers["x-forwarded-for"];
+    const clientIp = req.ip;
     console.log("IP 주소 : ", clientIp);
 
     redisCli.PFADD(localDate, clientIp);
