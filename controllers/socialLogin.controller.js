@@ -18,9 +18,7 @@ exports.kakaoLogin = (req, res, next) => {
         process.env.MYSECRET_KEY,
         { expiresIn: "2d" }
       );
-      res.redirect(
-        `https://frontend-hanghaee99team3.vercel.app/mbti?token=${token}`
-      );
+      res.redirect(`https://www.todaysmimic.today/mbti?token=${token}`);
     }
   )(req, res, next);
 };
