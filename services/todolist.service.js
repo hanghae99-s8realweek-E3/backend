@@ -114,7 +114,7 @@ class TodoListService {
 
     console.log("상세 todo 조회 - 오늘 과거의 자정: ", today);
     const today2 = new Date();
-    today.setHours(today.getHours() + 9);
+    today2.setHours(today2.getHours() + 9);
     today2.setHours(0, 0, 0, 0);
     console.log("[+9]상세 todo 조회 - 오늘 과거의 자정: ", today2);
 
