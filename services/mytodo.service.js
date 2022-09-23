@@ -2,7 +2,6 @@ const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 const Query = require("../utils/query");
 const Boom = require("@hapi/boom");
-evelop_v2
 // const dayjs = require("dayjs");
 // const localDate = dayjs().format("YYYY-MM-DD");
 // const localDatetimes = dayjs().format('YYYY-MM-DD 요일:ddd HH:mm:ss');
@@ -18,7 +17,6 @@ class myTodoController {
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
     console.log("도전 todo 등록 dateModule " + "+ " + localDate);
-lop_v2
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
