@@ -1,5 +1,5 @@
 const FollowService = require("../services/follow.service");
-const Joi = require("../advice/joi");
+const Joi = require("../utils/joi");
 
 class FollowController {
   followService = new FollowService();

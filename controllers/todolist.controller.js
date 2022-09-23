@@ -1,5 +1,5 @@
 const TodoListService = require("../services/todolist.service");
-const Joi = require("../advice/joi");
+const Joi = require("../utils/joi");
 
 class TodoListController {
   todoListService = new TodoListService();

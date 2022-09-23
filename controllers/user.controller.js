@@ -1,5 +1,5 @@
 const UserService = require("../services/user.service");
-const Joi = require("../advice/joi");
+const Joi = require("../utils/joi");
 
 class UserController {
   userService = new UserService();

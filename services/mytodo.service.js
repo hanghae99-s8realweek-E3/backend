@@ -1,6 +1,6 @@
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
-const Query = require("../advice/query");
+const Query = require("../utils/query");
 const Boom = require("@hapi/boom");
 const dayjs = require("dayjs");
 const localDate = dayjs().format("YYYY-MM-DD");
