@@ -1,7 +1,7 @@
 const { Todo, ChallengedTodo, Follow, Mbti, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
-const Query = require("../advice/query");
+const Query = require("../utils/query");
 const Boom = require("@hapi/boom");
 
 class TodoListService {

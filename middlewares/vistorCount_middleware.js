@@ -1,6 +1,6 @@
-const dayjs = require("dayjs");
-const localDate = dayjs().format("YYYY-MM-DD");
-const redisClient = require("../advice/redisconnect");
+const localDate =require("../utils/date")
+const redisClient = require("../utils/redisconnect");
+
 
 const redisCli = redisClient.v4;
 

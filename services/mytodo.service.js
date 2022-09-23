@@ -1,15 +1,9 @@
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
-const Query = require("../advice/query");
+const Query = require("../utils/query");
 const Boom = require("@hapi/boom");
 const dayjs = require("dayjs");
-const utc = require("dayjs/plugin/utc");
-const timezone = require("dayjs/plugin/timezone");
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Seoul");
-const localDate = dayjs().format("YYYY-MM-DD");
-const localDatetimes = dayjs().format('YYYY-MM-DD HH:mm:ss');
+
 
 class myTodoController {
   query = new Query();
@@ -18,7 +12,7 @@ class myTodoController {
   challengedTodoCreate = async (todoId, userId) => {
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    console.log(localDate,"+",localDatetimes);
+    // console.log(localDate,"+",localDatetimes);
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
@@ -157,7 +151,7 @@ class myTodoController {
   todoCreate = async (todo, userId) => {
     //todo 테이블에 todo, user의mbti,nickname,userId,를 넣어야함
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
-    console.log(localDate,"+",localDatetimes);
+    // console.log(localDate,"+",localDatetimes);
     const userData = await User.findOne({ where: { userId: userId } });
     if (!userData) {
       throw Boom.badRequest("사용자 정보가 없습니다.");
