@@ -8,7 +8,6 @@ const kakaoPassport = require("./passport/index");
 const setSchedule = require("./setSchedule");
 const setVisitorsCouSchedule = require("./setVisitorsCountSchedule");
 const { routerError, errorHandler } = require("./middlewares/error_handler");
-// const redis = require("redis");
 const indexRouter = require("./routes");
 const { sequelize } = require("./models");
 require("dotenv").config();
@@ -38,7 +37,8 @@ app.use(hpp());
 //cors관리
 const corsOption = {
   origin: [
-    "https://frontend-hanghaee99team3.vercel.app",
+    "https://www.todaysmimic.today",
+    "https://todaysmimic.today",
     "http://localhost:3000",
   ],
   credentials: true,
