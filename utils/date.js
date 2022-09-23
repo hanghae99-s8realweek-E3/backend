@@ -18,3 +18,4 @@ const date = function () {
 };
 
 module.exports = date;
+

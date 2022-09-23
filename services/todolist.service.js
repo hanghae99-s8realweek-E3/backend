@@ -112,6 +112,12 @@ class TodoListService {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    console.log("상세 todo 조회 - 오늘 과거의 자정: ", today);
+    const today2 = new Date();
+    today.setHours(today.getHours() + 9);
+    today2.setHours(0, 0, 0, 0);
+    console.log("[+9]상세 todo 조회 - 오늘 과거의 자정: ", today2);
+
     const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
       await Promise.all([
         sequelize.query(this.query.todoInfoQuery(todoId), {
@@ -176,13 +182,22 @@ class TodoListService {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     yesterday.setHours(0, 0, 0, 0);
-    console.log("어제 자정: ", yesterday);
+
+    console.log("메인 top5 - 어제 자정: ", yesterday);
+    const yesterday2 = new Date();
+    yesterday2.setHours(yesterday2.getHours() + 9);
+    yesterday2.setDate(yesterday2.getDate() - 1);
+    yesterday2.setHours(0, 0, 0, 0);
+    console.log("[+9] 메인 top5 - 어제 자정: ", yesterday2);
 
     const challenge = await Todo.findAll({
       where: {
         createdAt: { [Op.gte]: yesterday },
       },
-      order: [["challengedCounts", "DESC"]],
+      order: [
+        ["challengedCounts", "DESC"],
+        ["createdAt", "DESC"],
+      ],
       limit: 5,
     });
 
@@ -190,7 +205,10 @@ class TodoListService {
       where: {
         createdAt: { [Op.gte]: yesterday },
       },
-      order: [["commentCounts", "DESC"]],
+      order: [
+        ["commentCounts", "DESC"],
+        ["createdAt", "DESC"],
+      ],
       limit: 5,
     });
 
