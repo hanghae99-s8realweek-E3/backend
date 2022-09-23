@@ -36,7 +36,11 @@ app.use(hpp());
 
 //cors관리
 const corsOption = {
-  origin: ["https://todaysmimic.today", "http://localhost:3000"],
+  origin: [
+    "https://www.todaysmimic.today",
+    "https://todaysmimic.today",
+    "http://localhost:3000",
+  ],
   credentials: true,
 };
 
