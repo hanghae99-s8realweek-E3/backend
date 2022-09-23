@@ -183,12 +183,12 @@ class TodoListService {
     yesterday.setDate(yesterday.getDate() - 1);
     yesterday.setHours(0, 0, 0, 0);
 
-    console.log("[+9] 메인 top5 - 어제 자정: ", yesterday);
+    console.log("메인 top5 - 어제 자정: ", yesterday);
     const yesterday2 = new Date();
     yesterday2.setHours(yesterday2.getHours() + 9);
     yesterday2.setDate(yesterday2.getDate() - 1);
     yesterday2.setHours(0, 0, 0, 0);
-    console.log("메인 top5 - 어제 자정: ", yesterday2);
+    console.log("[+9] 메인 top5 - 어제 자정: ", yesterday2);
 
     const challenge = await Todo.findAll({
       where: {
