@@ -3,8 +3,13 @@ const { QueryTypes } = require("sequelize");
 const Query = require("../advice/query");
 const Boom = require("@hapi/boom");
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Seoul");
 const localDate = dayjs().format("YYYY-MM-DD");
-const localDatetimes = dayjs().format('YYYY-MM-DD 요일:ddd HH:mm:ss');
+const localDatetimes = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
 class myTodoController {
   query = new Query();
