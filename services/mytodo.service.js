@@ -196,16 +196,12 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (userId, date) => {
-    // const myTodos = await sequelize.query(this.query.myTodosQuery(user, date), {
-    //   type: QueryTypes.SELECT,
-    // });
     const [userInfo, followingCount, followerCount] = await Promise.all([
       User.findOne({
         where: { userId },
-        // include: ["Todo", "ChallengedTodo"],
         include: [
-          { model: Todo, where: { userId, date } },
-          { model: ChallengedTodo, where: { userId, date } },
+          { model: Todo, where: { userId, date }, required: false },
+          { model: ChallengedTodo, where: { userId, date }, required: false },
         ],
       }),
       Follow.count({
@@ -225,18 +221,22 @@ class myTodoController {
         followingCount,
         followerCount,
       },
-      challengedTodo: {
-        challengedTodoId: userInfo.ChallengedTodos.challengedTodoId,
-        challengedTodo: userInfo.ChallengedTodos.challengedTodo,
-        isCompleted: userInfo.ChallengedTodos.isCompleted,
-        originTodoId: userInfo.ChallengedTodos.originTodoId,
-      },
-      createdTodo: {
-        todoId: userInfo.Todos.todoId,
-        todo: userInfo.Todos.todo,
-        commentCounts: userInfo.Todos.commentCounts,
-        challengedCounts: userInfo.Todos.challengedCounts,
-      },
+      challengedTodo: userInfo.ChallengedTodos[0]
+        ? {
+            challengedTodoId: userInfo.ChallengedTodos[0].challengedTodoId,
+            challengedTodo: userInfo.ChallengedTodos[0].challengedTodo,
+            isCompleted: userInfo.ChallengedTodos[0].isCompleted,
+            originTodoId: userInfo.ChallengedTodos[0].originTodoId,
+          }
+        : [],
+      createdTodo: userInfo.Todos[0]
+        ? {
+            todoId: userInfo.Todos[0].todoId,
+            todo: userInfo.Todos[0].todo,
+            commentCounts: userInfo.Todos[0].commentCounts,
+            challengedCounts: userInfo.Todos[0].challengedCounts,
+          }
+        : [],
       date,
     };
   };

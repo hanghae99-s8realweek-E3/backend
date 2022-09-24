@@ -18,16 +18,16 @@ class Query {
   };
 
   // mytodo.service 나의 todo 피드 조회
-  myTodosQuery = (user, date) => {
-    return `SELECT users.userId AS id, nickname, profile, users.mbti AS userMbti,
-    (SELECT COUNT(*) FROM follows WHERE follows.userIdFollower = users.userId ) AS followingCount,
-    (SELECT COUNT(*) FROM follows WHERE follows.userIdFollowing = users.userId ) AS followerCount, 
-    todos.*, challengedTodos.*
-    FROM users
-    LEFT OUTER JOIN todos ON users.userId = todos.userId AND DATE_FORMAT(todos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')
-    LEFT OUTER JOIN challengedTodos ON users.userId = challengedTodos.userId AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')
-    WHERE users.userId = ${user.userId}`;
-  };
+  // myTodosQuery = (user, date) => {
+  //   return `SELECT users.userId AS id, nickname, profile, users.mbti AS userMbti,
+  //   (SELECT COUNT(*) FROM follows WHERE follows.userIdFollower = users.userId ) AS followingCount,
+  //   (SELECT COUNT(*) FROM follows WHERE follows.userIdFollowing = users.userId ) AS followerCount,
+  //   todos.*, challengedTodos.*
+  //   FROM users
+  //   LEFT OUTER JOIN todos ON users.userId = todos.userId AND DATE_FORMAT(todos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')
+  //   LEFT OUTER JOIN challengedTodos ON users.userId = challengedTodos.userId AND DATE_FORMAT(challengedTodos.createdAt, '%Y-%m-%d') = DATE_FORMAT( '${date}', '%Y-%m-%d')
+  //   WHERE users.userId = ${user.userId}`;
+  // };
 
   // mytodo.service 타인의 todo 피드 조회 - challengedTodos
   challengedTodosQuery = (userId) => {
