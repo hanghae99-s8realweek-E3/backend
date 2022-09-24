@@ -9,12 +9,16 @@ module.exports = class Todo extends Sequelize.Model {
           primaryKey: true,
           autoIncrement: true,
         },
-        todo: {
-          type: Sequelize.STRING(140),
-          allowNull: false,
-        },
         mbti: {
           type: Sequelize.STRING(4),
+          allowNull: false,
+        },
+        date: {
+          type: Sequelize.STRING(10),
+          allowNull: false,
+        },
+        todo: {
+          type: Sequelize.STRING(140),
           allowNull: false,
         },
         commentCounts: {

@@ -1,12 +1,9 @@
 const { Todo, ChallengedTodo, Follow, Mbti, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
-const Query = require("../utils/query");
 const Boom = require("@hapi/boom");
 
 class TodoListService {
-  query = new Query();
-
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (userId, mbti, filter) => {
     const myChallengedTodos = await ChallengedTodo.findAll({
@@ -114,12 +111,22 @@ class TodoListService {
 
     const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
       await Promise.all([
-        sequelize.query(this.query.todoInfoQuery(todoId), {
-          type: QueryTypes.SELECT,
-        }),
-        sequelize.query(this.query.commentsQuery(todoId), {
-          type: QueryTypes.SELECT,
-        }),
+        sequelize.query(
+          `SELECT *, 
+          (SELECT nickname FROM users WHERE users.userId = todos.userId) AS nickname, 
+          (SELECT profile FROM users WHERE users.userId = todos.userId) AS profile
+          FROM todos
+          WHERE todoId = $todoId`,
+          { bind: { todoId }, type: QueryTypes.SELECT }
+        ),
+        sequelize.query(
+          `SELECT *, 
+          (SELECT nickname FROM users WHERE users.userId = comments.userId) AS nickname, 
+          (SELECT profile FROM users WHERE users.userId = comments.userId) AS profile
+          FROM comments
+          WHERE todoId = $todoId`,
+          { bind: { todoId }, type: QueryTypes.SELECT }
+        ),
         ChallengedTodo.findOne({
           where: { userId, originTodoId: todoId },
         }),
@@ -177,7 +184,7 @@ class TodoListService {
     yesterday.setDate(yesterday.getDate() - 1);
     yesterday.setHours(0, 0, 0, 0);
 
-    const challenge = await Todo.findAll({
+    const challengeRanking = await Todo.findAll({
       where: {
         createdAt: { [Op.gte]: yesterday },
       },
@@ -188,7 +195,7 @@ class TodoListService {
       limit: 5,
     });
 
-    const comment = await Todo.findAll({
+    const commentRanking = await Todo.findAll({
       where: {
         createdAt: { [Op.gte]: yesterday },
       },
@@ -199,7 +206,7 @@ class TodoListService {
       limit: 5,
     });
 
-    return { challenge, comment };
+    return { challenge: challengeRanking, comment: commentRanking };
   };
 }
 
