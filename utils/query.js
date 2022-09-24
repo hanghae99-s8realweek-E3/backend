@@ -39,35 +39,35 @@ class Query {
   };
 
   //mytodo.service 오늘 도전한 todo 등록 -challengedTodo
-  challengedTodoSelectQuery = (localDate, userId) => {
-    return `SELECT *
-      FROM challengedTodos
-      WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
-  };
+  // challengedTodoSelectQuery = (localDate, userId) => {
+  //   return `SELECT *
+  //     FROM challengedTodos
+  //     WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
+  // };
 
   //mytodo.service 오늘 도전한 todo 진행 완료 또는 진행중 -challengedTodo
-  todayMyChallengedTodoSelectQuery = (localDate, userId) => {
-    return `SELECT isCompleted
-  FROM challengedTodos
-  WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
-  AND userId = ${userId};`;
-  };
+  // todayMyChallengedTodoSelectQuery = (localDate, userId) => {
+  //   return `SELECT isCompleted
+  // FROM challengedTodos
+  // WHERE DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
+  // AND userId = ${userId};`;
+  // };
 
   //mytodo.service 오늘 도전한 todo 진행 완료 또는 진행중 -challengedTodo
-  updateIsCompletedQuery = (challengedTodoId, localDate, userId) => {
-    return `UPDATE challengedTodos 
-  SET isCompleted = IF (isCompleted = true ,false ,true) 
-  WHERE challengedTodoId = ${challengedTodoId} 
-  AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
-  AND userId = ${userId};`;
-  };
+  // updateIsCompletedQuery = (challengedTodoId, localDate, userId) => {
+  //   return `UPDATE challengedTodos 
+  // SET isCompleted = IF (isCompleted = true ,false ,true) 
+  // WHERE challengedTodoId = ${challengedTodoId} 
+  // AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT('${localDate}', '%Y-%m-%d') 
+  // AND userId = ${userId};`;
+  // };
 
   //mytodo.service 오늘 도전한 todo 등록 -Todos
-  todosSelectquery = (localDate, userId) => {
-    return `SELECT *
-   FROM todos
-   WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
-  };
+  // todosSelectquery = (localDate, userId) => {
+  //   return `SELECT *
+  //  FROM todos
+  //  WHERE userId = ${userId} AND DATE_FORMAT(createdAt, '%Y-%m-%d') = DATE_FORMAT( '${localDate}', '%Y-%m-%d');`;
+  // };
 }
 
 module.exports = Query;

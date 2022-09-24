@@ -9,7 +9,6 @@ const redisCli = redisClient.v4;
 const date = require("./utils/date");
 const koreaDate = date();
 
-
 module.exports = async () => {
   try {
     //6시간마다 redis data DB에 저장
