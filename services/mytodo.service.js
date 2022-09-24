@@ -126,7 +126,7 @@ class myTodoController {
 
     //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
     await ChallengedTodo.update(
-      { isCompleted: isCompletedCheck? false : true },
+      { isCompleted: isCompletedCheck ? false : true },
       { where: { challengedTodoId } }
     );
 
@@ -255,9 +255,17 @@ class myTodoController {
         Follow.findAll({
           where: { userIdFollowing: userId },
         }),
-        sequelize.query(this.query.challengedTodosQuery(userId), {
-          type: QueryTypes.SELECT,
-        }),
+        sequelize.query(
+          `SELECT *, 
+          (SELECT commentCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
+          (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
+          FROM challengedTodos 
+          WHERE userId = $userId LIMIT 20`,
+          { bind: { userId } },
+          {
+            type: sequelize.QueryTypes.SELECT,
+          }
+        ),
       ]);
 
     if (!userInfo) {
