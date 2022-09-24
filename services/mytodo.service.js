@@ -1,5 +1,6 @@
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const Boom = require("@hapi/boom");
+const { Op } = require("sequelize");
 // const dayjs = require("dayjs");
 // const localDate = dayjs().format("YYYY-MM-DD");
 // const localDatetimes = dayjs().format('YYYY-MM-DD 요일:ddd HH:mm:ss');
@@ -7,8 +8,6 @@ const date = require("../utils/date");
 const todayDate = date();
 
 class myTodoController {
-
-
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
@@ -127,12 +126,13 @@ class myTodoController {
 
     //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
     await ChallengedTodo.update(
-      { isCompleted: isCompletedCheck ? false : true },
+      { isCompleted: isCompletedCheck? false : true },
       { where: { challengedTodoId } }
     );
 
     //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 challengedTodoId가 올바르지 않는경우 에러처리
-    if (challengedTodoId !== todaychallengedTodoData.challengedTodoId) {
+    //params는 문자열로 들어오기에 숫자열로 변경후 비교
+    if (Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId) {
       throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
     }
 
@@ -159,12 +159,13 @@ class myTodoController {
       throw Boom.badRequest("mbti 정보를 등록후 작성바랍니다.");
     }
 
-    const checkTodoData = await ChallengedTodo.findOne({
+    const checkTodoData = await Todo.findOne({
       where: {
         [Op.and]: [{ date: todayDate }, { userId }],
       },
     });
 
+    console.log(checkTodoData);
     if (checkTodoData) {
       throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
     }
