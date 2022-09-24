@@ -2,7 +2,11 @@ const { Count } = require("./models");
 const schedule = require("node-schedule");
 const logger = require("./logger");
 const dayjs = require("dayjs");
-const redisClient = require("./utils/redisconnect");
+const timezone = require("dayjs/plugin/timezone");
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs().tz("Asia/Seoul");
 const localDate = dayjs().format("YYYY-MM-DD");
 
 const redisCli = redisClient.v4;
