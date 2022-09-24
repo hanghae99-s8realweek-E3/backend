@@ -1,9 +1,11 @@
 const { User, Follow, sequelize } = require("../models");
 const { Op } = require("sequelize");
+const Joi = require("../utils/joi");
 const jwt = require("jsonwebtoken");
 const passport = require("passport");
 const Boom = require("@hapi/boom");
 require("dotenv").config();
+joi = new Joi();
 
 // Kakao callback Controller
 exports.kakaoLogin = (req, res, next) => {
@@ -26,8 +28,13 @@ exports.kakaoLogin = (req, res, next) => {
 // passport-kakao 연결끊기 콜백 API
 exports.deleteKakao = async (req, res, next) => {
   try {
-    const { user_id } = req.query;
-    const user = await User.findOne({ where: { snsId: user_id } });
+    const user_id = await joi.kakaoLeaveQuerySchema.validateAsync(
+      req.query.user_id
+    );
+
+    const user = await User.findOne({
+      where: { snsId: user_id, provider: "kakao" },
+    });
     if (!user) {
       throw Boom.badRequest("존재하지 않는 카카오 로그인 회원입니다");
     }
