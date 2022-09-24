@@ -261,10 +261,7 @@ class myTodoController {
           (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
           FROM challengedTodos 
           WHERE userId = $userId LIMIT 20`,
-          { bind: { userId } },
-          {
-            type: sequelize.QueryTypes.SELECT,
-          }
+          { bind: { userId }, type: sequelize.QueryTypes.SELECT }
         ),
       ]);
 
