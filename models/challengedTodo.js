@@ -13,6 +13,10 @@ module.exports = class ChallengedTodo extends Sequelize.Model {
           type: Sequelize.STRING(4),
           allowNull: false,
         },
+        date: {
+          type: Sequelize.STRING(10),
+          allowNull: false,
+        },
         challengedTodo: {
           type: Sequelize.STRING(140),
           allowNull: false,

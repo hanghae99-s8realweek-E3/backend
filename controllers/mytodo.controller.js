@@ -90,9 +90,9 @@ class MyTodoController {
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (req, res, next) => {
     try {
-      const { user } = res.locals;
+      const { userId } = res.locals.user;
       const { date } = await this.joi.dateSchema.validateAsync(req.query);
-      const data = await this.myTodoService.getMyTodo(user, date);
+      const data = await this.myTodoService.getMyTodo(userId, date);
       res.status(200).json({ message: "success", data });
     } catch (err) {
       next(err);

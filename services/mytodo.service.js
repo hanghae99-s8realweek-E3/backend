@@ -194,36 +194,48 @@ class myTodoController {
   };
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
-  getMyTodo = async (user, date) => {
-    const myTodos = await sequelize.query(this.query.myTodosQuery(user, date), {
-      type: QueryTypes.SELECT,
-    });
+  getMyTodo = async (userId, date) => {
+    // const myTodos = await sequelize.query(this.query.myTodosQuery(user, date), {
+    //   type: QueryTypes.SELECT,
+    // });
+    const [userInfo, followingCount, followerCount] = await Promise.all([
+      User.findOne({
+        where: { userId },
+        // include: ["Todo", "ChallengedTodo"],
+        include: [
+          { model: Todo, where: { userId, date } },
+          { model: ChallengedTodo, where: { userId, date } },
+        ],
+      }),
+      Follow.count({
+        where: { userIdFollower: userId },
+      }),
+      Follow.count({
+        where: { userIdFollowing: userId },
+      }),
+    ]);
 
     return {
       userInfo: {
-        userId: myTodos[0].id,
-        nickname: myTodos[0].nickname,
-        profile: myTodos[0].profile,
-        mbti: myTodos[0].userMbti,
-        followingCount: myTodos[0].followingCount,
-        followerCount: myTodos[0].followerCount,
+        userId: userInfo.userId,
+        nickname: userInfo.nickname,
+        profile: userInfo.profile,
+        mbti: userInfo.userMbti,
+        followingCount,
+        followerCount,
       },
-      challengedTodo: myTodos[0].challengedTodoId
-        ? {
-            challengedTodoId: myTodos[0].challengedTodoId,
-            challengedTodo: myTodos[0].challengedTodo,
-            isCompleted: myTodos[0].isCompleted,
-            originTodoId: myTodos[0].originTodoId,
-          }
-        : [],
-      createdTodo: myTodos[0].todoId
-        ? {
-            todoId: myTodos[0].todoId,
-            todo: myTodos[0].todo,
-            commentCounts: myTodos[0].commentCounts,
-            challengedCounts: myTodos[0].challengedCounts,
-          }
-        : [],
+      challengedTodo: {
+        challengedTodoId: userInfo.ChallengedTodos.challengedTodoId,
+        challengedTodo: userInfo.ChallengedTodos.challengedTodo,
+        isCompleted: userInfo.ChallengedTodos.isCompleted,
+        originTodoId: userInfo.ChallengedTodos.originTodoId,
+      },
+      createdTodo: {
+        todoId: userInfo.Todos.todoId,
+        todo: userInfo.Todos.todo,
+        commentCounts: userInfo.Todos.commentCounts,
+        challengedCounts: userInfo.Todos.challengedCounts,
+      },
       date,
     };
   };
