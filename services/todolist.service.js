@@ -177,7 +177,7 @@ class TodoListService {
     yesterday.setDate(yesterday.getDate() - 1);
     yesterday.setHours(0, 0, 0, 0);
 
-    const challenge = await Todo.findAll({
+    const challengeRanking = await Todo.findAll({
       where: {
         createdAt: { [Op.gte]: yesterday },
       },
@@ -188,7 +188,7 @@ class TodoListService {
       limit: 5,
     });
 
-    const comment = await Todo.findAll({
+    const commentRanking = await Todo.findAll({
       where: {
         createdAt: { [Op.gte]: yesterday },
       },
@@ -199,7 +199,7 @@ class TodoListService {
       limit: 5,
     });
 
-    return { challenge, comment };
+    return { challenge: challengeRanking, comment: commentRanking };
   };
 }
 
