@@ -9,6 +9,12 @@ class Joi {
     challengedTodoId: joi.string().pattern(/^[0-9]+$/),
   });
 
+  // 카카오 연결끊기 쿼리(user_id) 유효성 검사
+  kakaoLeaveQuerySchema = joi
+    .string()
+    .pattern(/^[0-9]+$/)
+    .required();
+
   // 댓글 작성 유효성 검사
   createCommentSchema = joi.object({
     comment: joi.string().min(1).required(),
