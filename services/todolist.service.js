@@ -1,6 +1,7 @@
 const { Todo, ChallengedTodo, Follow, Mbti, sequelize } = require("../models");
 const { QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
+const date = require("../utils/date");
 const Boom = require("@hapi/boom");
 
 class TodoListService {
@@ -105,9 +106,7 @@ class TodoListService {
       throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
     }
 
-    // 오늘 (과거의) 자정 시간 세팅
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = date.calculateToday();
 
     const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
       await Promise.all([
@@ -133,7 +132,7 @@ class TodoListService {
         ChallengedTodo.findOne({
           where: {
             userId,
-            createdAt: { [Op.gte]: today },
+            date: today,
           },
         }),
         Follow.findOne({
@@ -179,10 +178,7 @@ class TodoListService {
 
   // 현재 인기있는 피드 top5 [GET] /api/todolists/ranking
   rankingGet = async () => {
-    // 어제 날짜 - 자정으로 세팅
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
+    const yesterday = date.calculateYesterdayMidnight();
 
     const challengeRanking = await Todo.findAll({
       where: {
