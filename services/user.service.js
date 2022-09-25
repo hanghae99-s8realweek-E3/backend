@@ -3,6 +3,7 @@ const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
+const multer = require("../middlewares/multer");
 const Boom = require("@hapi/boom");
 
 class UserService {
@@ -196,7 +197,6 @@ class UserService {
     newPassword,
     confirmPassword,
     nickname,
-    profile,
     mbti
   ) => {
     const userData = await User.findByPk(userId);
@@ -227,10 +227,6 @@ class UserService {
       await User.update({ nickname }, { where: { userId } });
     }
 
-    if (profile) {
-      await User.update({ profile }, { where: { userId } });
-    }
-
     if (mbti) {
       await User.update({ mbti }, { where: { userId } });
     }
@@ -246,6 +242,32 @@ class UserService {
       profile: changedData.profile,
     };
 
+    const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
+      expiresIn: "2d",
+    });
+
+    return token;
+  };
+
+  // 프로필 사진 변경 [PUT] /api/accounts/profile
+  userProfileChange = async (userId, profile) => {
+    const user = await User.findByPk(userId);
+
+    if (user.profile !== "none") {
+      await multer.deleteProfile(user.profile);
+    }
+
+    await User.update({ profile }, { where: { userId } });
+
+    const changedData = await User.findByPk(userId);
+    // token 새로 보내주기
+    const payload = {
+      userId: changedData.userId,
+      nickname: changedData.nickname,
+      mbti: changedData.mbti,
+      provider: changedData.provider,
+      profile: changedData.profile,
+    };
     const token = jwt.sign(payload, process.env.MYSECRET_KEY, {
       expiresIn: "2d",
     });
