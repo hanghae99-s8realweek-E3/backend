@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@hapi/boom": "^10.0.0",
+    "aws-sdk": "^2.1223.0",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dayjs": "^1.11.5",
@@ -34,6 +35,8 @@
     "joi": "^17.6.0",
     "jsonwebtoken": "^8.5.1",
     "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^2.10.0",
     "mysql2": "^2.3.3",
     "node-schedule": "^2.1.0",
     "nodemailer": "^6.7.8",

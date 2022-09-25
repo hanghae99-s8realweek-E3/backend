@@ -51,7 +51,6 @@ class Joi {
         /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/
       ),
     nickname: joi.string().min(1),
-    profile: joi.string(),
     mbti: joi.string().pattern(/[A-Z]{4}/),
   });
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("../middlewares/multer");
 
 const UserController = require("../controllers/user.controller");
 const userController = new UserController();
@@ -16,6 +17,13 @@ router.post("/login", userController.login);
 router.post("/emailAuth", userController.emailAuth);
 // 이메일 인증확인 [POST] /api/accounts/emailAuth/check
 router.post("/emailAuth/check", userController.emailAuthCheck);
+// 프로필 사진 변경 [PUT] /api/accounts/profile
+router.put(
+  "/profile",
+  authMiddleware,
+  multer.uploadProfile.single("profile"),
+  userController.changeUserProfile
+);
 // 회원 정보 조회 [GET] /api/accounts
 router.get("/", authMiddleware, userController.getUserInfo);
 // 회원 정보 변경 [PUT] /api/accounts
