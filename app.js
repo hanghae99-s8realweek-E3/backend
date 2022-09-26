@@ -11,7 +11,7 @@ const { routerError, errorHandler } = require("./middlewares/error_handler");
 const {
   emailAuthTableSchedule,
   visitorCountSchedule,
-} = require("./setSchedule");
+} = require("./utils/setSchedule");
 require("dotenv").config();
 
 const app = express();
