@@ -16,6 +16,9 @@ const uploadProfile = multer({
     s3,
     bucket: process.env.S3_BUCKET,
     key(req, file, cb) {
+      if (!file) {
+        return cb(new Error("파일을 업로드 해주세요"));
+      }
       // cb === callback
       const extension = file.mimetype.split("/")[1];
       if (!["png", "jpg", "jpeg", "JPG", "JPEG"].includes(extension)) {
@@ -27,7 +30,7 @@ const uploadProfile = multer({
     },
   }),
   // 10mb로 제한
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 10 * 5000 * 5000 },
 });
 
 const deleteProfile = async (url) => {
