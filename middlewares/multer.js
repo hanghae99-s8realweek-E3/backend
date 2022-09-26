@@ -15,7 +15,6 @@ const uploadProfile = multer({
   storage: multerS3({
     s3,
     bucket: process.env.S3_BUCKET,
-    acl: "public-read",
     key(req, file, cb) {
       // cb === callback
       const extension = file.mimetype.split("/")[1];
