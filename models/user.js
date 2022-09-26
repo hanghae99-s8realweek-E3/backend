@@ -31,6 +31,11 @@ module.exports = class User extends Sequelize.Model {
           allowNull: true,
           defaultValue: "none",
         },
+        mimicCounts: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+          defaultValue: 0,
+        },
         snsId: {
           type: Sequelize.STRING(50),
           allowNull: true,
