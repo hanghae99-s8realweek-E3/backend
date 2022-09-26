@@ -4,12 +4,14 @@ const { stream } = require("./logger");
 const helmet = require("helmet");
 const hpp = require("hpp");
 const cors = require("cors");
-const kakaoPassport = require("./passport/index");
-const setSchedule = require("./setSchedule");
-const setVisitorsCouSchedule = require("./setVisitorsCountSchedule");
-const { routerError, errorHandler } = require("./middlewares/error_handler");
 const indexRouter = require("./routes");
+const kakaoPassport = require("./passport/index");
 const { sequelize } = require("./models");
+const { routerError, errorHandler } = require("./middlewares/error_handler");
+const {
+  emailAuthTableSchedule,
+  visitorCountSchedule,
+} = require("./setSchedule");
 require("dotenv").config();
 
 const app = express();
@@ -24,8 +26,8 @@ const corsOption = {
 };
 
 kakaoPassport(app);
-setVisitorsCouSchedule();
-setSchedule();
+emailAuthTableSchedule();
+visitorCountSchedule();
 
 // sequelize 연결
 sequelize
