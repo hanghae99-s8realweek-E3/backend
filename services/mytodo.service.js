@@ -172,6 +172,24 @@ class myTodoController {
       userId,
       date: todayDate,
     });
+
+    // 쿼리문 사용했을때
+    const [userTodoData, userChallengedTodoData] = await Promise.all([
+      await sequelize.query(
+        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM $tableName AS Todo GROUP BY userId) as count
+         WHERE userId = $userId `,
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT }
+      ),
+      await sequelize.query(
+        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM challengedTodos AS Todo GROUP BY userId) as count
+         WHERE userId = $userId `,
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT }
+      ),
+    ]);
+
+    const mimicCounts = userTodoData.COUNT + userChallengedTodoData.COUNT;
+
+    await User.update({ mimicCounts }, { where: { userId } });
   };
 
   // todo 삭제 [DELETE] /api/mytodos/:todoId
