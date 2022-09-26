@@ -16,7 +16,9 @@ class Query {
     (SELECT commentCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
     (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
     FROM challengedTodos 
-    WHERE userId = $userId LIMIT 20`;
+    WHERE userId = $userId 
+    ORDER BY createdAt DESC
+    LIMIT 20`;
 
   // comment.service - 댓글 작성, 댓글 삭제
   getCommentCountsQuery = `SELECT COUNT(*) AS commentCounts

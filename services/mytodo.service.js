@@ -247,7 +247,7 @@ class myTodoController {
       await Promise.all([
         User.findOne({
           where: { userId },
-          include: [{ model: Todo, limit: 20 }],
+          include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
         }),
         sequelize.query(this.query.getFollowingCountsQuery, {
           bind: { userId },
