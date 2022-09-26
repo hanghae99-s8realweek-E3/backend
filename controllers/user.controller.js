@@ -120,7 +120,12 @@ class UserController {
   changeUserProfile = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
-      const profile = req.file.location;
+      const beforeResizingProfile = req.file.location;
+      const profile = beforeResizingProfile.replace(
+        /\/mimic\//,
+        "/resizingMimic/"
+      );
+
       const data = await this.userService.userProfileChange(userId, profile);
 
       res.status(200).json({ message: "success", token: data });

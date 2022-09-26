@@ -40,7 +40,24 @@ const deleteProfile = async (url) => {
     },
     function (err, data) {
       if (err)
-        logger.error("[S3 profile 삭제 오류]" + err.name + " - " + err.message);
+        logger.error(
+          "[S3 profile 삭제 오류(/mimic)]" + err.name + " - " + err.message
+        );
+    }
+  );
+  await s3.deleteObject(
+    {
+      Bucket: process.env.S3_BUCKET_FOLDER2,
+      Key: filename,
+    },
+    function (err, data) {
+      if (err)
+        logger.error(
+          "[S3 profile 삭제 오류(/resizingMimic)]" +
+            err.name +
+            " - " +
+            err.message
+        );
     }
   );
 };
