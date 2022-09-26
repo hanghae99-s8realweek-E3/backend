@@ -3,6 +3,7 @@ const multerS3 = require("multer-s3");
 const AWS = require("aws-sdk");
 const path = require("path");
 const { logger } = require("../logger");
+const { read } = require("fs");
 
 AWS.config.update({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,
@@ -15,6 +16,7 @@ const uploadProfile = multer({
   storage: multerS3({
     s3,
     bucket: process.env.S3_BUCKET,
+    acl: "public-read",
     key(req, file, cb) {
       // cb === callback
       const extension = file.mimetype.split("/")[1];
