@@ -28,12 +28,12 @@ class TodoListController {
   // 상세 todo 조회 [GET] /api/todolists/:todoId
   getTodo = async (req, res, next) => {
     try {
-      const { userId } = res.locals.user;
+      const { user } = res.locals;
       const { todoId } = await this.joi.parameterSchema.validateAsync(
         req.params
       );
 
-      const data = await this.todoListService.todoGet(userId, todoId);
+      const data = await this.todoListService.todoGet(user, todoId);
 
       res.status(200).json({ message: "success", data });
     } catch (err) {
