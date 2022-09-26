@@ -10,7 +10,6 @@ const calculateToday = () => {
 };
 
 const calculateYesterdayMidnight = () => {
-  // return dayjs().subtract(1, "day").startOf("day");
   return dayjs()
     .subtract(1, "day")
     .startOf("day")
