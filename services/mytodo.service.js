@@ -161,35 +161,73 @@ class myTodoController {
       },
     });
 
-    if (checkTodoData) {
-      throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
+    // if (checkTodoData) {
+    //   throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
+    // }
+
+    // const onTransaction = await sequelize.transaction({
+    //   isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED ,
+    // });
+
+    // const { Transaction } = require("sequelize");
+
+    // await sequelize.transaction(
+    //   {
+    //     isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+    //   },
+    //   async (t) => {
+    //     // Your code
+    //   }
+    // );
+    // sequelize.transaction({
+    //   isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED
+    //  },
+    // let t = await models.sequelize.transaction(isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE); 
+    // try {
+    // const { Transaction } = require("sequelize");
+    // try {
+      await sequelize.transaction({isolationLevel: Sequelize.Transaction.SERIALIZABLE}, transaction => {
+    await sequelize.transaction(
+      {
+        isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+      },
+        async (transaction) => {
+          await Todo.create(
+            {
+              todo,
+              mbti: userData.mbti,
+              nickname: userData.nickname,
+              userId,
+              date: todayDate,
+            },
+            { transaction }
+          );
+          const [userTodoData] = await sequelize.query(
+            `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM todos AS Todo GROUP BY userId) as count
+               WHERE userId = $userId `,
+            { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
+            { transaction }
+          );
+          //값이 있다면 그 카운터를 반영 없다면 0으a로
+
+          let todoCounts = 0;
+          //값이 있는 경우에만 배열에서 count를 사용해서 반영
+          if (userTodoData !== undefined) {
+            todoCounts = userTodoData.COUNT;
+          }
+
+          console.log(userTodoData);
+          console.log(todoCounts);
+          await User.update(
+            { todoCounts },
+            { where: { userId } },
+            { transaction }
+          );
+        }
+      );
+    } catch (error) {
+      console.log(error);
     }
-
-    await Todo.create({
-      todo,
-      mbti: userData.mbti,
-      nickname: userData.nickname,
-      userId,
-      date: todayDate,
-    });
-
-    // 쿼리문 사용했을때
-    const [userTodoData, userChallengedTodoData] = await Promise.all([
-      await sequelize.query(
-        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM $tableName AS Todo GROUP BY userId) as count
-         WHERE userId = $userId `,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT }
-      ),
-      await sequelize.query(
-        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM challengedTodos AS Todo GROUP BY userId) as count
-         WHERE userId = $userId `,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT }
-      ),
-    ]);
-
-    const mimicCounts = userTodoData.COUNT + userChallengedTodoData.COUNT;
-
-    await User.update({ mimicCounts }, { where: { userId } });
   };
 
   // todo 삭제 [DELETE] /api/mytodos/:todoId
@@ -202,9 +240,36 @@ class myTodoController {
       throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
 
-    await Todo.destroy({
-      where: { todoId: todoId },
-    });
+    const onTransaction = await sequelize.transaction();
+    try {
+      await Todo.destroy({
+        where: { todoId: todoId },
+        transaction: onTransaction,
+      });
+
+      const [userTodoData] = await sequelize.query(
+        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM todos AS Todo GROUP BY userId) as count
+             WHERE userId = $userId `,
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT }
+      );
+      //값이 있다면 그 카운터를 반영 없다면 0으a로
+
+      //값이 있는 경우에만 배열에서 count를 사용해서 반영
+      if (userTodoData !== undefined) {
+        todoCounts = userTodoData[0].COUNT;
+      }
+
+      let todoCounts = 0;
+
+      await User.update(
+        { todoCounts },
+        { where: { userId }, transaction: onTransaction }
+      );
+
+      await onTransaction.commit();
+    } catch (error) {
+      await onTransaction.rollback();
+    }
   };
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
