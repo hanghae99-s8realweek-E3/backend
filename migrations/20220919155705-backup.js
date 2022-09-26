@@ -8,12 +8,14 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn("Todos", "date", {
-      type: Sequelize.STRING(10),
+    await queryInterface.addColumn("users", "mimicCounts", {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 0,
     });
-    await queryInterface.addColumn("ChallengedTodos", "date", {
-      type: Sequelize.STRING(10),
-    });
+    // await queryInterface.addColumn("challengedTodos", "date", {
+    //   type: Sequelize.STRING(10),
+    // });
   },
 
   async down(queryInterface, Sequelize) {
@@ -23,8 +25,8 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn("Todos", "date");
-    await queryInterface.removeColumn("ChallengedTodos", "date");
+    await queryInterface.removeColumn("users", "mimicCounts");
+    // await queryInterface.removeColumn("challengedTodos", "date");
   },
 };
 
