@@ -100,7 +100,7 @@ class TodoListService {
   };
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
-  todoGet = async (userId, todoId) => {
+  todoGet = async (user, todoId) => {
     const todo = await Todo.findByPk(todoId);
     if (!todo) {
       throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
@@ -111,32 +111,30 @@ class TodoListService {
     const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
       await Promise.all([
         sequelize.query(
-          `SELECT *, 
-          (SELECT nickname FROM users WHERE users.userId = todos.userId) AS nickname, 
-          (SELECT profile FROM users WHERE users.userId = todos.userId) AS profile
+          `SELECT todos.*, users.nickname, users.profile, users.todoCounts, users.challengeCounts
           FROM todos
+          INNER JOIN users ON todos.userId = users.userId
           WHERE todoId = $todoId`,
           { bind: { todoId }, type: QueryTypes.SELECT }
         ),
         sequelize.query(
-          `SELECT *, 
-          (SELECT nickname FROM users WHERE users.userId = comments.userId) AS nickname, 
-          (SELECT profile FROM users WHERE users.userId = comments.userId) AS profile
+          `SELECT comments.*, users.nickname, users.profile, users.todoCounts, users.challengeCounts
           FROM comments
+          LEFT OUTER JOIN users ON comments.userId = users.userId
           WHERE todoId = $todoId`,
           { bind: { todoId }, type: QueryTypes.SELECT }
         ),
         ChallengedTodo.findOne({
-          where: { userId, originTodoId: todoId },
+          where: { userId: user.userId, originTodoId: todoId },
         }),
         ChallengedTodo.findOne({
           where: {
-            userId,
+            userId: user.userId,
             date: today,
           },
         }),
         Follow.findOne({
-          where: { userIdFollower: userId, userIdFollowing: todo.userId },
+          where: { userIdFollower: user.userId, userIdFollowing: todo.userId },
         }),
       ]);
 
@@ -147,12 +145,15 @@ class TodoListService {
     return {
       todoInfo: todoInfo[0],
       comments: comments.map((comment) => {
+        const todoAndChallengeCounts =
+          comment.todoCounts + comment.challengeCounts;
         return {
           commentId: comment.commentId,
           comment: comment.comment,
           userId: comment.userId ? comment.userId : "none",
           nickname: comment.nickname ? comment.nickname : "(알수없음)",
           profile: comment.profile ? comment.profile : "none",
+          mimicCounts: todoAndChallengeCounts ? todoAndChallengeCounts : "none",
           createdAt: comment.createdAt,
           updatedAt: comment.updatedAt,
         };
@@ -160,6 +161,7 @@ class TodoListService {
       isChallenged: ischallenged ? true : false,
       isTodayDone: todaysChallenge ? true : false,
       isFollowed: isFollowed ? true : false,
+      loginUserProfile: user.profile,
     };
   };
 

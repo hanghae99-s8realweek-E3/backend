@@ -270,6 +270,7 @@ class myTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
+        mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
         followingCount: followings.length,
         followerCount: followers.length,
         isFollowed:

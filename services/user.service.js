@@ -185,6 +185,7 @@ class UserService {
       mbti: userData.mbti,
       nickname: userData.nickname,
       profile: userData.profile,
+      mimicCounts: userData.todoCounts + userData.challengeCounts,
       following: myfolloing.length,
       follower: myfollower.length,
     };
