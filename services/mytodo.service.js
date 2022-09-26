@@ -1,6 +1,6 @@
+const { Op } = require("sequelize");
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const Boom = require("@hapi/boom");
-const { Op } = require("sequelize");
 const { calculateToday } = require("../utils/date");
 
 class myTodoController {
@@ -161,72 +161,43 @@ class myTodoController {
       },
     });
 
-    // if (checkTodoData) {
-    //   throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
-    // }
+    if (checkTodoData) {
+      throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
+    }
 
-    // const onTransaction = await sequelize.transaction({
-    //   isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED ,
-    // });
-
-    // const { Transaction } = require("sequelize");
-
-    // await sequelize.transaction(
-    //   {
-    //     isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-    //   },
-    //   async (t) => {
-    //     // Your code
-    //   }
-    // );
-    // sequelize.transaction({
-    //   isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.READ_COMMITTED
-    //  },
-    // let t = await models.sequelize.transaction(isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE); 
-    // try {
-    // const { Transaction } = require("sequelize");
-    // try {
-      await sequelize.transaction({isolationLevel: Sequelize.Transaction.SERIALIZABLE}, transaction => {
-    await sequelize.transaction(
-      {
-        isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-      },
-        async (transaction) => {
-          await Todo.create(
-            {
-              todo,
-              mbti: userData.mbti,
-              nickname: userData.nickname,
-              userId,
-              date: todayDate,
-            },
-            { transaction }
-          );
-          const [userTodoData] = await sequelize.query(
-            `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM todos AS Todo GROUP BY userId) as count
-               WHERE userId = $userId `,
-            { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
-            { transaction }
-          );
-          //값이 있다면 그 카운터를 반영 없다면 0으a로
-
-          let todoCounts = 0;
-          //값이 있는 경우에만 배열에서 count를 사용해서 반영
-          if (userTodoData !== undefined) {
-            todoCounts = userTodoData.COUNT;
-          }
-
-          console.log(userTodoData);
-          console.log(todoCounts);
-          await User.update(
-            { todoCounts },
-            { where: { userId } },
-            { transaction }
-          );
-        }
+    const onTransaction = await sequelize.transaction();
+    try {
+      await Todo.create({
+        todo,
+        mbti: userData.mbti,
+        nickname: userData.nickname,
+        userId,
+        date: todayDate,
+      });
+      const [userTodoData] = await sequelize.query(
+        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM todos AS Todo GROUP BY userId) as count 
+        WHERE userId = $userId `,
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
+        { transaction: onTransaction }
       );
-    } catch (error) {
-      console.log(error);
+      //값이 있다면 그 카운터를 반영 없다면 0으a로
+
+      let todoCounts = 0;
+      //값이 있는 경우에만 배열에서 count를 사용해서 반영
+      if (userTodoData !== undefined) {
+        todoCounts = userTodoData.COUNT;
+      }
+
+      console.log(userTodoData);
+      console.log(todoCounts);
+      await User.update(
+        { todoCounts },
+        { where: { userId }, transaction: onTransaction }
+      );
+
+      await onTransaction.commit();
+    } catch (err) {
+      await onTransaction.rollback();
     }
   };
 
