@@ -13,7 +13,6 @@ class myTodoController {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
     if (!todoData.mbti) {
-      console.log(todoData.mbti);
       throw Boom.badRequest("MBTI 정보 등록바랍니다.");
     }
     if (todoData.userId === userId) {
@@ -162,7 +161,6 @@ class myTodoController {
       },
     });
 
-    console.log(checkTodoData);
     if (checkTodoData) {
       throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
     }
@@ -214,7 +212,7 @@ class myTodoController {
         userId: userInfo.userId,
         nickname: userInfo.nickname,
         profile: userInfo.profile,
-        mbti: userInfo.userMbti,
+        mbti: userInfo.mbti,
         followingCount,
         followerCount,
       },
