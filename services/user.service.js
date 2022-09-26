@@ -5,8 +5,11 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const multer = require("../middlewares/multer");
 const Boom = require("@hapi/boom");
+const Query = require("../utils/query");
 
 class UserService {
+  query = new Query();
+
   // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmPassword, nickname) => {
     const checkEamilDuplicate = await User.findOne({ where: { email: email } });
@@ -169,25 +172,26 @@ class UserService {
 
   //회원 정보 조회 [GET] /api/accounts
   userInfoGet = async (userId) => {
-    const [userData, myfolloing, myfollower] = await Promise.all([
+    const [userData, followings, followers] = await Promise.all([
       User.findByPk(userId),
-
-      Follow.findAll({
-        where: { userIdFollower: userId },
+      sequelize.query(this.query.getFollowingCountsQuery, {
+        bind: { userId },
+        type: sequelize.QueryTypes.SELECT,
       }),
-
-      Follow.findAll({
-        where: { userIdFollowing: userId },
+      sequelize.query(this.query.getFollowerCountsQuery, {
+        bind: { userId },
+        type: sequelize.QueryTypes.SELECT,
       }),
     ]);
+
     return {
       userId: userData.userId,
       mbti: userData.mbti,
       nickname: userData.nickname,
       profile: userData.profile,
       mimicCounts: userData.todoCounts + userData.challengeCounts,
-      following: myfolloing.length,
-      follower: myfollower.length,
+      following: followings[0].followingCount,
+      follower: followers[0].followerCount,
     };
   };
 
