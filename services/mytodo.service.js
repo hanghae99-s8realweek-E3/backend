@@ -119,27 +119,61 @@ class myTodoController {
     }
 
     const isCompletedCheck = todaychallengedTodoData.isCompleted;
+    const onTransaction = await sequelize.transaction();
+    try {
+      //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
+      await ChallengedTodo.update(
+        { isCompleted: isCompletedCheck ? false : true },
+        { where: { challengedTodoId } },
+        { transaction: onTransaction }
+      );
 
-    //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
-    await ChallengedTodo.update(
-      { isCompleted: isCompletedCheck ? false : true },
-      { where: { challengedTodoId } }
-    );
+      //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 challengedTodoId가 올바르지 않는경우 에러처리
+      //params는 문자열로 들어오기에 숫자열로 변경후 비교
+      if (
+        Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId
+      ) {
+        throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
+      }
 
-    //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 challengedTodoId가 올바르지 않는경우 에러처리
-    //params는 문자열로 들어오기에 숫자열로 변경후 비교
-    if (Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId) {
-      throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
+      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
+      const [challengedTodoData] = await sequelize.query(
+        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM challengedTodos AS ChallengedTodo WHERE isCompleted = true GROUP BY userId) as count 
+        WHERE userId = $userId`,
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
+        { transaction: onTransaction }
+      );
+      //값이 있다면 그 카운터를 반영 없다면 0으로
+
+      let challengeCounts = 0;
+
+      //값이 있는 경우에만 배열에서 count를 사용해서 반영
+      if (challengedTodoData !== undefined) {
+        challengeCounts = challengedTodoData.COUNT;
+      }
+
+      console.log(challengedTodoData);
+      console.log(challengeCounts);
+
+      await User.update(
+        { challengeCounts },
+        { where: { userId }, transaction: onTransaction }
+      );
+
+      // const updatedChallengedTodoData = await ChallengedTodo.findOne({
+      //   where: {
+      //     [Op.and]: [{ date: todayDate }, { userId }],
+      //   },
+      // });
+
+      // const isCompleted = updatedChallengedTodoData.isCompleted;
+      await onTransaction.commit();
+
+      const isCompleted = !isCompletedCheck;
+      return isCompleted;
+    } catch (err) {
+      await onTransaction.rollback();
     }
-
-    const updatedChallengedTodoData = await ChallengedTodo.findOne({
-      where: {
-        [Op.and]: [{ date: todayDate }, { userId }],
-      },
-    });
-
-    const isCompleted = updatedChallengedTodoData.isCompleted;
-    return isCompleted;
   };
 
   // 오늘의 제안 todo 작성 [POST] /api/mytodos
@@ -174,6 +208,7 @@ class myTodoController {
         userId,
         date: todayDate,
       });
+
       const [userTodoData] = await sequelize.query(
         `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM todos AS Todo GROUP BY userId) as count 
         WHERE userId = $userId `,
@@ -213,28 +248,33 @@ class myTodoController {
 
     const onTransaction = await sequelize.transaction();
     try {
-      await Todo.destroy({
-        where: { todoId: todoId },
-        transaction: onTransaction,
-      });
+      await Todo.destroy(
+        {
+          where: { todoId: todoId },
+        },
+        { transaction: onTransaction }
+      );
 
       const [userTodoData] = await sequelize.query(
         `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM todos AS Todo GROUP BY userId) as count
              WHERE userId = $userId `,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT }
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
+        { transaction: onTransaction }
       );
       //값이 있다면 그 카운터를 반영 없다면 0으a로
-
+      let todoCounts = 0;
       //값이 있는 경우에만 배열에서 count를 사용해서 반영
       if (userTodoData !== undefined) {
-        todoCounts = userTodoData[0].COUNT;
+        todoCounts = userTodoData.COUNT;
       }
 
-      let todoCounts = 0;
+      console.log(userTodoData);
+      console.log(todoCounts);
 
       await User.update(
         { todoCounts },
-        { where: { userId }, transaction: onTransaction }
+        { where: { userId } },
+        { transaction: onTransaction }
       );
 
       await onTransaction.commit();
