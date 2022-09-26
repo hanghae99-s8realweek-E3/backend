@@ -98,14 +98,8 @@ class UserController {
   changeUserInfo = async (req, res, next) => {
     try {
       const { userId } = res.locals.user;
-      const {
-        password,
-        newPassword,
-        confirmPassword,
-        nickname,
-        profile,
-        mbti,
-      } = await this.joi.changeUserInfoSchema.validateAsync(req.body);
+      const { password, newPassword, confirmPassword, nickname, mbti } =
+        await this.joi.changeUserInfoSchema.validateAsync(req.body);
 
       const data = await this.userService.userInfoChange(
         userId,
@@ -113,9 +107,26 @@ class UserController {
         newPassword,
         confirmPassword,
         nickname,
-        profile,
         mbti
       );
+
+      res.status(200).json({ message: "success", token: data });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // 프로필 사진 변경 [PUT] /api/accounts/profile
+  changeUserProfile = async (req, res, next) => {
+    try {
+      const { userId } = res.locals.user;
+      const beforeResizingProfile = req.file.location;
+      const profile = beforeResizingProfile.replace(
+        /\/mimic\//,
+        "/resizingMimic/"
+      );
+
+      const data = await this.userService.userProfileChange(userId, profile);
 
       res.status(200).json({ message: "success", token: data });
     } catch (err) {
