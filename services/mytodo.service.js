@@ -63,12 +63,12 @@ class myTodoController {
   };
 
   // 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
-  challengedTodoDelete = async (challengedTodoId) => {
-    const onTranscation = await sequelize.transaction();
+  challengedTodoDelete = async (challengedTodoId, userId) => {
+    const onTransaction = await sequelize.transaction();
     try {
       const challengedTodoData = await ChallengedTodo.findOne({
         where: { challengedTodoId: challengedTodoId },
-        transaction: onTranscation,
+        transaction: onTransaction,
       });
       if (challengedTodoData === null) {
         throw Boom.badRequest("삭제되었거나 존재하지 않는 todo 입니다.");
@@ -80,29 +80,49 @@ class myTodoController {
       //challengedTodoId를 기준으로 데이터 삭제
       await ChallengedTodo.destroy({
         where: { challengedTodoId: challengedTodoId },
-        transaction: onTranscation,
       });
-
-
-      
 
       //삭제된 todoId의 갯수
       const deletedTodoData = await ChallengedTodo.findAll({
         where: { originTodoId: deletedTodoId },
-        transaction: onTranscation,
+        transaction: onTransaction,
       });
+      
       const deletedTodoIdCount = deletedTodoData.length;
 
-
-      
       //Todos테이블에 도전갯수 업데이트
       await Todo.update(
         { challengedCounts: deletedTodoIdCount },
-        { where: { todoId: deletedTodoId }, transaction: onTranscation }
+        { where: { todoId: deletedTodoId }, transaction: onTransaction }
       );
-      await onTranscation.commit();
+
+      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
+      const [challengedData] = await sequelize.query(
+        `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM challengedTodos AS ChallengedTodo WHERE isCompleted = true GROUP BY userId) as count 
+          WHERE userId = $userId`,
+        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
+        { transaction: onTransaction }
+      );
+      //값이 있다면 그 카운터를 반영 없다면 0으로
+
+      let challengeCounts = 0;
+
+      //값이 있는 경우에만 배열에서 count를 사용해서 반영
+      if (challengedData !== undefined) {
+        challengeCounts = challengedData.COUNT;
+      }
+
+      console.log(challengedData);
+      console.log(challengeCounts);
+
+      await User.update(
+        { challengeCounts },
+        { where: { userId }, transaction: onTransaction }
+      );
+
+      await onTransaction.commit();
     } catch (err) {
-      await onTranscation.rollback();
+      await onTransaction.rollback();
     }
   };
 
@@ -139,7 +159,7 @@ class myTodoController {
         Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId
       ) {
         throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
-      } 
+      }
 
       //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
       const [challengedTodoData] = await sequelize.query(
