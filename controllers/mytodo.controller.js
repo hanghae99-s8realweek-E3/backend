@@ -24,10 +24,11 @@ class MyTodoController {
   // 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
   deleteChallengedTodo = async (req, res, next) => {
     try {
+      const { userId } = res.locals.user;
       const { challengedTodoId } = await this.joi.parameterSchema.validateAsync(
         req.params
       );
-      await this.myTodoService.challengedTodoDelete(challengedTodoId);
+      await this.myTodoService.challengedTodoDelete(challengedTodoId, userId);
       res.status(201).json({
         message: "success",
       });

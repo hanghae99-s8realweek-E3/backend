@@ -27,7 +27,7 @@ const uploadProfile = multer({
     },
   }),
   // 10mb로 제한
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 10 * 5000 * 5000 },
 });
 
 const deleteProfile = async (url) => {

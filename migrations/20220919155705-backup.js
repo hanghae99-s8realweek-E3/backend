@@ -14,8 +14,8 @@ module.exports = {
       defaultValue: 0,
     });
     // await queryInterface.addColumn("challengedTodos", "date", {
-    //   type: Sequelize.STRING(10),
     // });
+    //   type: Sequelize.STRING(10),
   },
 
   async down(queryInterface, Sequelize) {
