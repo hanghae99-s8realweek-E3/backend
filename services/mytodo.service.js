@@ -218,8 +218,8 @@ class myTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
-        followingCount: followings[0].followingCount,
-        followerCount: followers[0].followerCount,
+        followingCount: followings[0] ? followings[0].followingCount : 0,
+        followerCount: followers[0] ? followers[0].followerCount : 0,
       },
       challengedTodo: userInfo.ChallengedTodos[0]
         ? {
@@ -274,8 +274,8 @@ class myTodoController {
         profile: userInfo.profile,
         mbti: userInfo.mbti,
         mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
-        followingCount: followings[0].followingCount,
-        followerCount: followers[0].followerCount,
+        followingCount: followings[0] ? followings[0].followingCount : 0,
+        followerCount: followers[0] ? followers[0].followerCount : 0,
         isFollowed:
           followers.findIndex(
             (follower) => follower.userIdFollower === user.userId
