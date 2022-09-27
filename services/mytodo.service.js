@@ -2,8 +2,11 @@ const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const Boom = require("@hapi/boom");
 const { Op } = require("sequelize");
 const { calculateToday } = require("../utils/date");
+const Query = require("../utils/query");
 
 class myTodoController {
+  query = new Query();
+
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     const todayDate = calculateToday();
@@ -191,7 +194,7 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (userId, date) => {
-    const [userInfo, followingCount, followerCount] = await Promise.all([
+    const [userInfo, followings, followers] = await Promise.all([
       User.findOne({
         where: { userId },
         include: [
@@ -199,11 +202,13 @@ class myTodoController {
           { model: ChallengedTodo, where: { userId, date }, required: false },
         ],
       }),
-      Follow.count({
-        where: { userIdFollower: userId },
+      sequelize.query(this.query.getFollowingCountsQuery, {
+        bind: { userId },
+        type: sequelize.QueryTypes.SELECT,
       }),
-      Follow.count({
-        where: { userIdFollowing: userId },
+      sequelize.query(this.query.getFollowerCountsQuery, {
+        bind: { userId },
+        type: sequelize.QueryTypes.SELECT,
       }),
     ]);
 
@@ -213,8 +218,8 @@ class myTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
-        followingCount,
-        followerCount,
+        followingCount: followings[0].followingCount,
+        followerCount: followers[0].followerCount,
       },
       challengedTodo: userInfo.ChallengedTodos[0]
         ? {
@@ -242,22 +247,20 @@ class myTodoController {
       await Promise.all([
         User.findOne({
           where: { userId },
-          include: [{ model: Todo, limit: 20 }],
+          include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
         }),
-        Follow.findAll({
-          where: { userIdFollower: userId },
+        sequelize.query(this.query.getFollowingCountsQuery, {
+          bind: { userId },
+          type: sequelize.QueryTypes.SELECT,
         }),
-        Follow.findAll({
-          where: { userIdFollowing: userId },
+        sequelize.query(this.query.getFollowerCountsQuery, {
+          bind: { userId },
+          type: sequelize.QueryTypes.SELECT,
         }),
-        sequelize.query(
-          `SELECT *, 
-          (SELECT commentCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
-          (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
-          FROM challengedTodos 
-          WHERE userId = $userId LIMIT 20`,
-          { bind: { userId }, type: sequelize.QueryTypes.SELECT }
-        ),
+        sequelize.query(this.query.getChallengedTodosQuery, {
+          bind: { userId },
+          type: sequelize.QueryTypes.SELECT,
+        }),
       ]);
 
     if (!userInfo) {
@@ -271,8 +274,8 @@ class myTodoController {
         profile: userInfo.profile,
         mbti: userInfo.mbti,
         mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
-        followingCount: followings.length,
-        followerCount: followers.length,
+        followingCount: followings[0].followingCount,
+        followerCount: followers[0].followerCount,
         isFollowed:
           followers.findIndex(
             (follower) => follower.userIdFollower === user.userId

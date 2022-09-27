@@ -3,8 +3,11 @@ const { QueryTypes } = require("sequelize");
 const { Op } = require("sequelize");
 const date = require("../utils/date");
 const Boom = require("@hapi/boom");
+const Query = require("../utils/query");
 
 class TodoListService {
+  query = new Query();
+
   // todo 피드 조회 [GET] /api/todolists
   todoListsGet = async (userId, mbti, filter) => {
     const myChallengedTodos = await ChallengedTodo.findAll({
@@ -110,20 +113,14 @@ class TodoListService {
 
     const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
       await Promise.all([
-        sequelize.query(
-          `SELECT todos.*, users.nickname, users.profile, users.todoCounts, users.challengeCounts
-          FROM todos
-          INNER JOIN users ON todos.userId = users.userId
-          WHERE todoId = $todoId`,
-          { bind: { todoId }, type: QueryTypes.SELECT }
-        ),
-        sequelize.query(
-          `SELECT comments.*, users.nickname, users.profile, users.todoCounts, users.challengeCounts
-          FROM comments
-          LEFT OUTER JOIN users ON comments.userId = users.userId
-          WHERE todoId = $todoId`,
-          { bind: { todoId }, type: QueryTypes.SELECT }
-        ),
+        sequelize.query(this.query.getTodoQuery, {
+          bind: { todoId },
+          type: QueryTypes.SELECT,
+        }),
+        sequelize.query(this.query.getCommentsQuery, {
+          bind: { todoId },
+          type: QueryTypes.SELECT,
+        }),
         ChallengedTodo.findOne({
           where: { userId: user.userId, originTodoId: todoId },
         }),

@@ -1,7 +1,10 @@
 const { Comment, Todo, sequelize } = require("../models");
 const Boom = require("@hapi/boom");
+const Query = require("../utils/query");
 
 class CommentService {
+  query = new Query();
+
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (user, todoId, comment) => {
     const getTodo = await Todo.findOne({ where: { todoId } });
@@ -21,13 +24,13 @@ class CommentService {
         },
         { transaction: onTransaction }
       );
-      const todo = await Todo.findOne({
-        where: { todoId },
-        include: [{ model: Comment }],
+      const comments = await sequelize.query(this.query.getCommentCountsQuery, {
+        bind: { todoId },
         transaction: onTransaction,
+        type: sequelize.QueryTypes.SELECT,
       });
       await Todo.update(
-        { commentCounts: todo.Comments.length },
+        { commentCounts: comments[0].commentCounts },
         { where: { todoId }, transaction: onTransaction }
       );
       await onTransaction.commit();
@@ -45,7 +48,6 @@ class CommentService {
     if (user.userId !== comment.userId) {
       throw Boom.unauthorized("본인 댓글만 삭제 가능합니다.");
     }
-
     // 댓글 삭제하고 댓글 개수 update하는 과정 트렌젝션 설정
     const onTransaction = await sequelize.transaction();
     try {
@@ -53,15 +55,13 @@ class CommentService {
         where: { commentId },
         transaction: onTransaction,
       });
-
-      const todo = await Todo.findOne({
-        where: { todoId: comment.todoId },
-        include: [{ model: Comment }],
+      const comments = await sequelize.query(this.query.getCommentCountsQuery, {
+        bind: { todoId: comment.todoId },
         transaction: onTransaction,
+        type: sequelize.QueryTypes.SELECT,
       });
-
       await Todo.update(
-        { commentCounts: todo.Comments.length },
+        { commentCounts: comments[0].commentCounts },
         { where: { todoId: comment.todoId }, transaction: onTransaction }
       );
       await onTransaction.commit();
