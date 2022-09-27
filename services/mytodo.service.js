@@ -83,6 +83,9 @@ class myTodoController {
         transaction: onTranscation,
       });
 
+
+      
+
       //삭제된 todoId의 갯수
       const deletedTodoData = await ChallengedTodo.findAll({
         where: { originTodoId: deletedTodoId },
@@ -90,6 +93,8 @@ class myTodoController {
       });
       const deletedTodoIdCount = deletedTodoData.length;
 
+
+      
       //Todos테이블에 도전갯수 업데이트
       await Todo.update(
         { challengedCounts: deletedTodoIdCount },
@@ -134,7 +139,7 @@ class myTodoController {
         Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId
       ) {
         throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
-      }
+      } 
 
       //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
       const [challengedTodoData] = await sequelize.query(
@@ -160,13 +165,6 @@ class myTodoController {
         { where: { userId }, transaction: onTransaction }
       );
 
-      // const updatedChallengedTodoData = await ChallengedTodo.findOne({
-      //   where: {
-      //     [Op.and]: [{ date: todayDate }, { userId }],
-      //   },
-      // });
-
-      // const isCompleted = updatedChallengedTodoData.isCompleted;
       await onTransaction.commit();
 
       const isCompleted = !isCompletedCheck;
