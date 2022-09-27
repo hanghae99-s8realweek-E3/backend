@@ -100,7 +100,6 @@ class myTodoController {
         { transaction: onTransaction }
       );
 
-      console.log(challengedTodoData);
 
       //Todos테이블에 도전갯수 업데이트
       await Todo.update(
