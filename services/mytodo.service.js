@@ -85,10 +85,9 @@ class myTodoController {
         where: { challengedTodoId: challengedTodoId },
       });
 
-      //삭제된 todoId의 갯수
+      //originTodoId 갯수
       const deletedTodoData = await ChallengedTodo.findAll({
-        where: { originTodoId: deletedTodoId },
-        transaction: onTransaction,
+        where: { originTodoId: deletedTodoId }
       });
       
       const deletedTodoIdCount = deletedTodoData.length;
