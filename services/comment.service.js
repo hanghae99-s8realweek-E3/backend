@@ -61,7 +61,7 @@ class CommentService {
         type: sequelize.QueryTypes.SELECT,
       });
       await Todo.update(
-        { commentCounts: comments[0].commentCounts },
+        { commentCounts: comments[0] ? comments[0].commentCounts : 0 },
         { where: { todoId: comment.todoId }, transaction: onTransaction }
       );
       await onTransaction.commit();
