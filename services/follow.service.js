@@ -5,7 +5,7 @@ const Boom = require("@hapi/boom");
 class FollowService {
   // 팔로우 목록 조회 [GET] /api/follows/:userId
   followListGet = async (userId) => {
-    const checkUserId = await User.findOne({ where: { userId: userId } });
+    const checkUserId = await User.findByPk(userId);
     if (!checkUserId) {
       throw Boom.badRequest("존재하지 않는 사용자 입니다.");
     }
@@ -53,7 +53,7 @@ class FollowService {
 
   // 팔로우 추가 및 삭제 [PUT] /api/follows/:userId
   followListEdit = async (userId, elseUserId) => {
-    const checkUserId = await User.findOne({ where: { userId: elseUserId } });
+    const checkUserId = await User.findByPk(elseUserId);
     if (!checkUserId) {
       throw Boom.badRequest("존재하지 않는 사용자 입니다.");
     }
@@ -66,13 +66,9 @@ class FollowService {
     //팔로잉 테이블 에서 팔로우 usrerId 삭제
     //팔로잉 테이블에 팔로잉 안되어있으면
     //팔로잉 테이블 에서 팔로우 usrerId 추가
-    const myFollowerTable = await Follow.findAll({
-      where: { userIdFollower: userId },
+    const checkFollow = await Follow.findOne({
+      where: { userIdFollowing: elseUserId, userIdFollower: userId },
     });
-    const myfollowingUserId = await myFollowerTable.map((table) => {
-      return table.userIdFollowing;
-    });
-    const checkFollow = myfollowingUserId.includes(elseUserId);
     if (!checkFollow) {
       await Follow.create({
         userIdFollowing: elseUserId,
