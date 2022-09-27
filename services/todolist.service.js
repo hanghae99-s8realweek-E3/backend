@@ -135,10 +135,6 @@ class TodoListService {
         }),
       ]);
 
-    if (!todo) {
-      throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
-    }
-
     return {
       todoInfo: todoInfo[0],
       comments: comments.map((comment) => {
