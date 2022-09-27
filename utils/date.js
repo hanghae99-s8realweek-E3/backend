@@ -10,11 +10,14 @@ const calculateToday = () => {
 };
 
 const calculateYesterdayMidnight = () => {
-  return dayjs().subtract(1, "day").startOf("day");
+  return dayjs()
+    .subtract(1, "day")
+    .startOf("day")
+    .format("YYYY-MM-DD HH:mm:ss");
 };
 
 const calculateOneHourAgo = () => {
-  return dayjs().subtract(1, "hour");
+  return dayjs().subtract(1, "hour").format("YYYY-MM-DD HH:mm:ss");
 };
 
 module.exports = {

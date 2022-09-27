@@ -2,8 +2,11 @@ const { Op } = require("sequelize");
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
 const Boom = require("@hapi/boom");
 const { calculateToday } = require("../utils/date");
+const Query = require("../utils/query");
 
 class myTodoController {
+  query = new Query();
+
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     const todayDate = calculateToday();
@@ -303,7 +306,7 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (userId, date) => {
-    const [userInfo, followingCount, followerCount] = await Promise.all([
+    const [userInfo, followings, followers] = await Promise.all([
       User.findOne({
         where: { userId },
         include: [
@@ -311,11 +314,13 @@ class myTodoController {
           { model: ChallengedTodo, where: { userId, date }, required: false },
         ],
       }),
-      Follow.count({
-        where: { userIdFollower: userId },
+      sequelize.query(this.query.getFollowingCountsQuery, {
+        bind: { userId },
+        type: sequelize.QueryTypes.SELECT,
       }),
-      Follow.count({
-        where: { userIdFollowing: userId },
+      sequelize.query(this.query.getFollowerCountsQuery, {
+        bind: { userId },
+        type: sequelize.QueryTypes.SELECT,
       }),
     ]);
 
@@ -325,8 +330,8 @@ class myTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
-        followingCount,
-        followerCount,
+        followingCount: followings[0] ? followings[0].followingCount : 0,
+        followerCount: followers[0] ? followers[0].followerCount : 0,
       },
       challengedTodo: userInfo.ChallengedTodos[0]
         ? {
@@ -350,26 +355,27 @@ class myTodoController {
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (user, userId) => {
-    const [userInfo, followings, followers, challengedTodos] =
+    const [userInfo, followings, followers, challengedTodos, isFollowed] =
       await Promise.all([
         User.findOne({
           where: { userId },
-          include: [{ model: Todo, limit: 20 }],
+          include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
         }),
-        Follow.findAll({
-          where: { userIdFollower: userId },
+        sequelize.query(this.query.getFollowingCountsQuery, {
+          bind: { userId },
+          type: sequelize.QueryTypes.SELECT,
         }),
-        Follow.findAll({
-          where: { userIdFollowing: userId },
+        sequelize.query(this.query.getFollowerCountsQuery, {
+          bind: { userId },
+          type: sequelize.QueryTypes.SELECT,
         }),
-        sequelize.query(
-          `SELECT *, 
-          (SELECT commentCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
-          (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
-          FROM challengedTodos 
-          WHERE userId = $userId LIMIT 20`,
-          { bind: { userId }, type: sequelize.QueryTypes.SELECT }
-        ),
+        sequelize.query(this.query.getChallengedTodosQuery, {
+          bind: { userId },
+          type: sequelize.QueryTypes.SELECT,
+        }),
+        Follow.findOne({
+          where: { userIdFollower: user.userId, userIdFollowing: userId },
+        }),
       ]);
 
     if (!userInfo) {
@@ -383,14 +389,9 @@ class myTodoController {
         profile: userInfo.profile,
         mbti: userInfo.mbti,
         mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
-        followingCount: followings.length,
-        followerCount: followers.length,
-        isFollowed:
-          followers.findIndex(
-            (follower) => follower.userIdFollower === user.userId
-          ) !== -1
-            ? true
-            : false,
+        followingCount: followings[0] ? followings[0].followingCount : 0,
+        followerCount: followers[0] ? followers[0].followerCount : 0,
+        isFollowed: isFollowed ? true : false,
       },
       challengedTodos,
       createdTodos: userInfo.Todos,
