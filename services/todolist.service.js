@@ -111,8 +111,8 @@ class TodoListService {
 
     const today = date.calculateToday();
 
-    const [todoInfo, comments, ischallenged, todaysChallenge, isFollowed] =
-      await Promise.all([
+    const [todoInfo, comments, todaysChallenge, isFollowed] = await Promise.all(
+      [
         sequelize.query(this.query.getTodoQuery, {
           bind: { todoId },
           type: QueryTypes.SELECT,
@@ -120,9 +120,6 @@ class TodoListService {
         sequelize.query(this.query.getCommentsQuery, {
           bind: { todoId },
           type: QueryTypes.SELECT,
-        }),
-        ChallengedTodo.findOne({
-          where: { userId: user.userId, originTodoId: todoId },
         }),
         ChallengedTodo.findOne({
           where: {
@@ -133,7 +130,8 @@ class TodoListService {
         Follow.findOne({
           where: { userIdFollower: user.userId, userIdFollowing: todo.userId },
         }),
-      ]);
+      ]
+    );
 
     return {
       todoInfo: todoInfo[0],
