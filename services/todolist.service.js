@@ -137,21 +137,7 @@ class TodoListService {
 
     return {
       todoInfo: todoInfo[0],
-      comments: comments.map((comment) => {
-        const todoAndChallengeCounts =
-          comment.todoCounts + comment.challengeCounts;
-        return {
-          commentId: comment.commentId,
-          comment: comment.comment,
-          userId: comment.userId ? comment.userId : "none",
-          nickname: comment.nickname ? comment.nickname : "(알수없음)",
-          profile: comment.profile ? comment.profile : "none",
-          mimicCounts: todoAndChallengeCounts ? todoAndChallengeCounts : "none",
-          createdAt: comment.createdAt,
-          updatedAt: comment.updatedAt,
-        };
-      }),
-      isChallenged: ischallenged ? true : false,
+      comments,
       isTodayDone: todaysChallenge ? true : false,
       isFollowed: isFollowed ? true : false,
       loginUserProfile: user.profile,
