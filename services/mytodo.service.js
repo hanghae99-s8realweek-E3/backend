@@ -243,7 +243,7 @@ class myTodoController {
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (user, userId) => {
-    const [userInfo, followings, followers, challengedTodos] =
+    const [userInfo, followings, followers, challengedTodos, isFollowed] =
       await Promise.all([
         User.findOne({
           where: { userId },
@@ -261,6 +261,9 @@ class myTodoController {
           bind: { userId },
           type: sequelize.QueryTypes.SELECT,
         }),
+        Follow.findOne({
+          where: { userIdFollower: user.userId, userIdFollowing: userId },
+        }),
       ]);
 
     if (!userInfo) {
@@ -276,12 +279,7 @@ class myTodoController {
         mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
         followingCount: followings[0] ? followings[0].followingCount : 0,
         followerCount: followers[0] ? followers[0].followerCount : 0,
-        isFollowed:
-          followers.findIndex(
-            (follower) => follower.userIdFollower === user.userId
-          ) !== -1
-            ? true
-            : false,
+        isFollowed: isFollowed ? true : false,
       },
       challengedTodos,
       createdTodos: userInfo.Todos,
