@@ -190,8 +190,8 @@ class UserService {
       nickname: userData.nickname,
       profile: userData.profile,
       mimicCounts: userData.todoCounts + userData.challengeCounts,
-      following: followings[0].followingCount,
-      follower: followers[0].followerCount,
+      following: followings[0] ? followings[0].followingCount : 0,
+      follower: followers[0] ? followers[0].followerCount : 0,
     };
   };
 
