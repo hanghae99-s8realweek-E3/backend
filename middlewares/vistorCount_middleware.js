@@ -5,7 +5,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs().tz("Asia/Seoul");
 const localDate = dayjs().format("YYYY-MM-DD");
-const redisClient = require("../utils/redisconnect");
+const redisClient = require("../utils/redisConnect");
 
 
 const redisCli = redisClient.v4;
