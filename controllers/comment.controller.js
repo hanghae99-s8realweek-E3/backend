@@ -7,37 +7,27 @@ class CommentController {
 
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (req, res, next) => {
-    try {
-      const { user } = res.locals;
-      const { todoId } = await this.joi.parameterSchema.validateAsync(
-        req.params
-      );
-      const { comment } = await this.joi.createCommentSchema.validateAsync(
-        req.body
-      );
+    const { userId } = res.locals.user;
+    const { todoId } = await this.joi.parameterSchema.validateAsync(req.params);
+    const { comment } = await this.joi.createCommentSchema.validateAsync(
+      req.body
+    );
 
-      await this.commentService.createComment(user, todoId, comment);
+    await this.commentService.createComment(userId, todoId, comment);
 
-      res.status(200).json({ message: "success" });
-    } catch (err) {
-      next(err);
-    }
+    res.status(200).json({ message: "success" });
   };
 
   // 댓글 삭제 [DELETE] /api/comments/:commentId
   deleteComment = async (req, res, next) => {
-    try {
-      const { user } = res.locals;
-      const { commentId } = await this.joi.parameterSchema.validateAsync(
-        req.params
-      );
+    const { userId } = res.locals.user;
+    const { commentId } = await this.joi.parameterSchema.validateAsync(
+      req.params
+    );
 
-      await this.commentService.deleteComment(user, commentId);
+    await this.commentService.deleteComment(userId, commentId);
 
-      res.status(200).json({ message: "success" });
-    } catch (err) {
-      next(err);
-    }
+    res.status(200).json({ message: "success" });
   };
 }
 
