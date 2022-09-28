@@ -19,4 +19,10 @@ module.exports = {
       next(err);
     }
   },
+  //controllers부분 try catch 생략 미들웨어
+  wrapAsyncController: function tryCatch(fn) {
+    return (req, res, next) => {
+      fn(req, res, next).catch(next);
+    };
+  },
 };

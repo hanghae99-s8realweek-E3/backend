@@ -222,21 +222,16 @@ class myTodoController {
         date: todayDate,
       });
 
-      const [userTodoData] = await sequelize.query(
+      const userTodoData = await sequelize.query(
         this.query.getTodoGroupByuserId,
         { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
         { transaction: onTransaction }
       );
-      //값이 있다면 그 카운터를 반영 없다면 0으a로
-
-      let todoCounts = 0;
-      //값이 있는 경우에만 배열에서 count를 사용해서 반영
-      if (userTodoData !== undefined) {
-        todoCounts = userTodoData.COUNT;
-      }
 
       await User.update(
-        { todoCounts },
+        {
+          todoCounts: userTodoData[0] ? userTodoData[0].COUNT : 0,
+        },
         { where: { userId }, transaction: onTransaction }
       );
 
@@ -265,22 +260,17 @@ class myTodoController {
         { transaction: onTransaction }
       );
 
-      const [userTodoData] = await sequelize.query(
+      const userTodoData = await sequelize.query(
         this.query.getTodoGroupByuserId,
         { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
         { transaction: onTransaction }
       );
-      //값이 있다면 그 카운터를 반영 없다면 0으a로
-      let todoCounts = 0;
-      //값이 있는 경우에만 배열에서 count를 사용해서 반영
-      if (userTodoData !== undefined) {
-        todoCounts = userTodoData.COUNT;
-      }
 
       await User.update(
-        { todoCounts },
-        { where: { userId } },
-        { transaction: onTransaction }
+        {
+          todoCounts: userTodoData[0] ? userTodoData[0].COUNT : 0,
+        },
+        { where: { userId }, transaction: onTransaction }
       );
 
       await onTransaction.commit();
