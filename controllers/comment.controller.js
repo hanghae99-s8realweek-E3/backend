@@ -6,7 +6,7 @@ class CommentController {
   joi = new Joi();
 
   // 댓글 작성 [POST] /api/comments/:todoId
-  createComment = async (req, res, next) => {
+  createComment = async (req, res) => {
     const { userId } = res.locals.user;
     const { todoId } = await this.joi.parameterSchema.validateAsync(req.params);
     const { comment } = await this.joi.createCommentSchema.validateAsync(
@@ -19,7 +19,7 @@ class CommentController {
   };
 
   // 댓글 삭제 [DELETE] /api/comments/:commentId
-  deleteComment = async (req, res, next) => {
+  deleteComment = async (req, res) => {
     const { userId } = res.locals.user;
     const { commentId } = await this.joi.parameterSchema.validateAsync(
       req.params
