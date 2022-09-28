@@ -1,7 +1,7 @@
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const AWS = require("aws-sdk");
-const { logger } = require("../logger");
+const { logger } = require("../utils/logger");
 
 AWS.config.update({
   accessKeyId: process.env.S3_ACCESS_KEY_ID,

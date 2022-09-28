@@ -1,6 +1,6 @@
 const express = require("express");
 const morgan = require("morgan");
-const { stream } = require("./logger");
+const { stream } = require("./utils/logger");
 const helmet = require("helmet");
 const hpp = require("hpp");
 const cors = require("cors");
