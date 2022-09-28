@@ -4,7 +4,6 @@ const { Op } = require("sequelize");
 const date = require("../utils/date");
 const Boom = require("@hapi/boom");
 const Query = require("../utils/query");
-
 class TodoListService {
   query = new Query();
 

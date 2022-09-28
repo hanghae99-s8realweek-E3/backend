@@ -7,7 +7,6 @@ class FollowController {
 
   // 팔로우 목록 조회 [GET] /api/follows/:userId
   getfollowList = async (req, res, next) => {
-    try {
       const { userId } = await this.joi.parameterSchema.validateAsync(
         req.params
       ); //팔로우 조회할 유저 아이디
@@ -15,14 +14,10 @@ class FollowController {
       res.status(200).json({
         data,
       });
-    } catch (err) {
-      next(err);
-    }
   };
 
   // 팔로우 추가 및 삭제 [PUT] /api/follows/:userId
   editFollow = async (req, res, next) => {
-    try {
       await this.joi.parameterSchema.validateAsync(req.params);
       const elseUserId = Number(req.params.userId); //수정할 유저 아이디
       const { userId } = res.locals.user; //나의 유저아이디
@@ -32,9 +27,6 @@ class FollowController {
         asd,
         message: "success",
       });
-    } catch (err) {
-      next(err);
-    }
   };
 }
 
