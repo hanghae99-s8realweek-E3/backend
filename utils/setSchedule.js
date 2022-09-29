@@ -1,9 +1,9 @@
 const schedule = require("node-schedule");
 const { EmailAuth, Count } = require("../models");
 const { Op } = require("sequelize");
-const logger = require("../logger");
+const logger = require("../utils/logger");
 const date = require("./date");
-const redisClient = require("./redisconnect");
+const redisClient = require("./redisConnect");
 const redisCli = redisClient.v4;
 
 module.exports = {

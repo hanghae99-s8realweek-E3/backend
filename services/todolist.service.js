@@ -4,7 +4,6 @@ const { Op } = require("sequelize");
 const date = require("../utils/date");
 const Boom = require("@hapi/boom");
 const Query = require("../utils/query");
-
 class TodoListService {
   query = new Query();
 
@@ -103,7 +102,7 @@ class TodoListService {
   };
 
   // 상세 todo 조회 [GET] /api/todolists/:todoId
-  todoGet = async (user, todoId) => {
+  todoGet = async (userId, profile, todoId) => {
     const todo = await Todo.findByPk(todoId);
     if (!todo) {
       throw Boom.badRequest("존재하지 않거나 삭제된 Todo입니다.");
@@ -111,8 +110,8 @@ class TodoListService {
 
     const today = date.calculateToday();
 
-    const [todoInfo, comments, todaysChallenge, isFollowed] = await Promise.all(
-      [
+    const [[todoInfo], comments, todaysChallenge, isFollowed] =
+      await Promise.all([
         sequelize.query(this.query.getTodoQuery, {
           bind: { todoId },
           type: QueryTypes.SELECT,
@@ -123,34 +122,33 @@ class TodoListService {
         }),
         ChallengedTodo.findOne({
           where: {
-            userId: user.userId,
+            userId,
             date: today,
           },
         }),
         Follow.findOne({
-          where: { userIdFollower: user.userId, userIdFollowing: todo.userId },
+          where: { userIdFollower: userId, userIdFollowing: todo.userId },
         }),
-      ]
-    );
+      ]);
 
     return {
-      todoInfo: todoInfo[0],
+      todoInfo,
       comments,
       isTodayDone: todaysChallenge ? true : false,
       isFollowed: isFollowed ? true : false,
-      loginUserProfile: user.profile,
+      loginUserProfile: profile,
     };
   };
 
   // mbti 알고리즘 [GET] /api/todolists/mbti/:mbti
-  mbtiGet = async (user) => {
-    if (user.userId === "none") {
+  mbtiGet = async (userId, mbti) => {
+    if (userId === "none") {
       return {
         mbti: null,
       };
     }
     return await Mbti.findOne({
-      where: { mbti: user.mbti },
+      where: { mbti },
       attributes: { exclude: ["mbtiId"] },
     });
   };

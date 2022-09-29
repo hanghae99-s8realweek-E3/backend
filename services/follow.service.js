@@ -79,7 +79,6 @@ class FollowService {
         where: { userIdFollowing: elseUserId, userIdFollower: userId },
       });
     }
-    return;
   };
 }
 

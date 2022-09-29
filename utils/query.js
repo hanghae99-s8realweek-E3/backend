@@ -13,8 +13,8 @@ class Query {
 
   // mytodo.service - 타인의 todo 피드 조회
   getChallengedTodosQuery = `SELECT *, 
-    (SELECT commentCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
-    (SELECT challengedCounts FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
+    (SELECT ifnull(max(commentCounts), 0) FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS commentCounts,     
+    (SELECT ifnull(max(challengedCounts), 0) FROM todos WHERE challengedTodos.originTodoId = todos.todoId) AS challengedCounts
     FROM challengedTodos 
     WHERE userId = $userId 
     ORDER BY createdAt DESC
