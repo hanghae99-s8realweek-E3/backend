@@ -21,7 +21,7 @@ class Joi {
 
   // 댓글 작성 유효성 검사
   createCommentSchema = joi.object({
-    comment: joi.string().min(1).max(160).required(),
+    comment: joi.string().min(1).max(160).trim().required(),
   });
 
   // 이메일 인증번호 보내기 유효성 검사
@@ -40,7 +40,7 @@ class Joi {
     password: joi.string().min(1),
     newPassword: joi.string().pattern(passwordRegex),
     confirmPassword: joi.string().pattern(passwordRegex),
-    nickname: joi.string().min(1).max(12),
+    nickname: joi.string().min(1).max(12).trim(),
     mbti: joi.string().pattern(mbtiRegex),
   });
 
@@ -54,7 +54,7 @@ class Joi {
     email: joi.string().required(),
     password: joi.string().pattern(passwordRegex).required(),
     confirmPassword: joi.string().pattern(passwordRegex).required(),
-    nickname: joi.string().min(1).max(12).required(),
+    nickname: joi.string().min(1).max(12).trim().required(),
   });
 
   // mbti 등록 유효성 검사
@@ -75,7 +75,7 @@ class Joi {
 
   // todo 유효성 검사
   todoSchema = joi.object({
-    todo: joi.string().min(1).max(30).required(),
+    todo: joi.string().min(1).max(30).trim().required(),
   });
 
   // todo 조회 쿼리스트링 유효성 검사
