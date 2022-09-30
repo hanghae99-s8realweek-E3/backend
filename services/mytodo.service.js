@@ -36,8 +36,6 @@ class MyTodoController {
         userId
       );
 
-   
-
     //이미 오늘 도전을 담았는지 challengedtodo 데이터 체크
     if (todayChallengedTodoData) {
       throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
@@ -64,7 +62,7 @@ class MyTodoController {
       await Todo.update(
         {
           challengedCounts: challengedTodoData[0]
-            ? challengedTodoData[0].COUNT
+            ? challengedTodoData[0].COUNT + 1 
             : 1,
         },
         { where: { todoId: todoId } },
