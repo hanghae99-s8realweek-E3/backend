@@ -1,4 +1,5 @@
 const { User, Follow, sequelize } = require("../models");
+const { Transaction } = require("sequelize");
 const { Op } = require("sequelize");
 const Joi = require("../utils/joi");
 const jwt = require("jsonwebtoken");
@@ -39,24 +40,27 @@ exports.deleteKakao = async (req, res) => {
   }
 
   // 카카오 탈퇴 후 follow DB에서 해당 userId 데이터 삭제하는 과정 트렌젝션 설정
-  const onTransaction = await sequelize.transaction();
-  try {
-    await User.destroy({ where: { snsId: user_id } });
-    await Follow.destroy({
-      where: {
-        [Op.or]: [
-          { userIdFollowing: user.userId },
-          { userIdFollower: user.userId },
-        ],
-      },
-      transaction: onTransaction,
-    });
-    await onTransaction.commit();
-  } catch (err) {
-    await onTransaction.rollback();
-  }
+  await sequelize.transaction(
+    {
+      isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED,
+    },
+    async (transaction) => {
+      await User.destroy({ where: { snsId: user_id }, transaction });
+      await Follow.destroy({
+        where: {
+          [Op.or]: [
+            { userIdFollowing: user.userId },
+            { userIdFollower: user.userId },
+          ],
+        },
+        transaction,
+      });
+    }
+  );
 
-  res.status(201).json({
-    message: "success(kakao)",
+  console.log("카카오 연결끊기 완료");
+
+  res.status(200).json({
+    message: "success",
   });
 };

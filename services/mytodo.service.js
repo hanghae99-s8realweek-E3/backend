@@ -1,5 +1,6 @@
-const { Op } = require("sequelize");
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
+const { Transaction } = require("sequelize");
+const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 const { calculateToday } = require("../utils/date");
 const Query = require("../utils/query");
@@ -49,28 +50,31 @@ class MyTodoController {
 
     console.log("challengedTodoData",challengedTodoData);
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
-    await sequelize.transaction(async (transaction) => {
-      await ChallengedTodo.create(
-        {
-          userId,
-          mbti: todoData.mbti,
-          challengedTodo: todoData.todo,
-          originTodoId: todoId,
-          date: todayDate,
-        },
-        { transaction }
-      );
-      //challengedTodos에 있는 todo갯수 반영해주기
-      await Todo.update(
-        {
-          challengedCounts: challengedTodoData[0]
-            ? challengedTodoData[0].COUNT
-            : 1,
-        },
-        { where: { todoId: todoId } },
-        { transaction }
-      );
-    });
+    await sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        await ChallengedTodo.create(
+          {
+            userId,
+            mbti: todoData.mbti,
+            challengedTodo: todoData.todo,
+            originTodoId: todoId,
+            date: todayDate,
+          },
+          { transaction }
+        );
+
+        //challengedTodos에 있는 todo갯수 반영해주기
+        await Todo.update(
+          {
+            challengedCounts: challengedTodoData[0]
+              ? challengedTodoData[0].COUNT + 1
+              : 1,
+          },
+          { where: { todoId }, transaction }
+        );
+      }
+    );
   };
 
 
@@ -88,49 +92,48 @@ class MyTodoController {
     //삭제되어지는 todoId
     const deletedTodoId = userChallengedTodoData.originTodoId;
 
-    const onTransaction = await sequelize.transaction();
-    try {
-      //challengedTodoId를 기준으로 데이터 삭제
-      await ChallengedTodo.destroy(
-        {
+    await sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        //challengedTodoId를 기준으로 데이터 삭제
+        await ChallengedTodo.destroy({
           where: { challengedTodoId: challengedTodoId },
-        },
-        { transaction: onTransaction }
-      );
+          transaction,
+        });
 
-      const challengedTodoData = await sequelize.query(
-        this.query.getChallengedTodoGroupByoriginTodoId,
-        {
-          bind: { originTodoId: deletedTodoId },
-          type: sequelize.QueryTypes.SELECT,
-        },
-        { transaction: onTransaction }
-      );
+        const challengedTodoData = await sequelize.query(
+          this.query.getChallengedTodoGroupByoriginTodoId,
+          {
+            bind: { originTodoId: deletedTodoId },
+            type: sequelize.QueryTypes.SELECT,
+            transaction,
+          }
+        );
 
-      //Todos테이블에 도전갯수 업데이트
-      await Todo.update(
-        {
-          challengedCounts: challengedTodoData[0]?.COUNT ?? 0,
-        },
-        { where: { todoId: deletedTodoId }, transaction: onTransaction }
-      );
+        //Todos테이블에 도전갯수 업데이트
+        await Todo.update(
+          {
+            challengedCounts: challengedTodoData[0]?.COUNT ?? 0,
+          },
+          { where: { todoId: deletedTodoId }, transaction }
+        );
 
-      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
-      const challengedData = await sequelize.query(
-        this.query.getChallengedTodoGroupByuserId,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
-        { transaction: onTransaction }
-      );
+        //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isCompleted가 true인 것들만
+        const challengedData = await sequelize.query(
+          this.query.getChallengedTodoGroupByuserId,
+          {
+            bind: { userId: userId },
+            type: sequelize.QueryTypes.SELECT,
+            transaction,
+          }
+        );
 
-      await User.update(
-        { challengeCounts: challengedData[0]?.COUNT ?? 0 },
-        { where: { userId }, transaction: onTransaction }
-      );
-
-      await onTransaction.commit();
-    } catch (err) {
-      await onTransaction.rollback();
-    }
+        await User.update(
+          { challengeCounts: challengedData[0]?.COUNT ?? 0 },
+          { where: { userId }, transaction }
+        );
+      }
+    );
   };
 
   // 오늘의 도전 todo 완료/진행중 처리 [PUT] /:challengedTodoId/challenged
@@ -151,44 +154,43 @@ class MyTodoController {
     }
 
     const isCompletedCheck = todaychallengedTodoData.isCompleted;
-    const onTransaction = await sequelize.transaction();
-    try {
-      //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
-      await ChallengedTodo.update(
-        { isCompleted: isCompletedCheck ? false : true },
-        { where: { challengedTodoId } },
-        { transaction: onTransaction }
-      );
 
-      //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 challengedTodoId가 올바르지 않는경우 에러처리
-      //params는 문자열로 들어오기에 숫자열로 변경후 비교
-      if (
-        Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId
-      ) {
-        throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
+    await sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        //오늘 도전한 todo가 있다면 isCompleted의 값을 바꿔 준다.
+        await ChallengedTodo.update(
+          { isCompleted: isCompletedCheck ? false : true },
+          { where: { challengedTodoId } },
+          { transaction }
+        );
+
+        //이용자가 오늘 작성한 todo는 있지만 프론트에서 보낸 challengedTodoId가 올바르지 않는경우 에러처리
+        //params는 문자열로 들어오기에 숫자열로 변경후 비교
+        if (
+          Number(challengedTodoId) !== todaychallengedTodoData.challengedTodoId
+        ) {
+          throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
+        }
+
+        //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isCompleted true인 것들만
+        const challengedTodoData = await sequelize.query(
+          this.query.getChallengedTodoGroupByuserId,
+          { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
+          { transaction }
+        );
+
+        await User.update(
+          {
+            challengeCounts: challengedTodoData[0]?.COUNT ?? 0,
+          },
+          { where: { userId } },
+          { transaction }
+        );
+        const isCompleted = !isCompletedCheck;
+        return isCompleted;
       }
-
-      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
-      const challengedTodoData = await sequelize.query(
-        this.query.getChallengedTodoGroupByuserId,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
-        { transaction: onTransaction }
-      );
-
-      await User.update(
-        {
-          challengeCounts: challengedTodoData[0]?.COUNT ?? 0,
-        },
-        { where: { userId }, transaction: onTransaction }
-      );
-
-      await onTransaction.commit();
-
-      const isCompleted = !isCompletedCheck;
-      return isCompleted;
-    } catch (err) {
-      await onTransaction.rollback();
-    }
+    );
   };
 
   // 오늘의 제안 todo 작성 [POST] /api/mytodos
@@ -214,36 +216,40 @@ class MyTodoController {
       throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
     }
 
-    const onTransaction = await sequelize.transaction();
-    try {
-      await Todo.create({
-        todo,
-        mbti: userData.mbti,
-        nickname: userData.nickname,
-        userId,
-        date: todayDate,
-      });
+    await sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        await Todo.create(
+          {
+            todo,
+            mbti: userData.mbti,
+            nickname: userData.nickname,
+            userId,
+            date: todayDate,
+          },
+          { transaction }
+        );
 
-      const userTodoData = await sequelize.query(
-        this.query.getTodoGroupByuserId,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
-        { transaction: onTransaction }
-      );
+        const userTodoData = await sequelize.query(
+          this.query.getTodoGroupByuserId,
+          {
+            bind: { userId: userId },
+            type: sequelize.QueryTypes.SELECT,
+            transaction,
+          }
+        );
 
-      await User.update(
-        {
-          todoCounts: userTodoData[0]?.COUNT ?? 0,
-        },
-        { where: { userId }, transaction: onTransaction }
-      );
-
-      await onTransaction.commit();
-    } catch (err) {
-      await onTransaction.rollback();
-    }
+        await User.update(
+          {
+            todoCounts: userTodoData[0]?.COUNT ?? 0,
+          },
+          { where: { userId }, transaction }
+        );
+      }
+    );
   };
 
-  // todo 삭제 [DELETE] /api/mytodos/:todoId
+  // 오늘의 제안 todo 삭제 [DELETE] /api/mytodos/:todoId
   todoDelete = async (todoId, userId) => {
     const todoData = await Todo.findOne({
       where: { todoId, userId },
@@ -253,32 +259,31 @@ class MyTodoController {
       throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
 
-    const onTransaction = await sequelize.transaction();
-    try {
-      await Todo.destroy(
-        {
+    await sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        await Todo.destroy({
           where: { todoId: todoId },
-        },
-        { transaction: onTransaction }
-      );
+          transaction,
+        });
 
-      const userTodoData = await sequelize.query(
-        this.query.getTodoGroupByuserId,
-        { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
-        { transaction: onTransaction }
-      );
+        const userTodoData = await sequelize.query(
+          this.query.getTodoGroupByuserId,
+          {
+            bind: { userId: userId },
+            transaction,
+            type: sequelize.QueryTypes.SELECT,
+          }
+        );
 
-      await User.update(
-        {
-          todoCounts: userTodoData[0]?.COUNT ?? 0,
-        },
-        { where: { userId }, transaction: onTransaction }
-      );
-
-      await onTransaction.commit();
-    } catch (error) {
-      await onTransaction.rollback();
-    }
+        await User.update(
+          {
+            todoCounts: userTodoData[0]?.COUNT ?? 0,
+          },
+          { where: { userId }, transaction }
+        );
+      }
+    );
   };
 
   // 나의 todo 피드 조회 [GET] /api/mytodos

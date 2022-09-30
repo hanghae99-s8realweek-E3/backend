@@ -1,16 +1,11 @@
-const dayjs = require("dayjs");
-const timezone = require("dayjs/plugin/timezone");
-const utc = require("dayjs/plugin/utc");
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs().tz("Asia/Seoul");
-const localDate = dayjs().format("YYYY-MM-DD");
+
 const redisClient = require("../utils/redisConnect");
-
-
+const { calculateToday } = require("../utils/date");
 const redisCli = redisClient.v4;
+const localDate = calculateToday();
 
 module.exports = (req, res, next) => {
+
   try {
     const clientIp = req.ip;
     console.log("IP 주소 : ", clientIp);

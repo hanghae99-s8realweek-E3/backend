@@ -1,4 +1,5 @@
 const { Comment, Todo, sequelize } = require("../models");
+const { Transaction } = require("sequelize");
 const Boom = require("@hapi/boom");
 const Query = require("../utils/query");
 
@@ -13,29 +14,33 @@ class CommentService {
     }
 
     // 댓글 생성하고 댓글 개수 update하는 과정 트렌젝션 설정
-    const onTransaction = await sequelize.transaction();
-    try {
-      await Comment.create(
-        {
-          userId,
-          todoId,
-          comment,
-        },
-        { transaction: onTransaction }
-      );
-      const comments = await sequelize.query(this.query.getCommentCountsQuery, {
-        bind: { todoId },
-        transaction: onTransaction,
-        type: sequelize.QueryTypes.SELECT,
-      });
-      await Todo.update(
-        { commentCounts: comments[0].commentCounts },
-        { where: { todoId }, transaction: onTransaction }
-      );
-      await onTransaction.commit();
-    } catch (err) {
-      await onTransaction.rollback();
-    }
+    await sequelize.transaction(
+      {
+        isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
+      },
+      async (transaction) => {
+        await Comment.create(
+          {
+            userId,
+            todoId,
+            comment,
+          },
+          { transaction }
+        );
+        const comments = await sequelize.query(
+          this.query.getCommentCountsQuery,
+          {
+            bind: { todoId },
+            type: sequelize.QueryTypes.SELECT,
+            transaction,
+          }
+        );
+        await Todo.update(
+          { commentCounts: comments[0].commentCounts },
+          { where: { todoId }, transaction }
+        );
+      }
+    );
   };
 
   // 댓글 삭제 [DELETE] /api/comments/:commentId
@@ -47,26 +52,30 @@ class CommentService {
     if (userId !== comment.userId) {
       throw Boom.unauthorized("본인 댓글만 삭제 가능합니다.");
     }
+
     // 댓글 삭제하고 댓글 개수 update하는 과정 트렌젝션 설정
-    const onTransaction = await sequelize.transaction();
-    try {
-      await Comment.destroy({
-        where: { commentId },
-        transaction: onTransaction,
-      });
-      const comments = await sequelize.query(this.query.getCommentCountsQuery, {
-        bind: { todoId: comment.todoId },
-        transaction: onTransaction,
-        type: sequelize.QueryTypes.SELECT,
-      });
-      await Todo.update(
-        { commentCounts: comments[0]?.commentCounts ?? 0 },
-        { where: { todoId: comment.todoId }, transaction: onTransaction }
-      );
-      await onTransaction.commit();
-    } catch (err) {
-      await onTransaction.rollback();
-    }
+    // ISOLATION_LEVELS.READ_UNCOMMITTED을 설정하여 sql deadlock 방지
+    await sequelize.transaction(
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        await Comment.destroy({
+          where: { commentId },
+          transaction,
+        });
+        const comments = await sequelize.query(
+          this.query.getCommentCountsQuery,
+          {
+            bind: { todoId: comment.todoId },
+            type: sequelize.QueryTypes.SELECT,
+            transaction,
+          }
+        );
+        await Todo.update(
+          { commentCounts: comments[0]?.commentCounts ?? 0 },
+          { where: { todoId: comment.todoId }, transaction }
+        );
+      }
+    );
   };
 }
 
