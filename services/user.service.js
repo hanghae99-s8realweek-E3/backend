@@ -185,16 +185,14 @@ class UserService {
 
     // 회원탈퇴 후 follow DB에서 해당 userId 데이터 삭제하는 과정 트렌젝션 설정
     await sequelize.transaction(
-      {
-        isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED,
-      },
-      async (t) => {
-        await User.destroy({ where: { userId }, transaction: t });
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      async (transaction) => {
+        await User.destroy({ where: { userId }, transaction });
         await Follow.destroy({
           where: {
             [Op.or]: [{ userIdFollowing: userId }, { userIdFollower: userId }],
           },
-          transaction: t,
+          transaction,
         });
       }
     );

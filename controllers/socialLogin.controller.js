@@ -44,8 +44,8 @@ exports.deleteKakao = async (req, res) => {
     {
       isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED,
     },
-    async (t) => {
-      await User.destroy({ where: { snsId: user_id }, transaction: t });
+    async (transaction) => {
+      await User.destroy({ where: { snsId: user_id }, transaction });
       await Follow.destroy({
         where: {
           [Op.or]: [
@@ -53,7 +53,7 @@ exports.deleteKakao = async (req, res) => {
             { userIdFollower: user.userId },
           ],
         },
-        transaction: t,
+        transaction,
       });
     }
   );
