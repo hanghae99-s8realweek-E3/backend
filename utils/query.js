@@ -38,16 +38,23 @@ class Query {
     LEFT OUTER JOIN users ON comments.userId = users.userId
     WHERE todoId = $todoId`;
 
-  //mytodo.service - 오늘의 도전 todo 등록 취소
-  //mytodo.service - 오늘의 도전 todo 완료/진행중 처리
-  getChallengedTodoGroupByuserId = `SELECT * FROM (SELECT userId, count(userId) as COUNT FROM challengedTodos AS ChallengedTodo WHERE isCompleted = true GROUP BY userId) as count 
-    WHERE userId = $userId`;
+  //mytodo.service - 오늘의 도전 todo 등록 취소, 오늘의 도전 todo 완료/진행중 처리
+  getChallengedTodoGroupByuserId = `SELECT COUNT(*) AS COUNT 
+    FROM challengedTodos
+    WHERE userId = $userId AND isCompleted = true
+    GROUP BY userId`;
 
-  //mytodo.service - 오늘의 도전 todo 완료/진행중 처리
-  getTodoGroupByuserId = `SELECT count(*) as COUNT FROM todos AS Todo  WHERE userId = $userId GROUP BY userId`;
+  //mytodo.service - 오늘의 제안 todo 작성, 오늘의 제안 todo 삭제
+  getTodoGroupByuserId = `SELECT COUNT(*) AS COUNT 
+    FROM todos AS Todo  
+    WHERE userId = $userId 
+    GROUP BY userId`;
 
-  //mytodo.service - 오늘의 도전 todo 완료/진행중 처리
-  getChallengedTodoGroupByoriginTodoId = `SELECT count(*) as COUNT FROM challengedTodos AS ChallengedTodo WHERE originTodoId = $originTodoId GROUP BY originTodoId`;
+  //mytodo.service - 오늘의 도전 todo 등록, 오늘의 도전 todo 등록 취소
+  getChallengedTodoGroupByoriginTodoId = `SELECT COUNT(*) AS COUNT 
+    FROM challengedTodos AS ChallengedTodo 
+    WHERE originTodoId = $originTodoId 
+    GROUP BY originTodoId`;
 }
 
 module.exports = Query;

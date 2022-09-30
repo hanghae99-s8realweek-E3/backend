@@ -16,7 +16,7 @@ class CommentService {
     // 댓글 생성하고 댓글 개수 update하는 과정 트렌젝션 설정
     await sequelize.transaction(
       {
-        isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED,
+        isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
       },
       async (t) => {
         await Comment.create(
@@ -55,7 +55,7 @@ class CommentService {
     // 댓글 삭제하고 댓글 개수 update하는 과정 트렌젝션 설정
     await sequelize.transaction(
       {
-        isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED,
+        isolationLevel: Transaction.ISOLATION_LEVELS.UNCOMMITTED,
       },
       async (t) => {
         await Comment.destroy({
