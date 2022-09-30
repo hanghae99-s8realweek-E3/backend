@@ -1,5 +1,6 @@
-const { Op } = require("sequelize");
 const { ChallengedTodo, Todo, User, Follow, sequelize } = require("../models");
+const { Transaction } = require("sequelize");
+const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 const { calculateToday } = require("../utils/date");
 const Query = require("../utils/query");
@@ -103,7 +104,7 @@ class myTodoController {
         { where: { todoId: deletedTodoId }, transaction: onTransaction }
       );
 
-      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
+      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isCompleted가 true인 것들만
       const challengedData = await sequelize.query(
         this.query.getChallengedTodoGroupByuserId,
         { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
@@ -156,7 +157,7 @@ class myTodoController {
         throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
       }
 
-      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isChallenged가 true인 것들만
+      //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isCompleted true인 것들만
       const challengedTodoData = await sequelize.query(
         this.query.getChallengedTodoGroupByuserId,
         { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
@@ -231,7 +232,7 @@ class myTodoController {
     }
   };
 
-  // todo 삭제 [DELETE] /api/mytodos/:todoId
+  // 오늘의 제안 todo 삭제 [DELETE] /api/mytodos/:todoId
   todoDelete = async (todoId, userId) => {
     const todoData = await Todo.findOne({
       where: { todoId, userId },
