@@ -55,27 +55,27 @@
 
 | 라이브러리 | 설명 |
 | --- | --- |
-![Sequelize](https://img.shields.io/badge/6.21.3-Sequelize-52B0E7?style=flat&logoColor=white) | MySQL ORM 콘솔 |
-![mysql2](https://img.shields.io/badge/2.3.3-mysql2-52B0E7?style=flat&logoColor=white) | MySQL 연동 |
-![cors](https://img.shields.io/badge/2.8.5-cors-52B0E7?style=flat&logoColor=white) | 리소스 공유 CORS 정책 설정 |
-![dotenv](https://img.shields.io/badge/16.0.1-dotenv-52B0E7?style=flat&logoColor=black) | 환경변수 사용 |
-![morgan](https://img.shields.io/badge/1.10.0-morgan-52B0E7?style=flat&logoColor=white) | http 로그 기록 |
-![winston](https://img.shields.io/badge/3.8.1-winston-52B0E7?style=flat&logoColor=white) | 로그 파일 생성 |
-![winston-daily-rotate-file](https://img.shields.io/badge/4.7.1-winston_daily_rotate_file-52B0E7?style=flat&logoColor=white) | 로그 파일 관리 |
-![jsonwebtoken](https://img.shields.io/badge/8.5.1-jsonwebtoken-52B0E7?style=flat&logoColor=white) | 토큰 암호화 |
-![passport](https://img.shields.io/badge/0.6.0-passport-52B0E7?style=flat&logoColor=white) | node.js authentication |
-![Passport-kakao](https://img.shields.io/badge/1.0.1-Passport_kakao-52B0E7?style=flat&logoColor=white) | 카카오 소셜 로그인 |
-![bcrypt](https://img.shields.io/badge/5.0.1-bcrypt-52B0E7?style=flat&logoColor=white) | 유저 비밀번호 암호화 |
-![nodemailer](https://img.shields.io/badge/2.1.0-nodemailer-52B0E7?style=flat&logoColor=white) | 이메일 인증번호 전송 |
-![joi](https://img.shields.io/badge/17.6.0-joi-52B0E7?style=flat&logoColor=white) | 입력 데이터 유효성검사 |
-![jest](https://img.shields.io/badge/28.1.3-jest-52B0E7?style=flat&logoColor=white) | Test Runner + Assertion을 한번에 진행할수 있는 테스트 프레임워크 |
-![@hapi/boom](https://img.shields.io/badge/10.0.0-@hapi/boom-52B0E7?style=flat&logoColor=white) | 에러 관리 |
-![helmet](https://img.shields.io/badge/6.0.0-helmet-52B0E7?style=flat&logoColor=white) | HTTP 헤더 설정을 자동으로 바꾸어주어 잘 알려진 앱의 취약성으로부터 앱 보호  |
-![hpp](https://img.shields.io/badge/0.2.3-Sequelize-52B0E7?style=flat&logoColor=white) | http 파라미터 오염 공격 방어 |
-![node-schedule](https://img.shields.io/badge/2.1.0-node_schedule-52B0E7?style=flat&logoColor=white) | 스케쥴 업무 자동화 |
-![multer](https://img.shields.io/badge/1.4.5-multer-52B0E7?style=flat&logoColor=white) | multipart/form-data 파일 업로드 |
-![multer-s3](https://img.shields.io/badge/2.10.0-multer_s3-52B0E7?style=flat&logoColor=white) | AWS S3 파일 업로드 |
-![redis](https://img.shields.io/badge/4.3.1-redis-52B0E7?style=flat&logoColor=white) | 방문자IP 카운터 |
+![Sequelize](https://img.shields.io/badge/Sequelize-6.21.3-9E9E9E?style=flat&logoColor=white) | MySQL ORM 콘솔 |
+![mysql2](https://img.shields.io/badge/mysql2-2.3.3-9E9E9E?style=flat&logoColor=white) | MySQL 연동 |
+![cors](https://img.shields.io/badge/cors-2.8.5-9E9E9E?style=flat&logoColor=white) | 리소스 공유 CORS 정책 설정 |
+![dotenv](https://img.shields.io/badge/dotenv-16.0.1-9E9E9E?style=flat&logoColor=black) | 환경변수 사용 |
+![morgan](https://img.shields.io/badge/morgan-1.10.0-9E9E9E?style=flat&logoColor=white) | http 로그 기록 |
+![winston](https://img.shields.io/badge/winston-3.8.1-9E9E9E?style=flat&logoColor=white) | 로그 파일 생성 |
+![winston-daily-rotate-file](https://img.shields.io/badge/winston_daily_rotate_file-4.7.1-9E9E9E?style=flat&logoColor=white) | 로그 파일 관리 |
+![jsonwebtoken](https://img.shields.io/badge/jsonwebtoken-8.5.1-9E9E9E?style=flat&logoColor=white) | 토큰 암호화 |
+![passport](https://img.shields.io/badge/passport-0.6.0-9E9E9E?style=flat&logoColor=white) | node.js authentication |
+![Passport-kakao](https://img.shields.io/badge/Passport_kakao-1.0.1-9E9E9E?style=flat&logoColor=white) | 카카오 소셜 로그인 |
+![bcrypt](https://img.shields.io/badge/bcrypt-5.0.1-9E9E9E?style=flat&logoColor=white) | 유저 비밀번호 암호화 |
+![nodemailer](https://img.shields.io/badge/nodemailer-2.1.0-9E9E9E?style=flat&logoColor=white) | 이메일 인증번호 전송 |
+![joi](https://img.shields.io/badge/joi-17.6.0-9E9E9E?style=flat&logoColor=white) | 입력 데이터 유효성검사 |
+![jest](https://img.shields.io/badge/jest-28.1.3-9E9E9E?style=flat&logoColor=white) | Test Runner + Assertion을 한번에 진행할수 있는 JS 테스트 프레임워크 |
+![@hapi/boom](https://img.shields.io/badge/@hapi/boom-10.0.0-9E9E9E?style=flat&logoColor=white) | 에러 관리 |
+![helmet](https://img.shields.io/badge/helmet-6.0.0-9E9E9E?style=flat&logoColor=white) | HTTP 헤더 설정을 자동으로 바꾸어주어 잘 알려진 앱의 취약성으로부터 앱 보호  |
+![hpp](https://img.shields.io/badge/hpp-0.2.3-9E9E9E?style=flat&logoColor=white) | http 파라미터 오염 공격 방어 |
+![node-schedule](https://img.shields.io/badge/node_schedule-2.1.0-9E9E9E?style=flat&logoColor=white) | 스케쥴 업무 자동화 |
+![multer](https://img.shields.io/badge/multer-1.4.5-9E9E9E?style=flat&logoColor=white) | multipart/form-data 파일 업로드 |
+![multer-s3](https://img.shields.io/badge/multer_s3-2.10.0-9E9E9E?style=flat&logoColor=white) | AWS S3 파일 업로드 |
+![redis](https://img.shields.io/badge/redis-4.3.1-9E9E9E?style=flat&logoColor=white) | 방문자IP 카운터 |
 
 ## **📂 파일 구조**
 

@@ -7,8 +7,16 @@ const { wrapAsyncController } = require("../middlewares/error_handler");
 const authMiddleware = require("../middlewares/auth_middlewares");
 
 // 팔로우 목록 조회 [GET] /api/follows/:userId
-router.get("/:userId", wrapAsyncController(followController.getfollowList));
+router.get(
+  "/:userId",
+  authMiddleware,
+  wrapAsyncController(followController.getfollowList)
+);
 // 팔로우 추가 및 삭제 [PUT] /api/follows/:userId
-router.put("/:userId", wrapAsyncController(authMiddleware, followController.editFollow));
+router.put(
+  "/:userId",
+  authMiddleware,
+  wrapAsyncController(followController.editFollow)
+);
 
 module.exports = router;

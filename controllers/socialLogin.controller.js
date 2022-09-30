@@ -26,7 +26,7 @@ exports.kakaoLogin = (req, res, next) => {
 };
 
 // passport-kakao 연결끊기 콜백 API
-exports.deleteKakao = async (req, res, next) => {
+exports.deleteKakao = async (req, res) => {
   const user_id = await joi.kakaoLeaveQuerySchema.validateAsync(
     req.query.user_id
   );

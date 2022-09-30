@@ -13,6 +13,7 @@ class MyTodoController {
   challengedTodoCreate = async (todoId, userId) => {
     const todayDate = calculateToday();
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
+
     // const todoData = await Todo.findOne({ where: { todoId: todoId } });
     const todoData = await this.mytodoRepository.getTodoByTodoId(todoId);
 
@@ -51,7 +52,7 @@ class MyTodoController {
     await sequelize.transaction(async (transaction) => {
       await ChallengedTodo.create(
         {
-          userId: userId,
+          userId,
           mbti: todoData.mbti,
           challengedTodo: todoData.todo,
           originTodoId: todoId,
@@ -109,9 +110,7 @@ class MyTodoController {
       //Todos테이블에 도전갯수 업데이트
       await Todo.update(
         {
-          challengedCounts: challengedTodoData[0]
-            ? challengedTodoData[0].COUNT
-            : 0,
+          challengedCounts: challengedTodoData[0]?.COUNT ?? 0,
         },
         { where: { todoId: deletedTodoId }, transaction: onTransaction }
       );
@@ -124,7 +123,7 @@ class MyTodoController {
       );
 
       await User.update(
-        { challengeCounts: challengedData[0] ? challengedData[0].COUNT : 0 },
+        { challengeCounts: challengedData[0]?.COUNT ?? 0 },
         { where: { userId }, transaction: onTransaction }
       );
 
@@ -178,9 +177,7 @@ class MyTodoController {
 
       await User.update(
         {
-          challengeCounts: challengedTodoData[0]
-            ? challengedTodoData[0].COUNT
-            : 0,
+          challengeCounts: challengedTodoData[0]?.COUNT ?? 0,
         },
         { where: { userId }, transaction: onTransaction }
       );
@@ -235,7 +232,7 @@ class MyTodoController {
 
       await User.update(
         {
-          todoCounts: userTodoData[0] ? userTodoData[0].COUNT : 0,
+          todoCounts: userTodoData[0]?.COUNT ?? 0,
         },
         { where: { userId }, transaction: onTransaction }
       );
@@ -273,7 +270,7 @@ class MyTodoController {
 
       await User.update(
         {
-          todoCounts: userTodoData[0] ? userTodoData[0].COUNT : 0,
+          todoCounts: userTodoData[0]?.COUNT ?? 0,
         },
         { where: { userId }, transaction: onTransaction }
       );
@@ -310,51 +307,37 @@ class MyTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
-        followingCount: followings[0] ? followings[0].followingCount : 0,
-        followerCount: followers[0] ? followers[0].followerCount : 0,
+        followingCount: followings[0]?.followingCount ?? 0,
+        followerCount: followers[0]?.followerCount ?? 0,
       },
-      challengedTodo: userInfo.ChallengedTodos[0]
-        ? {
-            challengedTodoId: userInfo.ChallengedTodos[0].challengedTodoId,
-            challengedTodo: userInfo.ChallengedTodos[0].challengedTodo,
-            isCompleted: userInfo.ChallengedTodos[0].isCompleted,
-            originTodoId: userInfo.ChallengedTodos[0].originTodoId,
-          }
-        : [],
-      createdTodo: userInfo.Todos[0]
-        ? {
-            todoId: userInfo.Todos[0].todoId,
-            todo: userInfo.Todos[0].todo,
-            commentCounts: userInfo.Todos[0].commentCounts,
-            challengedCounts: userInfo.Todos[0].challengedCounts,
-          }
-        : [],
+      challengedTodo: userInfo?.ChallengedTodos[0] ?? [],
+      createdTodo: userInfo?.Todos[0] ?? [],
       date,
     };
   };
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
-  getUserTodo = async (user, userId) => {
+  getUserTodo = async (userId, elseUserId) => {
     const [userInfo, followings, followers, challengedTodos, isFollowed] =
       await Promise.all([
         User.findOne({
-          where: { userId },
+          where: { userId: elseUserId },
           include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
         }),
         sequelize.query(this.query.getFollowingCountsQuery, {
-          bind: { userId },
+          bind: { userId: elseUserId },
           type: sequelize.QueryTypes.SELECT,
         }),
         sequelize.query(this.query.getFollowerCountsQuery, {
-          bind: { userId },
+          bind: { userId: elseUserId },
           type: sequelize.QueryTypes.SELECT,
         }),
         sequelize.query(this.query.getChallengedTodosQuery, {
-          bind: { userId },
+          bind: { userId: elseUserId },
           type: sequelize.QueryTypes.SELECT,
         }),
         Follow.findOne({
-          where: { userIdFollower: user.userId, userIdFollowing: userId },
+          where: { userIdFollower: userId, userIdFollowing: elseUserId },
         }),
       ]);
 
@@ -364,13 +347,13 @@ class MyTodoController {
 
     return {
       userInfo: {
-        userId,
+        userId: userInfo.userId,
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
         mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
-        followingCount: followings[0] ? followings[0].followingCount : 0,
-        followerCount: followers[0] ? followers[0].followerCount : 0,
+        followingCount: followings[0]?.followingCount ?? 0,
+        followerCount: followers[0]?.followerCount ?? 0,
         isFollowed: isFollowed ? true : false,
       },
       challengedTodos,

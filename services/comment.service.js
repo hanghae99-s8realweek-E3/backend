@@ -18,7 +18,6 @@ class CommentService {
       await Comment.create(
         {
           userId,
-          nickname: user.nickname,
           todoId,
           comment,
         },
