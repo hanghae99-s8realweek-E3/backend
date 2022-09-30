@@ -24,19 +24,21 @@ class UserService {
       throw Boom.badRequest("비밀번호와 비밀번호 확인값이 일치 하지 않습니다.");
     }
     if (!authResult) {
-      throw new Error("이메일 인증이 완료되지 않았습니다.");
+      throw Boom.badRequest("이메일 인증이 완료되지 않았습니다.");
     }
+
     const bcrPassword = bcrypt.hashSync(
       password,
       parseInt(parseInt(process.env.SALT))
-    ); //비밀번호 암호화
+    );
     await User.create({
       email,
       password: bcrPassword,
       nickname,
     });
     const userData = await User.findOne({ where: { email: email } });
-    createToken(userData);
+    const token = createToken(userData);
+
     return token;
   };
 
@@ -44,7 +46,8 @@ class UserService {
   userMbti = async (mbti, userId) => {
     await User.update({ mbti: mbti }, { where: { userId: userId } });
     const userData = await User.findOne({ where: { userId: userId } });
-    createToken(userData);
+    const token = createToken(userData);
+
     return token;
   };
 
@@ -58,7 +61,9 @@ class UserService {
     if (!bcrCompareResult) {
       throw Boom.badRequest("아이디나 비번이 올바르지 않습니다.");
     }
-    createToken(userData);
+
+    const token = createToken(userData);
+
     return token;
   };
 
@@ -73,6 +78,7 @@ class UserService {
     if (exEmailAuth) {
       await EmailAuth.destroy({ where: { email } });
     }
+
     sendEmail(email);
   };
 
@@ -156,7 +162,7 @@ class UserService {
     }
 
     const changedData = await User.findByPk(userId);
-    createToken(changedData);
+    const token = createToken(changedData);
 
     return token;
   };
@@ -170,7 +176,7 @@ class UserService {
     await User.update({ profile }, { where: { userId } });
 
     const changedData = await User.findByPk(userId);
-    createToken(changedData);
+    const token = createToken(changedData);
 
     return token;
   };
@@ -185,7 +191,7 @@ class UserService {
 
     // 회원탈퇴 후 follow DB에서 해당 userId 데이터 삭제하는 과정 트렌젝션 설정
     await sequelize.transaction(
-      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
+      { isolationLevel: Transaction.ISOLATION_LEVELS.READ_COMMITTED },
       async (transaction) => {
         await User.destroy({ where: { userId }, transaction });
         await Follow.destroy({
