@@ -1,5 +1,4 @@
-const { Follow } = require("../models");
-const { User } = require("../models");
+const { Follow, User, sequelize } = require("../models");
 const Boom = require("@hapi/boom");
 const Query = require("../utils/query");
 
