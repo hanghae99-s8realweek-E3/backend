@@ -27,16 +27,19 @@ class CommentService {
           },
           { transaction }
         );
-        const comments = await sequelize.query(
-          this.query.getCommentCountsQuery,
-          {
-            bind: { todoId },
-            type: sequelize.QueryTypes.SELECT,
-            transaction,
-          }
-        );
+
+        const [commentData] = await Comment.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "commentCounts"],
+          ],
+          where: {
+            todoId,
+          },
+          transaction,
+        });
+
         await Todo.update(
-          { commentCounts: comments[0].commentCounts },
+          { commentCounts: commentData.dataValues.commentCounts },
           { where: { todoId }, transaction }
         );
       }
@@ -62,16 +65,19 @@ class CommentService {
           where: { commentId },
           transaction,
         });
-        const comments = await sequelize.query(
-          this.query.getCommentCountsQuery,
-          {
-            bind: { todoId: comment.todoId },
-            type: sequelize.QueryTypes.SELECT,
-            transaction,
-          }
-        );
+
+        const [commentData] = await Comment.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "commentCounts"],
+          ],
+          where: {
+            todoId: comment.todoId,
+          },
+          transaction,
+        });
+
         await Todo.update(
-          { commentCounts: comments[0]?.commentCounts ?? 0 },
+          { commentCounts: commentData.dataValues.commentCounts },
           { where: { todoId: comment.todoId }, transaction }
         );
       }
