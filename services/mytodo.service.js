@@ -4,11 +4,9 @@ const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 const { calculateToday } = require("../utils/date");
 const Query = require("../utils/query");
-const MytodoRepository = require("../repositories/mytodo.repository");
 
 class MyTodoController {
   query = new Query();
-  mytodoRepository = new MytodoRepository();
 
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
@@ -16,7 +14,7 @@ class MyTodoController {
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
 
     // const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    const todoData = await this.mytodoRepository.getTodoByTodoId(todoId);
+    const todoData = await Todo.findOne({ where: { todoId: todoId } });
 
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
@@ -31,11 +29,11 @@ class MyTodoController {
 
     //오늘 날짜 + userId(todayDate, userId),
 
-    const todayChallengedTodoData =
-      await this.mytodoRepository.getChallengedTodoByDateAndUserid(
-        todayDate,
-        userId
-      );
+    const todayChallengedTodoData = await ChallengedTodo.findOne({
+      where: {
+        [Op.and]: [{ date: todayDate }, { userId }],
+      },
+    });
 
     //이미 오늘 도전을 담았는지 challengedtodo 데이터 체크
     if (todayChallengedTodoData) {
@@ -43,9 +41,10 @@ class MyTodoController {
     }
 
     //challengedTodoData에서 originTodoId의 갯수 가져오기
-    const challengedTodoData =
-      await this.mytodoRepository.getChallengedTodoByoriginTodoId(todoId);
-
+    const challengedTodoData = await sequelize.query(
+      this.query.getChallengedTodoGroupByoriginTodoId,
+      { bind: { originTodoId: todoId }, type: sequelize.QueryTypes.SELECT }
+    );
     console.log("challengedTodoData", challengedTodoData);
 
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정

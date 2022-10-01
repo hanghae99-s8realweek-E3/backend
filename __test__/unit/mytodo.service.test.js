@@ -1,14 +1,12 @@
 const { ChallengedTodo, Todo, sequelize } = require("../../models");
-const Query = require("../../utils/query");
-const { Transaction } = require("sequelize");
+
 const userData = require("../data/userData.json");
 const MyTodoController = require("../../services/mytodo.service");
-const MytodoRepository = require("../../repositories/mytodo.repository");
+
 const myTodoController = new MyTodoController();
-const mytodoRepository = new MytodoRepository();
 
 Todo.findOne = jest.fn();
-mytodoRepository.getTodoByTodoId = jest.fn();
+
 ChallengedTodo.findOne = jest.fn();
 sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
@@ -68,12 +66,5 @@ describe("challengedTodoCreate", () => {
     ChallengedTodo.findOne.mockReturnValue();
     await myTodoController.challengedTodoCreate(todoId, userId);
     expect(sequelize.transaction).toBeCalled();
-  });
-
-  it("transaction function이 실행되는지 ", async () => {
-    ChallengedTodo.findOne.mockReturnValue();
-    sequelize.transaction.mockReturnValue();
-    await myTodoController.challengedTodoCreate(todoId, userId);
-    expect(ChallengedTodo.create).toBeCalled();
   });
 });
