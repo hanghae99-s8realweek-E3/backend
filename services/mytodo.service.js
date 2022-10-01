@@ -4,33 +4,49 @@ const { Op } = require("sequelize");
 const Boom = require("@hapi/boom");
 const { calculateToday } = require("../utils/date");
 const Query = require("../utils/query");
+const MytodoRepository = require("../repositories/mytodo.repository");
 
-class myTodoController {
+class MyTodoController {
   query = new Query();
+  mytodoRepository = new MytodoRepository();
 
   // 오늘의 도전 todo 등록 [POST] /:todoId/challenged
   challengedTodoCreate = async (todoId, userId) => {
     const todayDate = calculateToday();
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
-    const todoData = await Todo.findOne({ where: { todoId } });
+
+    // const todoData = await Todo.findOne({ where: { todoId: todoId } });
+    const todoData = await this.mytodoRepository.getTodoByTodoId(todoId);
+
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
+    if (!todoData.mbti) {
+      throw Boom.badRequest("MBTI 정보 등록바랍니다.");
+    }
+
     if (todoData.userId === userId) {
       throw Boom.badRequest("본인 글은 도전할 수 없습니다.");
     }
 
     //오늘 날짜 + userId(todayDate, userId),
-    const todayChallengedTodoData = await ChallengedTodo.findOne({
-      where: {
-        [Op.and]: [{ date: todayDate }, { userId }],
-      },
-    });
 
-    // //이미 오늘 도전을 담았는지 challengedtodo 데이터 체크
+    const todayChallengedTodoData =
+      await this.mytodoRepository.getChallengedTodoByDateAndUserid(
+        todayDate,
+        userId
+      );
+
+    //이미 오늘 도전을 담았는지 challengedtodo 데이터 체크
     if (todayChallengedTodoData) {
       throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
     }
+
+    //challengedTodoData에서 originTodoId의 갯수 가져오기
+    const challengedTodoData =
+      await this.mytodoRepository.getChallengedTodoByoriginTodoId(todoId);
+
+    console.log("challengedTodoData", challengedTodoData);
 
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
     await sequelize.transaction(
@@ -48,19 +64,20 @@ class myTodoController {
         );
 
         //challengedTodoData에서 originTodoId의 갯수 가져오기
-        const challengedTodoData = await sequelize.query(
-          this.query.getChallengedTodoGroupByoriginTodoId,
-          {
-            bind: { originTodoId: todoId },
-            type: sequelize.QueryTypes.SELECT,
-            transaction,
-          }
-        );
+        const [challengedTodoData] = await ChallengedTodo.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "COUNT"],
+          ],
+          where: {
+            originTodoId: todoId,
+          },
+          transaction,
+        });
 
         //challengedTodos에 있는 todo갯수 반영해주기
         await Todo.update(
           {
-            challengedCounts: challengedTodoData[0]?.COUNT ?? 0,
+            challengedCounts: challengedTodoData.dataValues.COUNT,
           },
           { where: { todoId }, transaction }
         );
@@ -89,35 +106,38 @@ class myTodoController {
           transaction,
         });
 
-        const challengedTodoData = await sequelize.query(
-          this.query.getChallengedTodoGroupByoriginTodoId,
-          {
-            bind: { originTodoId: deletedTodoId },
-            type: sequelize.QueryTypes.SELECT,
-            transaction,
-          }
-        );
+        const [challengedTodoData] = await ChallengedTodo.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "COUNT"],
+          ],
+          where: {
+            originTodoId: deletedTodoId,
+          },
+          transaction,
+        });
 
         //Todos테이블에 도전갯수 업데이트
         await Todo.update(
           {
-            challengedCounts: challengedTodoData[0]?.COUNT ?? 0,
+            challengedCounts: challengedTodoData.dataValues.COUNT,
           },
           { where: { todoId: deletedTodoId }, transaction }
         );
 
         //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isCompleted가 true인 것들만
-        const challengedData = await sequelize.query(
-          this.query.getChallengedTodoGroupByuserId,
-          {
-            bind: { userId: userId },
-            type: sequelize.QueryTypes.SELECT,
-            transaction,
-          }
-        );
+
+        const [challengedTodoDatas] = await ChallengedTodo.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "COUNT"],
+          ],
+          where: {
+            [Op.and]: [{ isCompleted: true }, { userId }],
+          },
+          transaction,
+        });
 
         await User.update(
-          { challengeCounts: challengedData[0]?.COUNT ?? 0 },
+          { challengeCounts: challengedTodoDatas.dataValues.COUNT },
           { where: { userId }, transaction }
         );
       }
@@ -161,16 +181,19 @@ class myTodoController {
           throw Boom.badRequest("challengedTodoId가 올바르지 않습니다.");
         }
 
-        //challengedTodo에서 userId를 기준으로 그룹을 하데 조건은 isCompleted true인 것들만
-        const challengedTodoData = await sequelize.query(
-          this.query.getChallengedTodoGroupByuserId,
-          { bind: { userId: userId }, type: sequelize.QueryTypes.SELECT },
-          { transaction }
-        );
+        const [challengedTodoData] = await ChallengedTodo.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "COUNT"],
+          ],
+          where: {
+            [Op.and]: [{ isCompleted: true }, { userId }],
+          },
+          transaction,
+        });
 
         await User.update(
           {
-            challengeCounts: challengedTodoData[0]?.COUNT ?? 0,
+            challengeCounts: challengedTodoData.dataValues.COUNT,
           },
           { where: { userId } },
           { transaction }
@@ -218,18 +241,19 @@ class myTodoController {
           { transaction }
         );
 
-        const userTodoData = await sequelize.query(
-          this.query.getTodoGroupByuserId,
-          {
-            bind: { userId: userId },
-            type: sequelize.QueryTypes.SELECT,
-            transaction,
-          }
-        );
+        const [userTodoData] = await Todo.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "COUNT"],
+          ],
+          where: {
+            userId,
+          },
+          transaction,
+        });
 
         await User.update(
           {
-            todoCounts: userTodoData[0]?.COUNT ?? 0,
+            todoCounts: userTodoData.dataValues.COUNT,
           },
           { where: { userId }, transaction }
         );
@@ -255,18 +279,19 @@ class myTodoController {
           transaction,
         });
 
-        const userTodoData = await sequelize.query(
-          this.query.getTodoGroupByuserId,
-          {
-            bind: { userId: userId },
-            transaction,
-            type: sequelize.QueryTypes.SELECT,
-          }
-        );
+        const [userTodoData] = await Todo.findAll({
+          attributes: [
+            [sequelize.fn("COUNT", sequelize.col("userId")), "COUNT"],
+          ],
+          where: {
+            userId,
+          },
+          transaction,
+        });
 
         await User.update(
           {
-            todoCounts: userTodoData[0]?.COUNT ?? 0,
+            todoCounts: userTodoData.dataValues.COUNT,
           },
           { where: { userId }, transaction }
         );
@@ -355,4 +380,4 @@ class myTodoController {
   };
 }
 
-module.exports = myTodoController;
+module.exports = MyTodoController;
