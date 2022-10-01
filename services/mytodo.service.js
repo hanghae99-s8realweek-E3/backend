@@ -13,9 +13,9 @@ class MyTodoController {
     const todayDate = calculateToday();
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
 
-    // const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    const todoData = await Todo.findOne({ where: { todoId: todoId } });
 
+    const todoData = await Todo.findOne({ where: { todoId: todoId } });
+    
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
@@ -39,13 +39,6 @@ class MyTodoController {
     if (todayChallengedTodoData) {
       throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
     }
-
-    //challengedTodoData에서 originTodoId의 갯수 가져오기
-    const challengedTodoData = await sequelize.query(
-      this.query.getChallengedTodoGroupByoriginTodoId,
-      { bind: { originTodoId: todoId }, type: sequelize.QueryTypes.SELECT }
-    );
-    console.log("challengedTodoData", challengedTodoData);
 
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
     await sequelize.transaction(
