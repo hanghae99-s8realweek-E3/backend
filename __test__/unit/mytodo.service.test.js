@@ -1,16 +1,17 @@
-const { ChallengedTodo, Todo, sequelize } = require("../../models");
-
+const { ChallengedTodo, Todo, sequelize, User } = require("../../models");
 const userData = require("../data/userData.json");
 const MyTodoController = require("../../services/mytodo.service");
-
 const myTodoController = new MyTodoController();
+const returnChallengedTodoData = require("../data/returnChallengedTodoData.json");
+const returnUserData = require("../data/returnUserData.json");
+
 
 Todo.findOne = jest.fn();
-
 ChallengedTodo.findOne = jest.fn();
 sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
 ChallengedTodo.create = jest.fn();
+User.findOne = jest.fn();
 
 describe("challengedTodoCreate", () => {
   beforeEach(() => {
@@ -67,4 +68,141 @@ describe("challengedTodoCreate", () => {
     await myTodoController.challengedTodoCreate(todoId, userId);
     expect(sequelize.transaction).toBeCalled();
   });
+});
+
+describe("challengedTodoDelete", () => {
+  beforeEach(() => {
+    challengedTodoId = userData.todoId;
+    userId = userData.userId;
+  });
+
+  it("challengedTodoDelete function이 존재하는가?", () => {
+    expect(typeof myTodoController.challengedTodoDelete).toBe("function");
+  });
+
+  it("(req)challengedTodoId와 일치하는 데이터가 없다면", async () => {
+    await expect(async () => {
+      ChallengedTodo.findOne.mockReturnValue();
+      await myTodoController.challengedTodoDelete(challengedTodoId, userId);
+    }).rejects.toThrowError(
+      new Error("삭제되었거나 존재하지 않는 todo 입니다.")
+    );
+  });
+
+  it("ChallengedTodo 테이블에 (req)challengedTodoId와 일치하는 데이터가 있다면 transaction실행", async () => {
+    ChallengedTodo.findOne.mockReturnValue(returnChallengedTodoData);
+    await myTodoController.challengedTodoDelete(challengedTodoId, userId);
+    expect(sequelize.transaction).toBeCalled();
+  });
+});
+
+describe("challengedTodoComplete", () => {
+  beforeEach(() => {
+    challengedTodoId = userData.todoId;
+    userId = userData.userId;
+  });
+
+  it("challengedTodoDelete function이 존재하는가?", () => {
+    expect(typeof myTodoController.challengedTodoComplete).toBe("function");
+  });
+
+  it("이용자가 오늘 도전한 todo가 없다면", async () => {
+    await expect(async () => {
+      ChallengedTodo.findOne.mockReturnValue();
+      await myTodoController.challengedTodoDelete(challengedTodoId, userId);
+    }).rejects.toThrowError(
+      new Error("삭제되었거나 존재하지 않는 todo 입니다.")
+    );
+  });
+
+  it("이용자가 오늘 도전한 todo가 있다면 transactiont 시작", async () => {
+    ChallengedTodo.findOne.mockReturnValue(returnChallengedTodoData);
+    await myTodoController.challengedTodoDelete(challengedTodoId, userId);
+    expect(sequelize.transaction).toBeCalled();
+  });
+});
+
+describe("todoCreate", () => {
+  beforeEach(() => {
+    todoId = userData.todoId;
+    userId = userData.userId;
+  });
+
+  it("todoCreate function이 존재하는가?", () => {
+    expect(typeof myTodoController.todoCreate).toBe("function");
+  });
+
+  it("사용자 정보가 없다면", async () => {
+    await expect(async () => {
+      User.findOne.mockReturnValue();
+      await myTodoController.todoCreate(todoId, userId);
+    }).rejects.toThrowError(new Error("사용자 정보가 없습니다."));
+  });
+
+  it("사용자 정보에 mbti정보가  없다면", async () => {
+    await expect(async () => {
+      User.findOne.mockReturnValue(returnUserData[0]);
+      await myTodoController.todoCreate(todoId, userId);
+    }).rejects.toThrowError(new Error("mbti 정보를 등록후 작성바랍니다."));
+  });
+
+  it("todo제안할때 필용한 사용자 정보가 다 있다면 transactiont 시작 ", async () => {
+    User.findOne.mockReturnValue(returnUserData[1]);
+    await myTodoController.todoCreate(todoId, userId);
+    expect(sequelize.transaction).toBeCalled();
+  });
+});
+
+describe("todoDelete", () => {
+  beforeEach(() => {
+    todoId = userData.todoId;
+    userId = userData.userId;
+  });
+
+  it("todoCreate function이 존재하는가?", () => {
+    expect(typeof myTodoController.todoDelete).toBe("function");
+  });
+
+  it("사용자가 제안한 오늘의 제안한 todo가  없다면", async () => {
+    await expect(async () => {
+      Todo.findOne.mockReturnValue();
+      await myTodoController.todoDelete(todoId, userId);
+    }).rejects.toThrowError(new Error("이미 삭제되었거나 없는 todo입니다."));
+  });
+
+  it("todo제안할때 필용한 사용자 정보가 다 있다면 transactiont 시작 ", async () => {
+    User.findOne.mockReturnValue(returnTodoData[1]);
+    await myTodoController.todoDelete(todoId, userId);
+    expect(sequelize.transaction).toBeCalled();
+  });
+
+
+
+});
+
+describe("getMyTodo", () => {
+  beforeEach(() => {
+    todoId = userData.todoId;
+    userId = userData.userId;
+  });
+
+  it("todoCreate function이 존재하는가?", () => {
+    expect(typeof myTodoController.todoDelete).toBe("function");
+  });
+
+  it("사용자가 제안한 오늘의 제안한 todo가  없다면", async () => {
+    await expect(async () => {
+      Todo.findOne.mockReturnValue();
+      await myTodoController.todoDelete(todoId, userId);
+    }).rejects.toThrowError(new Error("이미 삭제되었거나 없는 todo입니다."));
+  });
+
+  it("todo제안할때 필용한 사용자 정보가 다 있다면 transactiont 시작 ", async () => {
+    User.findOne.mockReturnValue(returnTodoData[1]);
+    await myTodoController.todoDelete(todoId, userId);
+    expect(sequelize.transaction).toBeCalled();
+  });
+
+
+
 });
