@@ -1,6 +1,6 @@
 const { ChallengedTodo, Todo, sequelize } = require("../../models");
 const Query = require("../../utils/query");
-
+const { Transaction } = require("sequelize");
 const userData = require("../data/userData.json");
 const MyTodoController = require("../../services/mytodo.service");
 const MytodoRepository = require("../../repositories/mytodo.repository");
@@ -13,6 +13,7 @@ ChallengedTodo.findOne = jest.fn();
 sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
 ChallengedTodo.create = jest.fn();
+
 describe("challengedTodoCreate", () => {
   beforeEach(() => {
     todoId = userData.todoId;
@@ -60,14 +61,19 @@ describe("challengedTodoCreate", () => {
     await expect(async () => {
       ChallengedTodo.findOne.mockReturnValue({});
       await myTodoController.challengedTodoCreate(todoId, userId);
-      // await ChallengedTodo.create.mockRejectedValue(new Error("Async error"));
     }).rejects.toThrowError(new Error("오늘의 todo가 이미 등록되었습니다."));
   });
 
-  it("오늘 등록한 도전이 이미 있다면", async () => {
+  it("transaction function이 실행되는지 ", async () => {
     ChallengedTodo.findOne.mockReturnValue();
-    await sequelize.transaction();
-    // await ChallengedTodo.create.mockRejectedValue(new Error("Async error"));
     await myTodoController.challengedTodoCreate(todoId, userId);
+    expect(sequelize.transaction).toBeCalled();
+  });
+
+  it("transaction function이 실행되는지 ", async () => {
+    ChallengedTodo.findOne.mockReturnValue();
+    sequelize.transaction.mockReturnValue();
+    await myTodoController.challengedTodoCreate(todoId, userId);
+    expect(ChallengedTodo.create).toBeCalled();
   });
 });

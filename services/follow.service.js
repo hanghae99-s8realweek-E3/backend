@@ -1,40 +1,27 @@
 const { Follow } = require("../models");
 const { User } = require("../models");
 const Boom = require("@hapi/boom");
+const Query = require("../utils/query");
 
 class FollowService {
+  query = new Query();
+
   // 팔로우 목록 조회 [GET] /api/follows/:userId
   followListGet = async (userId) => {
     const checkUserId = await User.findByPk(userId);
     if (!checkUserId) {
       throw Boom.badRequest("존재하지 않는 사용자 입니다.");
     }
-    //myFollowerlist
-    const myFollowerTable = await Follow.findAll({
-      where: { userIdFollowing: userId },
+    const myFollowerlist = await sequelize.query(this.query.getFollwerlist, {
+      bind: { userIdFollowing: userId },
+      type: sequelize.QueryTypes.SELECT,
     });
 
-    const myFollowerUserId = myFollowerTable.map(
-      (table) => table.userIdFollower
-    );
-
-    const myFollowerlist = await User.findAll({
-      where: { userId: myFollowerUserId },
-      attributes: ["userId", "nickname", "mbti", "profile"],
+    const myFollowinglist = await sequelize.query(this.query.getFollwinglist, {
+      bind: { userIdFollower: userId },
+      type: sequelize.QueryTypes.SELECT,
     });
 
-    //myFollowinglist
-    const myFollowingTable = await Follow.findAll({
-      where: { userIdFollower: userId },
-    });
-
-    const myFollowingUserId = myFollowingTable.map(
-      (table) => table.userIdFollowing
-    );
-    const myFollowinglist = await User.findAll({
-      where: { userId: myFollowingUserId },
-      attributes: ["userId", "nickname", "mbti", "profile"],
-    });
     return {
       following: myFollowinglist,
       follower: myFollowerlist,
