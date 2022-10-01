@@ -2,10 +2,9 @@ const joi = require("joi");
 
 const numberRegex = /^[0-9]+$/;
 const emailRegex = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,4})+$/;
-const passwordRegex =
-  /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
+const passwordRegex = /^(?!((?:[A-Za-z]+)|(?:[~!@#$%^&()_+=]+)|(?=[0-9]+))$)[A-Za-z\d~!@#$%^&()_+=]{8,20}$/;
 const dateRegex = /^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/;
-const mbtiRegex = /[A-Z]{4}/;
+const mbtiInfo = [ "INFP", "ENFP", "INFJ", "ENFJ", "INTJ", "ENTJ", "INTP", "ENTP", "ISFP", "ESFP", "ISTP", "ESTP", "ISFJ", "ESFJ", "ISTJ", "ESTJ" ];
 
 class Joi {
   // parameter primaryKey 유효성 검사
@@ -32,7 +31,7 @@ class Joi {
   // 이메일 인증 번호 확인 유효성 검사
   emailAuthCheckSchema = joi.object({
     email: joi.string().pattern(emailRegex).required(),
-    emailAuthNumber: joi.number().min(1).required(),
+    emailAuthNumber: joi.number().min(1).max(6).required(),
   });
 
   // 회원 정보 변경 유효성 검사
@@ -41,7 +40,12 @@ class Joi {
     newPassword: joi.string().pattern(passwordRegex),
     confirmPassword: joi.string().pattern(passwordRegex),
     nickname: joi.string().min(1).max(12).trim(),
-    mbti: joi.string().pattern(mbtiRegex),
+    mbti: joi.string().custom((mbti, helper) => {
+      if (!mbtiInfo.includes(mbti)) {
+        return helper.message("please select the MBTI");
+      }
+      return mbti;
+    }),
   });
 
   // 회원탈퇴 유효성 검사
@@ -59,7 +63,12 @@ class Joi {
 
   // mbti 등록 유효성 검사
   mbtiSchema = joi.object({
-    mbti: joi.string().pattern(mbtiRegex).required(),
+    mbti: joi.string().custom((mbti, helper) => {
+      if (!mbtiInfo.includes(mbti)) {
+        return helper.message("please select the MBTI");
+      }
+      return mbti;
+    }),
   });
 
   // 로그인 유효성 검사
@@ -80,7 +89,15 @@ class Joi {
 
   // todo 조회 쿼리스트링 유효성 검사
   getTodoListsSchema = joi.object({
-    mbti: joi.string().pattern(mbtiRegex).allow(null, ""),
+    mbti: joi
+      .string()
+      .custom((mbti, helper) => {
+        if (!mbtiInfo.includes(mbti)) {
+          return helper.message("please select the MBTI");
+        }
+        return mbti;
+      })
+      .allow(null, ""),
     filter: joi.string().allow(null, ""),
   });
 }

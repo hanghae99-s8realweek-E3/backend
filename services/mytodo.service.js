@@ -6,6 +6,7 @@ const { calculateToday } = require("../utils/date");
 const Query = require("../utils/query");
 const MytodoRepository = require("../repositories/mytodo.repository");
 
+
 class MyTodoController {
   query = new Query();
   mytodoRepository = new MytodoRepository();
@@ -44,11 +45,13 @@ class MyTodoController {
       throw Boom.badRequest("오늘의 todo가 이미 등록되었습니다.");
     }
 
+
     //challengedTodoData에서 originTodoId의 갯수 가져오기
     const challengedTodoData =
       await this.mytodoRepository.getChallengedTodoByoriginTodoId(todoId);
 
     console.log("challengedTodoData",challengedTodoData);
+
     // 도전 생성하고 도전 개수 update하는 과정 트렌젝션 설정
     await sequelize.transaction(
       { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
@@ -64,12 +67,20 @@ class MyTodoController {
           { transaction }
         );
 
+        //challengedTodoData에서 originTodoId의 갯수 가져오기
+        const challengedTodoData = await sequelize.query(
+          this.query.getChallengedTodoGroupByoriginTodoId,
+          {
+            bind: { originTodoId: todoId },
+            type: sequelize.QueryTypes.SELECT,
+            transaction,
+          }
+        );
+
         //challengedTodos에 있는 todo갯수 반영해주기
         await Todo.update(
           {
-            challengedCounts: challengedTodoData[0]
-              ? challengedTodoData[0].COUNT + 1
-              : 1,
+            challengedCounts: challengedTodoData[0]?.COUNT ?? 0,
           },
           { where: { todoId }, transaction }
         );

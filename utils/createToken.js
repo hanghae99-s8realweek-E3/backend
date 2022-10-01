@@ -9,9 +9,9 @@ const createToken = (userData) => {
     profile: userData.profile,
   };
 
-  return (token = jwt.sign(payload, process.env.MYSECRET_KEY, {
+  return jwt.sign(payload, process.env.MYSECRET_KEY, {
     expiresIn: "2d",
-  }));
+  });
 };
 
 module.exports = createToken;
