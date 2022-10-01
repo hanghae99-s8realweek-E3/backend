@@ -6,9 +6,11 @@ module.exports = {
     res.locals.message = err.message;
     res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
     logger.error(err.name + " - " + err.message);
-    res.status(err.output ? err.output.statusCode : 500).json({
-      errorMessage: err.message,
-    });
+    res.status(err.output ? err.output.statusCode : 500).json(
+      err.output
+        ? { errorMessage: err.message }
+        : { errorMessage: "[" + err.name + "] " + "There was a problem processing your request. Please try again." }
+    );
   },
   routerError: (req, res, next) => {
     try {
