@@ -4,13 +4,10 @@ const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const multer = require("../middlewares/multer");
 const Boom = require("@hapi/boom");
-const Query = require("../utils/query");
 const createToken = require("../utils/createToken");
 const sendEmail = require("../utils/nodeMailer");
 
 class UserService {
-  query = new Query();
-
   // 회원가입 [POST] /api/accounts/signup
   userSignup = async (email, password, confirmPassword, nickname) => {
     const checkEamilDuplicate = await User.findOne({ where: { email: email } });
@@ -99,15 +96,25 @@ class UserService {
 
   //회원 정보 조회 [GET] /api/accounts
   userInfoGet = async (userId) => {
-    const [userData, followings, followers] = await Promise.all([
+    const [userData, [followingCounts], [followerCounts]] = await Promise.all([
       User.findByPk(userId),
-      sequelize.query(this.query.getFollowingCountsQuery, {
-        bind: { userId },
-        type: sequelize.QueryTypes.SELECT,
+      await Follow.findAll({
+        attributes: [
+          [
+            sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+            "followingCounts",
+          ],
+        ],
+        where: { userIdFollower: userId },
       }),
-      sequelize.query(this.query.getFollowerCountsQuery, {
-        bind: { userId },
-        type: sequelize.QueryTypes.SELECT,
+      await Follow.findAll({
+        attributes: [
+          [
+            sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+            "followerCounts",
+          ],
+        ],
+        where: { userIdFollowing: userId },
       }),
     ]);
 
@@ -117,8 +124,8 @@ class UserService {
       nickname: userData.nickname,
       profile: userData.profile,
       mimicCounts: userData.todoCounts + userData.challengeCounts,
-      following: followings[0]?.followingCount ?? 0,
-      follower: followers[0]?.followerCount ?? 0,
+      following: followingCounts.dataValues.followingCounts,
+      follower: followerCounts.dataValues.followerCounts,
     };
   };
 

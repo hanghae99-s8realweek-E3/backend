@@ -276,7 +276,7 @@ class myTodoController {
 
   // 나의 todo 피드 조회 [GET] /api/mytodos
   getMyTodo = async (userId, date) => {
-    const [userInfo, followings, followers] = await Promise.all([
+    const [userInfo, [followingCounts], [followerCounts]] = await Promise.all([
       User.findOne({
         where: { userId },
         include: [
@@ -284,13 +284,23 @@ class myTodoController {
           { model: ChallengedTodo, where: { userId, date }, required: false },
         ],
       }),
-      sequelize.query(this.query.getFollowingCountsQuery, {
-        bind: { userId },
-        type: sequelize.QueryTypes.SELECT,
+      await Follow.findAll({
+        attributes: [
+          [
+            sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+            "followingCounts",
+          ],
+        ],
+        where: { userIdFollower: userId },
       }),
-      sequelize.query(this.query.getFollowerCountsQuery, {
-        bind: { userId },
-        type: sequelize.QueryTypes.SELECT,
+      await Follow.findAll({
+        attributes: [
+          [
+            sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+            "followerCounts",
+          ],
+        ],
+        where: { userIdFollowing: userId },
       }),
     ]);
 
@@ -300,8 +310,8 @@ class myTodoController {
         nickname: userInfo.nickname,
         profile: userInfo.profile,
         mbti: userInfo.mbti,
-        followingCount: followings[0]?.followingCount ?? 0,
-        followerCount: followers[0]?.followerCount ?? 0,
+        followingCount: followingCounts.dataValues.followingCounts,
+        followerCount: followerCounts.dataValues.followerCounts,
       },
       challengedTodo: userInfo?.ChallengedTodos[0] ?? [],
       createdTodo: userInfo?.Todos[0] ?? [],
@@ -311,28 +321,43 @@ class myTodoController {
 
   // 타인의 todo 피드 조회 [GET] /api/mytodos/:userId
   getUserTodo = async (userId, elseUserId) => {
-    const [userInfo, followings, followers, challengedTodos, isFollowed] =
-      await Promise.all([
-        User.findOne({
-          where: { userId: elseUserId },
-          include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
-        }),
-        sequelize.query(this.query.getFollowingCountsQuery, {
-          bind: { userId: elseUserId },
-          type: sequelize.QueryTypes.SELECT,
-        }),
-        sequelize.query(this.query.getFollowerCountsQuery, {
-          bind: { userId: elseUserId },
-          type: sequelize.QueryTypes.SELECT,
-        }),
-        sequelize.query(this.query.getChallengedTodosQuery, {
-          bind: { userId: elseUserId },
-          type: sequelize.QueryTypes.SELECT,
-        }),
-        Follow.findOne({
-          where: { userIdFollower: userId, userIdFollowing: elseUserId },
-        }),
-      ]);
+    const [
+      userInfo,
+      [followingCounts],
+      [followerCounts],
+      challengedTodos,
+      isFollowed,
+    ] = await Promise.all([
+      User.findOne({
+        where: { userId: elseUserId },
+        include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
+      }),
+      await Follow.findAll({
+        attributes: [
+          [
+            sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+            "followingCounts",
+          ],
+        ],
+        where: { userIdFollower: userId },
+      }),
+      await Follow.findAll({
+        attributes: [
+          [
+            sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+            "followerCounts",
+          ],
+        ],
+        where: { userIdFollowing: userId },
+      }),
+      sequelize.query(this.query.getChallengedTodosQuery, {
+        bind: { userId: elseUserId },
+        type: sequelize.QueryTypes.SELECT,
+      }),
+      Follow.findOne({
+        where: { userIdFollower: userId, userIdFollowing: elseUserId },
+      }),
+    ]);
 
     if (!userInfo) {
       throw Boom.badRequest("존재하지 않거나 탈퇴한 회원입니다.");
@@ -345,8 +370,8 @@ class myTodoController {
         profile: userInfo.profile,
         mbti: userInfo.mbti,
         mimicCounts: userInfo.todoCounts + userInfo.challengeCounts,
-        followingCount: followings[0]?.followingCount ?? 0,
-        followerCount: followers[0]?.followerCount ?? 0,
+        followingCount: followingCounts.dataValues.followingCounts,
+        followerCount: followerCounts.dataValues.followerCounts,
         isFollowed: isFollowed ? true : false,
       },
       challengedTodos,
