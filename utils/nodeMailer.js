@@ -1,8 +1,10 @@
 const nodemailer = require("nodemailer");
 const { EmailAuth } = require("../models");
+
 const sendEmail = (email) => {
-  // 6자리의 난수
+  // 최대 6자리의 난수
   const authNumber = Math.floor(Math.random() * 1000000);
+
   // 인증번호 전송
   const configOptions = {
     service: process.env.NODEMAILER_SERVICE,
@@ -10,15 +12,15 @@ const sendEmail = (email) => {
     port: process.env.NODEMAILER_PORT,
     maxConnections: 50,
     auth: {
-      user: process.env.NODEMAILER_USER, // generated ethereal user
-      pass: process.env.NODEMAILER_PASSWORD, // generated ethereal password
+      user: process.env.NODEMAILER_USER,
+      pass: process.env.NODEMAILER_PASSWORD,
     },
   };
   const emailForm = {
     from: process.env.NODEMAILER_USER, // sender address
     to: email, // list of receivers
-    subject: "MIMIC 이메일 인증", // Subject line
-    text: "MIMIC", // plain text body
+    subject: "MIMIC 이메일 인증",
+    text: "MIMIC",
     html: `<h1>[ MIMIC 이메일 인증 안내 ]</h1>
           <h2><sup>당신의 하루, 그리고 나의 하루. MIMIC🎯</sup></h2>
           <p>안녕하세요. MIMIC 이메일 인증을 위한 메일입니다.</p>

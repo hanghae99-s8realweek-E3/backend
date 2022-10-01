@@ -1,48 +1,25 @@
 const { Follow } = require("../models");
 const { User } = require("../models");
 const Boom = require("@hapi/boom");
+const Query = require("../utils/query");
 
 class FollowService {
+  query = new Query();
+
   // 팔로우 목록 조회 [GET] /api/follows/:userId
   followListGet = async (userId) => {
     const checkUserId = await User.findByPk(userId);
     if (!checkUserId) {
       throw Boom.badRequest("존재하지 않는 사용자 입니다.");
     }
-    //======================================
-    //follower:나를 팔로우 하는 사람
-    //follwing:내가 팔로우 하는 사람
-    //팔로우 테이블 불러오기
-    //팔로우 테이블에서 userId 가져오기
-    //팔로우 userId에서 userData 가져오기
-    //userData를 userlist로 바꿔서 보내주기
-    const myFollowerTable = await Follow.findAll({
-      where: { userIdFollowing: userId },
-    });
-    const myFollowerUserId = myFollowerTable.map(
-      (table) => table.userIdFollower
-    );
-    const myFollowerlist = await User.findAll({
-      where: { userId: myFollowerUserId },
-      attributes: ["userId", "nickname", "mbti", "profile"],
+    const myFollowerlist = await sequelize.query(this.query.getFollwerlist, {
+      bind: { userIdFollowing: userId },
+      type: sequelize.QueryTypes.SELECT,
     });
 
-    //=====================================================
-    //내가 팔로잉 하는  테이블 불러오기
-    //팔로잉 테이블에서 userId 가져오기
-    //팔로잉 userId에서 userData 가져오기
-    //userData를 userlist로 바꿔서 보내주기
-
-    const myFollowingTable = await Follow.findAll({
-      where: { userIdFollower: userId },
-    });
-
-    const myFollowingUserId = myFollowingTable.map(
-      (table) => table.userIdFollowing
-    );
-    const myFollowinglist = await User.findAll({
-      where: { userId: myFollowingUserId },
-      attributes: ["userId", "nickname", "mbti", "profile"],
+    const myFollowinglist = await sequelize.query(this.query.getFollwinglist, {
+      bind: { userIdFollower: userId },
+      type: sequelize.QueryTypes.SELECT,
     });
 
     return {
@@ -60,12 +37,6 @@ class FollowService {
     if (userId === elseUserId) {
       throw Boom.badRequest("자기 자신은 팔로우를 하지 못합니다.");
     }
-    //=====================================================
-    //팔로우 관계 동일한것 제작 금지
-    //나의 팔로잉 테이블에 팔로잉 되어있으면
-    //팔로잉 테이블 에서 팔로우 usrerId 삭제
-    //팔로잉 테이블에 팔로잉 안되어있으면
-    //팔로잉 테이블 에서 팔로우 usrerId 추가
     const checkFollow = await Follow.findOne({
       where: { userIdFollowing: elseUserId, userIdFollower: userId },
     });

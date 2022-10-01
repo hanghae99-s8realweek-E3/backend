@@ -84,7 +84,7 @@ class UserController {
     const { password, newPassword, confirmPassword, nickname, mbti } =
       await this.joi.changeUserInfoSchema.validateAsync(req.body);
 
-    const data = await this.userService.userInfoChange(
+    const token = await this.userService.userInfoChange(
       userId,
       password,
       newPassword,
@@ -93,7 +93,7 @@ class UserController {
       mbti
     );
 
-    res.status(200).json({ message: "success", token: data });
+    res.status(200).json({ message: "success", token });
   };
 
   // 프로필 사진 변경 [PUT] /api/accounts/profile
@@ -105,9 +105,9 @@ class UserController {
       "/resizingMimic/"
     );
 
-    const data = await this.userService.userProfileChange(userId, profile);
+    const token = await this.userService.userProfileChange(userId, profile);
 
-    res.status(200).json({ message: "success", token: data });
+    res.status(200).json({ message: "success", token });
   };
 
   // 회원탈퇴 [DELETE] /api/accounts
