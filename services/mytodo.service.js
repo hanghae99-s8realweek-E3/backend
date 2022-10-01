@@ -364,7 +364,7 @@ class MyTodoController {
             "followingCounts",
           ],
         ],
-        where: { userIdFollower: userId },
+        where: { userIdFollower: elseUserId },
       }),
       await Follow.findAll({
         attributes: [
@@ -373,7 +373,7 @@ class MyTodoController {
             "followerCounts",
           ],
         ],
-        where: { userIdFollowing: userId },
+        where: { userIdFollowing: elseUserId },
       }),
       sequelize.query(this.query.getChallengedTodosQuery, {
         bind: { userId: elseUserId },
