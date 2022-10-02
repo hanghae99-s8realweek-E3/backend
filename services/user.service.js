@@ -98,7 +98,7 @@ class UserService {
   userInfoGet = async (userId) => {
     const [userData, [followingCounts], [followerCounts]] = await Promise.all([
       User.findByPk(userId),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollower")),
@@ -107,7 +107,7 @@ class UserService {
         ],
         where: { userIdFollower: userId },
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollowing")),

@@ -13,9 +13,8 @@ class MyTodoController {
     const todayDate = calculateToday();
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
 
-
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    
+
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
@@ -301,7 +300,7 @@ class MyTodoController {
           { model: ChallengedTodo, where: { userId, date }, required: false },
         ],
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollower")),
@@ -310,7 +309,7 @@ class MyTodoController {
         ],
         where: { userIdFollower: userId },
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
@@ -349,7 +348,7 @@ class MyTodoController {
         where: { userId: elseUserId },
         include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollower")),
@@ -358,7 +357,7 @@ class MyTodoController {
         ],
         where: { userIdFollower: elseUserId },
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
