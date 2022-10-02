@@ -31,7 +31,7 @@ class Joi {
   // 이메일 인증 번호 확인 유효성 검사
   emailAuthCheckSchema = joi.object({
     email: joi.string().pattern(emailRegex).required(),
-    emailAuthNumber: joi.number().min(1).max(6).required(),
+    emailAuthNumber: joi.number().max(1000000).required(),
   });
 
   // 회원 정보 변경 유효성 검사
