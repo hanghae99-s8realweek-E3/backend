@@ -202,7 +202,7 @@ class MyTodoController {
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
     const todayDate = calculateToday();
     const userData = await User.findOne({ where: { userId } });
-    console.log(userData);
+
     if (!userData) {
       throw Boom.badRequest("사용자 정보가 없습니다.");
     }
@@ -216,8 +216,6 @@ class MyTodoController {
       },
     });
 
-
-    console.log(checkTodoData);
     if (checkTodoData) {
       throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
     }
@@ -265,9 +263,6 @@ class MyTodoController {
     if (!todoData) {
       throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
-
-
-    console.log(todoData);
 
     await sequelize.transaction(
       { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
