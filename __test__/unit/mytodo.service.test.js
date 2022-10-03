@@ -1,4 +1,10 @@
-const { ChallengedTodo, Todo, sequelize } = require("../../models");
+const {
+  User,
+  Follow,
+  ChallengedTodo,
+  Todo,
+  sequelize,
+} = require("../../models");
 
 const userData = require("../data/userData.json");
 const MyTodoController = require("../../services/mytodo.service");
@@ -6,7 +12,9 @@ const MyTodoController = require("../../services/mytodo.service");
 const myTodoController = new MyTodoController();
 
 Todo.findOne = jest.fn();
-
+User.findOne = jest.fn();
+Follow.findAll = jest.fn();
+Follow.findOne = jest.fn();
 ChallengedTodo.findOne = jest.fn();
 sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
@@ -66,5 +74,31 @@ describe("challengedTodoCreate", () => {
     ChallengedTodo.findOne.mockReturnValue();
     await myTodoController.challengedTodoCreate(todoId, userId);
     expect(sequelize.transaction).toBeCalled();
+  });
+});
+
+describe("나의 todo 피드 조회 API 테스트", () => {
+  it("유저 정보가 존재하면 true를 반환한다", async () => {
+    const userId = 1;
+    const date = "2022-10-01";
+    await expect(async () => {
+      User.findOne.mockReturnValue({});
+      Follow.findAll.mockReturnValue({});
+      await myTodoController.getMyTodo(userId, date);
+    }).toBeTruthy();
+  });
+});
+
+describe("타인의 todo 피드 조회 API 테스트", () => {
+  it("유저 정보가 존재하면 true를 반환한다", async () => {
+    const userId = 1;
+    const elseUserId = 2;
+    await expect(async () => {
+      User.findOne.mockReturnValue({});
+      Follow.findAll.mockReturnValue({});
+      Follow.findOne.mockReturnValue({});
+      sequelize.query.mockReturnValue({});
+      await myTodoController.getUserTodo(userId, elseUserId);
+    }).toBeTruthy();
   });
 });
