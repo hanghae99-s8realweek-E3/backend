@@ -1,11 +1,8 @@
 const { Comment, Todo, sequelize } = require("../models");
 const { Transaction } = require("sequelize");
 const Boom = require("@hapi/boom");
-const Query = require("../utils/query");
 
 class CommentService {
-  query = new Query();
-
   // 댓글 작성 [POST] /api/comments/:todoId
   createComment = async (userId, todoId, comment) => {
     const getTodo = await Todo.findOne({ where: { todoId } });
