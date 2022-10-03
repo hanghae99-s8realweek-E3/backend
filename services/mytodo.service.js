@@ -216,6 +216,8 @@ class MyTodoController {
       },
     });
 
+
+    console.log(checkTodoData);
     if (checkTodoData) {
       throw Boom.badRequest("오늘의 todo 작성을 이미 하셨습니다.");
     }
@@ -263,6 +265,9 @@ class MyTodoController {
     if (!todoData) {
       throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
+
+
+    console.log(todoData);
 
     await sequelize.transaction(
       { isolationLevel: Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED },
