@@ -247,6 +247,43 @@ Ngnix Rate Limiting 무차별 요청방지
 
 ######
 
+## 3️⃣ 이미지 리사이징(multer,S3, Lamda)
+
+######
+
+`도입과정`
+
+사진 용량이 커짐에 따라 네트워크 통신에 부하를 줄 수 있다고 판단
+
+`1)해결과정` 
+
+업로드 할 수있는 사진용량제한 (사이즈 1024x1024 & 5MB)
+
+`문제` 
+
+대부분의 사진 용량제한 넘어 버려 업로드❌
+
+용량제한 완화 시 브라우저 로딩속도 ⬇️
+
+2)해결과정
+
+이미지 용량제한 + 리사이징 작업시  CPU 메모리 차지  문제해결
+
+적용사항:AWS S3+Lambda(sharp)
+
+`결과`
+
+**전/후 비교**
+
+- 리사이징 전 (총 크기 : 15.7MB)
+![Untitled](https://user-images.githubusercontent.com/96816022/193822994-7a3a98d1-9c6f-4915-9459-915d49db2c5c.png)
+
+- 리사이징 후 (총 크기 : 323.4KB)
+![Untitled](https://user-images.githubusercontent.com/96816022/193822998-fb80a7bf-fc9d-4528-be37-72ca88168d84.png)
+
+######
+
+
 ##
 ## **📈 Git Strategy**
     - Main: 최종 배포를 담당하는 브랜치
