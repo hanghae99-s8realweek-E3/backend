@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 
 const socialLoginController = require("../controllers/socialLogin.controller");
-const { wrapAsyncController } = require("../middlewares/error_handler");
+const { wrapAsyncController } = require("../middlewares/errorHandler");
 
 // passport-kakao Login [GET] /api/accounts/kakao
 router.get("/kakao", passport.authenticate("kakao"));

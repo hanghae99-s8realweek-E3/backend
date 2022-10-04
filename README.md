@@ -6,14 +6,16 @@
 [1. 프로젝트 소개](#프로젝트-소개)  
 [2. 프로젝트 기간](#프로젝트-기간)  
 [3. 서비스 링크](#서비스-링크)  
-[4. 백엔드 팀원 소개](#백엔드-팀원-소개)  
-[5. 기술 스택](#기술-스택)  
-[6. 라이브러리](#라이브러리)  
-[7. 파일 구조](#파일-구조)  
-[8. DB ERD](#db-erd)  
-[9. Git Strategy](#git-strategy)  
-[10. Commit Rule](#commit-rule)  
+[4. 백엔드 팀원 소개](#백엔드-팀원-소개)   
+[5. 서비스 아키텍쳐](#️-서비스-아키텍쳐)  
+[6. 기술 스택](#기술-스택)  
+[7. 라이브러리](#라이브러리)  
+[8. 파일 구조](#파일-구조)  
+[9. DB ERD](#db-erd)  
+[10. Git Strategy](#git-strategy)  
+[11. Commit Rule](#commit-rule)  
 
+##
 ## **📖 프로젝트 소개**
 
 > 미믹(MIMIC)이란, ‘흉내쟁이’ 또는 ‘따라쟁이’라는 의미를 가진 단어입니다.
@@ -21,23 +23,34 @@
 > 
 > 요즘 뜨는 MBTI에서 영감을 얻어서 나와 다른 성향을 가진 사람들의 일상을 살아보면 어떨까? 또, 나의 일상이 다른 사람들의 일상이 된다면 어떨까? 라는 취지로 제작된, 타인과 나의 일상을 체험해보도록 하는 조금 특이한 SNS입니다.
 > 
+##
+## **🗓 프로젝트 운영 기간**
 
-## **🗓 프로젝트 기간**
+- 개발 기간: 2022년 8월 26일 ~ 2022년 10월 7일
+- 운영 기간: 2022년 9월 27일 ~ 2022년 10월 7일
+- 런칭: 2022년 9월 27일 (Ver.1.0.0)
+- 추가 업데이트: 2022년 10월 3일 (Ver.1.1.0)
 
-- 2022년 8월 26일 ~ 2022년 10월 07일 (6주)
-
+##
 ## 🔗 서비스 링크
 
 [MIMIC 사이트 바로가기](https://www.todaysmimic.today/)
 
+##
 ## **👥 백엔드 팀원 소개**
 
 👨🏻‍💻 [부리더 - ISTP] 장지유: [https://github.com/jangjiyu](https://github.com/jangjiyu)
 
 👨🏻‍💻 [테크리더 -ESTJ] 서우혁: [https://github.com/WHS95](https://github.com/WHS95)
+  
+##
+## **⛑️ 서비스 아키텍쳐**
 
+![아키텍쳐](https://user-images.githubusercontent.com/102751923/193623858-f22ca9cd-9da4-4777-8599-0f4d3a8db797.jpg)
+
+
+##
 ## **💿 기술 스택**
-
 기술스택 | 설명
 ---|:---:
 ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) | 자바스크립트 런타임
@@ -51,6 +64,7 @@
 ![S3](https://img.shields.io/badge/S3-569A31?style=for-the-badge&logo=AmazonS3&logoColor=white) | AWS S3 - 이미지 파일 저장
 ![Lambda](https://img.shields.io/badge/Lambda-FF9900?style=for-the-badge&logo=AWSLambda&logoColor=white) | AWS Lambda - 이미지 리사이징
 
+##
 ## **📖 라이브러리**
 
 | 라이브러리 | 설명 |
@@ -77,10 +91,19 @@
 ![multer-s3](https://img.shields.io/badge/multer_s3-2.10.0-9E9E9E?style=flat&logoColor=white) | AWS S3 파일 업로드 |
 ![redis](https://img.shields.io/badge/redis-4.3.1-9E9E9E?style=flat&logoColor=white) | 방문자IP 카운터 |
 
+##
 ## **📂 파일 구조**
 
 ```
 📦src
+ ┣ 📂__test__
+ ┃ ┣ 📂data
+ ┃ ┃  ┗ 📜userData.json
+ ┃ ┣ 📂unit 
+ ┃ ┃  ┣ 📜comment.service.test.js
+ ┃ ┃  ┣ mytodo.service.test.js
+ ┃ ┃  ┣ todolist.service.test.js
+ ┃ ┃  ┗ user.service.test.js
  ┣ 📂config
  ┃ ┗ 📜config.js
  ┣ 📂controllers
@@ -91,13 +114,12 @@
  ┃ ┣ 📜todolist.controller.js
  ┃ ┗ 📜user.controller.js
  ┣ 📂middlewares
- ┃ ┣ 📜auth_middlewares.js
- ┃ ┣ 📜error_handler.js
+ ┃ ┣ 📜authMiddlewares.js
+ ┃ ┣ 📜errorHandler.js
  ┃ ┣ 📜multer.js
- ┃ ┣ 📜nonUser_middlewares.js
- ┃ ┗ 📜vistorCount_middleware.js
+ ┃ ┣ 📜nonUserMiddlewares.js
+ ┃ ┗ 📜vistorCountMiddleware.js
  ┣ 📂migrations
- ┃ ┣ 📜20220919155705-backup.js
  ┃ ┗ 📜20220926144114-level.js
  ┣ 📂models
  ┃ ┣ 📜challengedTodo.js
@@ -129,8 +151,11 @@
  ┃ ┣ 📜todolist.service.js
  ┃ ┗ 📜user.service.js
  ┣ 📂utils
+ ┃ ┣ 📜createToken.js
  ┃ ┣ 📜date.js
  ┃ ┣ 📜joi.js
+ ┃ ┣ 📜logger.js
+ ┃ ┣ 📜nodeMailer.js
  ┃ ┣ 📜query.js
  ┃ ┣ 📜redisconnect.js
  ┃ ┗ 📜setSchedule.js
@@ -139,22 +164,21 @@
  ┣ 📜README.md
  ┣ 📜api_test.http
  ┣ 📜app.js
- ┣ 📜combined.log
- ┣ 📜error.log
- ┣ 📜logger.js
  ┣ 📜package-lock.json
  ┗ 📜package.json
 ```
-
+##
 ## 📂 ****DB ERD****
 
 ![Untitled](https://user-images.githubusercontent.com/102751923/192713435-1a6fedef-550f-472c-af89-b7b3a0a7b035.png)
 
+##
 ## **📈 Git Strategy**
     - Main: 최종 배포를 담당하는 브랜치
     - Develop: 개발된 내용들을 통합하는, 개발 중심점인 브랜치
     - Features_기능: 각자 담당한 기능들을 구현하고 관리하기 위한 브랜치
 
+##
 ## **✍ Commit Rule**
 
 - 사용 키워드
@@ -168,4 +192,7 @@
     - Rename: 파일의 이름을 변경 시 작성
     - Test: 파일의 테스트 코드 작성
 ######
-- 예시) git commit -m “Fix (join.jsx : 유효성 검사 수정, login.jsx : 버튼 색상 수정), Add (main.jsx), Use(gravatar: 유저 프로필 이미지 라이브러리 - mypage.jsx), Delete (404found.jsx)”
+  
+##
+#### **💻 프론트엔드 깃헙 레포지토리**
+MIMIC 프론트엔드 깃헙 [바로가기](https://github.com/hanghae99-s8realweek-E3/frontend)

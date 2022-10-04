@@ -13,9 +13,8 @@ class MyTodoController {
     const todayDate = calculateToday();
     //todoId가 Todos테이블에 존재하는건지 유효성 체크
 
-
     const todoData = await Todo.findOne({ where: { todoId: todoId } });
-    
+
     if (!todoData) {
       throw Boom.badRequest("존재하지 않는 todo 입니다.");
     }
@@ -80,9 +79,9 @@ class MyTodoController {
   // 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
   challengedTodoDelete = async (challengedTodoId, userId) => {
     const userChallengedTodoData = await ChallengedTodo.findOne({
-      where: { challengedTodoId: challengedTodoId },
+      where: { challengedTodoId },
     });
-    if (userChallengedTodoData === null) {
+    if (!userChallengedTodoData) {
       throw Boom.badRequest("삭제되었거나 존재하지 않는 todo 입니다.");
     }
 
@@ -202,6 +201,7 @@ class MyTodoController {
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
     const todayDate = calculateToday();
     const userData = await User.findOne({ where: { userId } });
+
     if (!userData) {
       throw Boom.badRequest("사용자 정보가 없습니다.");
     }
@@ -259,7 +259,7 @@ class MyTodoController {
       where: { todoId, userId },
     });
 
-    if (todoData === null) {
+    if (!todoData) {
       throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
 
@@ -301,7 +301,7 @@ class MyTodoController {
           { model: ChallengedTodo, where: { userId, date }, required: false },
         ],
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollower")),
@@ -310,7 +310,7 @@ class MyTodoController {
         ],
         where: { userIdFollower: userId },
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
@@ -320,6 +320,32 @@ class MyTodoController {
         where: { userIdFollowing: userId },
       }),
     ]);
+
+    // const userInfo = await User.findOne({
+    //   where: { userId },
+    //   include: [
+    //     { model: Todo, where: { userId, date }, required: false },
+    //     { model: ChallengedTodo, where: { userId, date }, required: false },
+    //   ],
+    // });
+    // const [followingCounts] = await Follow.findAll({
+    //   attributes: [
+    //     [
+    //       sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+    //       "followingCounts",
+    //     ],
+    //   ],
+    //   where: { userIdFollower: userId },
+    // });
+    // const [followerCounts] = await Follow.findAll({
+    //   attributes: [
+    //     [
+    //       sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+    //       "followerCounts",
+    //     ],
+    //   ],
+    //   where: { userIdFollowing: userId },
+    // });
 
     return {
       userInfo: {
@@ -349,7 +375,7 @@ class MyTodoController {
         where: { userId: elseUserId },
         include: [{ model: Todo, order: [["createdAt", "DESC"]], limit: 20 }],
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollower")),
@@ -358,7 +384,7 @@ class MyTodoController {
         ],
         where: { userIdFollower: elseUserId },
       }),
-      await Follow.findAll({
+      Follow.findAll({
         attributes: [
           [
             sequelize.fn("COUNT", sequelize.col("userIdFollowing")),

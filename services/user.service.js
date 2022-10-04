@@ -96,27 +96,27 @@ class UserService {
 
   //회원 정보 조회 [GET] /api/accounts
   userInfoGet = async (userId) => {
-    const [userData, [followingCounts], [followerCounts]] = await Promise.all([
-      User.findByPk(userId),
-      await Follow.findAll({
-        attributes: [
-          [
-            sequelize.fn("COUNT", sequelize.col("userIdFollower")),
-            "followingCounts",
-          ],
+    const userData = await User.findByPk(userId);
+
+    const [followingCounts] = await Follow.findAll({
+      attributes: [
+        [
+          sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+          "followingCounts",
         ],
-        where: { userIdFollower: userId },
-      }),
-      await Follow.findAll({
-        attributes: [
-          [
-            sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
-            "followerCounts",
-          ],
+      ],
+      where: { userIdFollower: userId },
+    });
+
+    const [followerCounts] = await Follow.findAll({
+      attributes: [
+        [
+          sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+          "followerCounts",
         ],
-        where: { userIdFollowing: userId },
-      }),
-    ]);
+      ],
+      where: { userIdFollowing: userId },
+    });
 
     return {
       userId: userData.userId,

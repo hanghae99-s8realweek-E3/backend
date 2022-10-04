@@ -3,8 +3,8 @@ const router = express.Router();
 
 const MyTodoController = require("../controllers/mytodo.controller");
 const myTodoController = new MyTodoController();
-const { wrapAsyncController } = require("../middlewares/error_handler");
-const authMiddleware = require("../middlewares/auth_middlewares");
+const { wrapAsyncController } = require("../middlewares/errorHandler");
+const authMiddleware = require("../middlewares/authMiddlewares");
 
 // 나의 todo 피드 조회 [GET] /api/mytodos?date=
 router.get("/", authMiddleware, wrapAsyncController(myTodoController.getMyTodo));

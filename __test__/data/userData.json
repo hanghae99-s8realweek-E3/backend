@@ -1,4 +1,6 @@
 {
     "todoId" : 1,
-    "userId" : 1
+    "userId" : 1,
+    "challengedTodoId": 1,
+    "date": "2022-10-02"
 }

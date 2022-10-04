@@ -4,8 +4,8 @@ const multer = require("../middlewares/multer");
 
 const UserController = require("../controllers/user.controller");
 const userController = new UserController();
-const { wrapAsyncController } = require("../middlewares/error_handler");
-const authMiddleware = require("../middlewares/auth_middlewares");
+const { wrapAsyncController } = require("../middlewares/errorHandler");
+const authMiddleware = require("../middlewares/authMiddlewares");
 
 // 로컬 회원가입 [POST] /api/accounts/signup
 router.post("/signup", wrapAsyncController(userController.signup)); //로컬 회원가입
