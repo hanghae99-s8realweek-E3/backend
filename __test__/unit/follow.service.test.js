@@ -7,19 +7,17 @@ const FollowService = new followService();
 User.findByPk = jest.fn();
 sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
-ChallengedTodo.create = jest.fn();
-User.findOne = jest.fn();
 
-describe("challengedTodoCreate", () => {
+describe("followListGet", () => {
   beforeEach(() => {
     userId = userData.userId;
   });
 
-  it("challengedTodoCreate function이 존재하는가?", () => {
+  it("followListGet function이 존재하는가?", () => {
     expect(typeof FollowService.followListGet).toBe("function");
   });
 
-  it("사용자 정보가 없다면", async () => {
+  it("팔로우 목록 조회하려는 사용자의 정보가 없다면", async () => {
     await expect(async () => {
       User.findByPk.mockReturnValue();
       await FollowService.followListGet(userId);
@@ -27,3 +25,4 @@ describe("challengedTodoCreate", () => {
   });
 
 });
+

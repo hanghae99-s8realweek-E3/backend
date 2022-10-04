@@ -3,8 +3,6 @@ const { Todo, Comment, sequelize } = require("../../models");
 const CommentService = require("../../services/comment.service");
 const commentService = new CommentService();
 
-const todoModel = jest.mock("../../models/todo");
-
 Todo.findOne = jest.fn();
 sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
@@ -58,7 +56,6 @@ describe("댓글 작성 API 테스트", () => {
       })
     );
     await commentService.createComment(userId, todoId, comment);
-
     expect(sequelize.transaction).toBeCalled();
   });
 });

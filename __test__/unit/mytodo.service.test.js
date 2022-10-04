@@ -1,4 +1,10 @@
-const { ChallengedTodo, Todo, sequelize, User } = require("../../models");
+const {
+  Follow,
+  ChallengedTodo,
+  Todo,
+  sequelize,
+  User,
+} = require("../../models");
 const userData = require("../data/userData.json");
 const MyTodoController = require("../../services/mytodo.service");
 const myTodoController = new MyTodoController();
@@ -13,6 +19,7 @@ sequelize.transaction = jest.fn();
 sequelize.query = jest.fn();
 ChallengedTodo.create = jest.fn();
 User.findOne = jest.fn();
+Follow.findAll = jest.fn();
 
 describe("challengedTodoCreate", () => {
   beforeEach(() => {
@@ -197,16 +204,14 @@ describe("getMyTodo", () => {
     expect(typeof myTodoController.getMyTodo).toBe("function");
   });
 
-  it("나의 todo 피드 조회 API 테스트", () => {
-    it("유저 정보가 존재하면 true를 반환한다", async () => {
-      const userId = 1;
-      const date = "2022-10-01";
-      await expect(async () => {
-        User.findOne.mockReturnValue({});
-        Follow.findAll.mockReturnValue({});
-        await myTodoController.getMyTodo(userId, date);
-      }).toBeTruthy();
-    });
+  it("유저 정보가 존재하면 true를 반환한다", async () => {
+    const userId = 1;
+    const date = "2022-10-01";
+    await expect(async () => {
+      User.findOne.mockReturnValue({});
+      Follow.findAll.mockReturnValue({});
+      await myTodoController.getMyTodo(userId, date);
+    }).toBeTruthy();
   });
 });
 
@@ -214,17 +219,15 @@ describe("getUserTodo", () => {
   it("todoCreate function이 존재하는가?", () => {
     expect(typeof myTodoController.getMyTodo).toBe("function");
   });
-  it("타인의 todo 피드 조회 API 테스트", () => {
-    it("유저 정보가 존재하면 true를 반환한다", async () => {
-      const userId = 1;
-      const elseUserId = 2;
-      await expect(async () => {
-        User.findOne.mockReturnValue({});
-        Follow.findAll.mockReturnValue({});
-        Follow.findOne.mockReturnValue({});
-        sequelize.query.mockReturnValue({});
-        await myTodoController.getUserTodo(userId, elseUserId);
-      }).toBeTruthy();
-    });
+  it("유저 정보가 존재하면 true를 반환한다", async () => {
+    const userId = 1;
+    const elseUserId = 2;
+    await expect(async () => {
+      User.findOne.mockReturnValue({});
+      Follow.findAll.mockReturnValue({});
+      Follow.findOne.mockReturnValue({});
+      sequelize.query.mockReturnValue({});
+      await myTodoController.getUserTodo(userId, elseUserId);
+    }).toBeTruthy();
   });
 });

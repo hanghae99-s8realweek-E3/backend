@@ -32,7 +32,6 @@ class TodoListService {
       const todos = await Todo.findAll({
         order: [["createdAt", "DESC"]],
       });
-
       return result(todos, myChallengedTodos);
     }
 
@@ -130,6 +129,23 @@ class TodoListService {
           where: { userIdFollower: userId, userIdFollowing: todo.userId },
         }),
       ]);
+    // const [todoInfo] = await sequelize.query(this.query.getTodoQuery, {
+    //   bind: { todoId },
+    //   type: QueryTypes.SELECT,
+    // });
+    // const comments = await sequelize.query(this.query.getCommentsQuery, {
+    //   bind: { todoId },
+    //   type: QueryTypes.SELECT,
+    // });
+    // const todaysChallenge = await ChallengedTodo.findOne({
+    //   where: {
+    //     userId,
+    //     date: today,
+    //   },
+    // });
+    // const isFollowed = await Follow.findOne({
+    //   where: { userIdFollower: userId, userIdFollowing: todo.userId },
+    // });
 
     return {
       todoInfo,

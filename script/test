@@ -1,2 +1,2 @@
 #!/bin/sh
-npm jest 
+    npx jest --detectOpenHandles --forceExit

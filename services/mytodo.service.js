@@ -321,6 +321,32 @@ class MyTodoController {
       }),
     ]);
 
+    // const userInfo = await User.findOne({
+    //   where: { userId },
+    //   include: [
+    //     { model: Todo, where: { userId, date }, required: false },
+    //     { model: ChallengedTodo, where: { userId, date }, required: false },
+    //   ],
+    // });
+    // const [followingCounts] = await Follow.findAll({
+    //   attributes: [
+    //     [
+    //       sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+    //       "followingCounts",
+    //     ],
+    //   ],
+    //   where: { userIdFollower: userId },
+    // });
+    // const [followerCounts] = await Follow.findAll({
+    //   attributes: [
+    //     [
+    //       sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+    //       "followerCounts",
+    //     ],
+    //   ],
+    //   where: { userIdFollowing: userId },
+    // });
+
     return {
       userInfo: {
         userId: userInfo.userId,
