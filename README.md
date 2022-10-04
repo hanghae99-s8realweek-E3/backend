@@ -12,7 +12,7 @@
 [7. 라이브러리](#라이브러리)  
 [8. 파일 구조](#파일-구조)  
 [9. DB ERD](#db-erd)   
-[10. 트러블슈팅](#트러블-슈팅)  
+[10. 트러블슈팅](#트러블-슈팅)   
 [11. Git Strategy](#git-strategy)   
 [12. Commit Rule](#commit-rule)  
 
@@ -173,7 +173,8 @@
 
 ![Untitled](https://user-images.githubusercontent.com/102751923/192713435-1a6fedef-550f-472c-af89-b7b3a0a7b035.png)
 
-## **⚡️트러블 슈팅**
+## **트러블 슈팅**
+## ⚡️트러블슈팅
 
 ## 1️⃣ 비동기 처리(Promise-All)
 
