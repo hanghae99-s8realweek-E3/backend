@@ -172,7 +172,8 @@
 
 ![Untitled](https://user-images.githubusercontent.com/102751923/192713435-1a6fedef-550f-472c-af89-b7b3a0a7b035.png)
 
-## ⚡️ ****트러블 슈팅 ****
+## **⚡️ 트러블 슈팅**
+
 ## 1️⃣ 비동기 처리(Promise-All)
 
 `도입이유`
@@ -201,6 +202,49 @@ promise.All을 사용하여 비동기 함수를 병렬처리를 함으로써 효
 
     ![Untitled](https://user-images.githubusercontent.com/96816022/193802903-734819d0-5e58-41c9-93ae-728e99af0e07.png)
     
+######
+
+## 2️⃣  서버 부하 개선 (Nginx)
+
+
+######
+
+`문제` 
+
+하나의 EC2 안에서 로드밸런싱 처리
+결과:서버가 받는 요청의 총량이 줄어드는 것은 아니었다는 것을 확인.
+(서버부하 테스트 에러 발생)
+
+`해결` 
+
+nginx 서버를 프록시 서버로 활용하여 로드 밸런싱 구현
+node.js 서버에 분산 처리하도록 설계
+
+`결과`
+
+node 서버 에러 발생 해결
+
+
+`추가 개선사항` 
+
+
+직접적인 서버의 존재를 숨 김으로서 보안적 측면 개선 
+
+Ngnix Rate Limiting 무차별 요청방지
+
+`결과`
+
+**적용 전 :** 서버연결 요청에러 발생 
+
+![Untitled](https://user-images.githubusercontent.com/96816022/193804881-856667bf-2b70-49a6-a1a6-8e646813dd97.png)
+
+![Untitled](https://user-images.githubusercontent.com/96816022/193804877-5e871f20-1fdf-430f-ad9e-fdb1cfa3594c.png)
+
+**적용 후 :** 서버연결 요청에러 발생없어짐
+
+![Untitled](https://user-images.githubusercontent.com/96816022/193804882-c8e96999-1fe1-4b03-90e6-944ef950dae0.png)
+
+
 ######
 
 ##
