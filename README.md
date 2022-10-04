@@ -172,6 +172,37 @@
 
 ![Untitled](https://user-images.githubusercontent.com/102751923/192713435-1a6fedef-550f-472c-af89-b7b3a0a7b035.png)
 
+## ⚡️ ****트러블 슈팅 ****
+## 1️⃣ 비동기 처리(Promise-All)
+
+`도입이유`
+
+API 요청 처리 하기 위해서 요청되는 비동기 함수들이 많아 비 효율적이라 판단
+
+`문제`
+
+![Untitled](https://user-images.githubusercontent.com/96816022/193802866-1c09fdde-6bda-48d5-b2a2-6996029b024e.png)
+
+연속적인 비동기 처리 시,  async-await 함수를 하나하나씩 기다리다보니 소요 시간이 오래 걸렸습니다.
+
+`해결방안`
+
+![Untitled](https://user-images.githubusercontent.com/96816022/193802868-7116c51b-23c4-40c8-999d-a2d380bb9bbc.png)
+
+promise.All을 사용하여 비동기 함수를 병렬처리를 함으로써 효율화 시켰습니다.
+
+`결과`
+
+- async-await 평균응답속도: 50.6ms
+    
+    ![Untitled](https://user-images.githubusercontent.com/96816022/193802899-d83f120f-8f47-4d9b-842a-0b221dce7295.png)
+    
+- promise.All 평균응답속도: 23.6ms
+
+    ![Untitled](https://user-images.githubusercontent.com/96816022/193802903-734819d0-5e58-41c9-93ae-728e99af0e07.png)
+    
+######
+
 ##
 ## **📈 Git Strategy**
     - Main: 최종 배포를 담당하는 브랜치
