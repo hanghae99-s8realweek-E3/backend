@@ -7,7 +7,7 @@ const cors = require("cors");
 const indexRouter = require("./routes");
 const kakaoPassport = require("./passport/index");
 const { sequelize } = require("./models");
-const { routerError, errorHandler } = require("./middlewares/error_handler");
+const { routerError, errorHandler } = require("./middlewares/errorHandler");
 const {
   emailAuthTableSchedule,
   visitorCountSchedule,

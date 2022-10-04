@@ -3,8 +3,8 @@ const router = express.Router();
 
 const FollowController = require("../controllers/follow.controller");
 const followController = new FollowController();
-const { wrapAsyncController } = require("../middlewares/error_handler");
-const authMiddleware = require("../middlewares/auth_middlewares");
+const { wrapAsyncController } = require("../middlewares/errorHandler");
+const authMiddleware = require("../middlewares/authMiddlewares");
 
 // 팔로우 목록 조회 [GET] /api/follows/:userId
 router.get(

@@ -4,10 +4,10 @@ const router = express.Router();
 const TodoListController = require("../controllers/todolist.controller");
 const todoListController = new TodoListController();
 
-const authMiddleware = require("../middlewares/auth_middlewares");
-const nonUserMiddleware = require("../middlewares/nonUser_middlewares");
-const vistorCountMiddleware = require("../middlewares/vistorCount_middleware");
-const { wrapAsyncController } = require("../middlewares/error_handler");
+const authMiddleware = require("../middlewares/authMiddlewares");
+const nonUserMiddleware = require("../middlewares/nonUserMiddlewares");
+const vistorCountMiddleware = require("../middlewares/vistorCountMiddleware");
+const { wrapAsyncController } = require("../middlewares/errorHandler");
 
 // mbti 알고리즘 [GET] /api/todolists/mbti
 router.get(
