@@ -1,9 +1,6 @@
 const { Todo, Mbti } = require("../../models");
-
 const TodolistService = require("../../services/todolist.service");
 const todolistService = new TodolistService();
-
-const todoModel = jest.mock("../../models/todo");
 
 Todo.findByPk = jest.fn();
 Mbti.findOne = jest.fn();
