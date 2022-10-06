@@ -7,14 +7,15 @@
 [2. 프로젝트 기간](#프로젝트-기간)  
 [3. 서비스 링크](#서비스-링크)  
 [4. 백엔드 팀원 소개](#백엔드-팀원-소개)   
-[5. 서비스 아키텍쳐](#️-서비스-아키텍쳐)  
+[5. 서비스 아키텍쳐](#️서비스-아키텍쳐)  
 [6. 기술 스택](#기술-스택)  
-[7. 라이브러리](#라이브러리)  
-[8. 파일 구조](#파일-구조)  
-[9. DB ERD](#db-erd)   
-[10. 트러블슈팅](#트러블-슈팅)   
-[11. Git Strategy](#git-strategy)   
-[12. Commit Rule](#commit-rule)  
+[7. 기술 스택 사용이유](#기술-스택-사용이유)  
+[8. 라이브러리](#라이브러리)  
+[9. 파일 구조](#파일-구조)  
+[10. DB ERD](#db-erd)  
+[11. 트러블 슈팅](#트러블-슈팅)  
+[12. Git Strategy](#git-strategy)  
+[13. Commit Rule](#commit-rule)  
 
 ##
 ## **📖 프로젝트 소개**
@@ -25,7 +26,7 @@
 > 요즘 뜨는 MBTI에서 영감을 얻어서 나와 다른 성향을 가진 사람들의 일상을 살아보면 어떨까? 또, 나의 일상이 다른 사람들의 일상이 된다면 어떨까? 라는 취지로 제작된, 타인과 나의 일상을 체험해보도록 하는 조금 특이한 SNS입니다.
 > 
 ##
-## **🗓 프로젝트 운영 기간**
+## **🗓 프로젝트 기간**
 
 - 개발 기간: 2022년 8월 26일 ~ 2022년 10월 7일
 - 운영 기간: 2022년 9월 27일 ~ 2022년 10월 7일
@@ -45,13 +46,15 @@
 👨🏻‍💻 [테크리더 -ESTJ] 서우혁: [https://github.com/WHS95](https://github.com/WHS95)
   
 ##
-## **⛑️ 서비스 아키텍쳐**
+## ⛑️서비스 아키텍쳐
 
 <img width="810" alt="서비스 아키텍쳐" src="https://user-images.githubusercontent.com/102751923/194042532-14058e00-ad05-4259-80d7-6b4f6fb0c0de.png">
 
 
 ##
-## **💿 기술 스택**
+## **💿기술 스택**
+
+
 기술스택 | 설명
 ---|:---:
 ![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white) | 자바스크립트 런타임
@@ -66,7 +69,11 @@
 ![Lambda](https://img.shields.io/badge/Lambda-FF9900?style=for-the-badge&logo=AWSLambda&logoColor=white) | AWS Lambda - 이미지 리사이징
 
 ##
-## **📖 라이브러리**
+## **❓기술 스택 사용이유**
+[기술 스택 사용이유](https://www.notion.so/121310790ef948a1b6bd6a48e398b9f9)   
+
+##
+## **📖라이브러리**
 
 | 라이브러리 | 설명 |
 | --- | --- |
@@ -169,10 +176,11 @@
  ┗ 📜package.json
 ```
 ##
-## 📂 ****DB ERD****
+## 📂DB ERD
 
 ![Untitled](https://user-images.githubusercontent.com/102751923/192713435-1a6fedef-550f-472c-af89-b7b3a0a7b035.png)
 
+##
 ## ❗트러블 슈팅
 
 ## 1️⃣ 비동기 처리(Promise-All)
@@ -316,13 +324,13 @@ Redis의 PFADD 명령어를 이용하여 중복되지 않는 경우에만 집계
 ######
 
 ##
-## **📈 Git Strategy**
+## 📈Git Strategy
     - Main: 최종 배포를 담당하는 브랜치
     - Develop: 개발된 내용들을 통합하는, 개발 중심점인 브랜치
     - Features_기능: 각자 담당한 기능들을 구현하고 관리하기 위한 브랜치
 
 ##
-## **✍ Commit Rule**
+## Commit Rule
 
 - 사용 키워드
     - Initial: 초기 설정 내용
@@ -337,5 +345,5 @@ Redis의 PFADD 명령어를 이용하여 중복되지 않는 경우에만 집계
 ######
   
 ##
-#### **💻 프론트엔드 깃헙 레포지토리**
+#### 💻 프론트엔드 깃헙 레포지토리
 MIMIC 프론트엔드 깃헙 [바로가기](https://github.com/hanghae99-s8realweek-E3/frontend)
