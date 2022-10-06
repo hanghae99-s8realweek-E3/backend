@@ -79,9 +79,9 @@ class MyTodoController {
   // 오늘의 도전 todo 등록 취소 [DELETE] /:challengedTodoId/challenged
   challengedTodoDelete = async (challengedTodoId, userId) => {
     const userChallengedTodoData = await ChallengedTodo.findOne({
-      where: { challengedTodoId: challengedTodoId },
+      where: { challengedTodoId },
     });
-    if (userChallengedTodoData === null) {
+    if (!userChallengedTodoData) {
       throw Boom.badRequest("삭제되었거나 존재하지 않는 todo 입니다.");
     }
 
@@ -201,6 +201,7 @@ class MyTodoController {
     //mytodo테이블에도 동시에 담기(서버단에서 작성된 날짜기준으로 넣는다.)
     const todayDate = calculateToday();
     const userData = await User.findOne({ where: { userId } });
+
     if (!userData) {
       throw Boom.badRequest("사용자 정보가 없습니다.");
     }
@@ -258,7 +259,7 @@ class MyTodoController {
       where: { todoId, userId },
     });
 
-    if (todoData === null) {
+    if (!todoData) {
       throw Boom.badRequest("이미 삭제되었거나 없는 todo입니다.");
     }
 
@@ -319,6 +320,32 @@ class MyTodoController {
         where: { userIdFollowing: userId },
       }),
     ]);
+
+    // const userInfo = await User.findOne({
+    //   where: { userId },
+    //   include: [
+    //     { model: Todo, where: { userId, date }, required: false },
+    //     { model: ChallengedTodo, where: { userId, date }, required: false },
+    //   ],
+    // });
+    // const [followingCounts] = await Follow.findAll({
+    //   attributes: [
+    //     [
+    //       sequelize.fn("COUNT", sequelize.col("userIdFollower")),
+    //       "followingCounts",
+    //     ],
+    //   ],
+    //   where: { userIdFollower: userId },
+    // });
+    // const [followerCounts] = await Follow.findAll({
+    //   attributes: [
+    //     [
+    //       sequelize.fn("COUNT", sequelize.col("userIdFollowing")),
+    //       "followerCounts",
+    //     ],
+    //   ],
+    //   where: { userIdFollowing: userId },
+    // });
 
     return {
       userInfo: {

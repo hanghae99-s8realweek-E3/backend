@@ -32,7 +32,6 @@ class TodoListService {
       const todos = await Todo.findAll({
         order: [["createdAt", "DESC"]],
       });
-
       return result(todos, myChallengedTodos);
     }
 
