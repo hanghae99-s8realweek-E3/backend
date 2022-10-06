@@ -136,15 +136,6 @@ describe("프로필 사진 변경", () => {
     expect(typeof userService.userProfileChange).toBe("function");
   });
 
-  // it("사용자 profile 정보가 none아닐경우 기존 프로필을 지우고 업데이트를 한다.", async () => {
-  //   const userId = 1;
-  //   const profile = "newProfile";
-  //   User.findByPk.mockReturnValue({
-  //     porfile: "notNone",
-  //   });
-  //   await userService.userProfileChange(userId, profile);
-  //   expect(await multer.deleteProfile).toBeCalled();
-  // });
 });
 
 describe("회원탈퇴", () => {

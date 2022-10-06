@@ -139,8 +139,6 @@ class UserService {
     mbti
   ) => {
     const userData = await User.findByPk(userId);
-
-    console.log("password", password);
     if (password) {
       const bcrCompareResult = await bcrypt.compare(
         password,
@@ -178,7 +176,6 @@ class UserService {
   // 프로필 사진 변경 [PUT] /api/accounts/profile
   userProfileChange = async (userId, profile) => {
     const user = await User.findByPk(userId);
-    console.log("user", user);
     if (user.profile !== "none") {
       await multer.deleteProfile(user.profile);
     }
@@ -192,11 +189,8 @@ class UserService {
 
   // 회원탈퇴 [DELETE] /api/accounts
   userInfoDelete = async (userId, password) => {
-      console.log("password",password);
     const userData = await User.findByPk(userId);
-    console.log("userData", userData.password);
     const bcrCompareResult = await bcrypt.compare(password, userData.password);
-    console.log("bcrCompareResult", bcrCompareResult);
     if (!bcrCompareResult) {
       throw Boom.unauthorized("아이디 또는 비밀번호가 올바르지 않습니다.");
     }
