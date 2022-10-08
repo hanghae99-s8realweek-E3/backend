@@ -40,9 +40,10 @@
 
 <br/>
 
-## 🔗 시연영상 및 서비스 링크
+## 🔗시연영상 및 서비스 링크
 
-[MIMIC 시연영상](https://youtu.be/iYOMM7AynPU)
+[MIMIC 시연영상](https://youtu.be/iYOMM7AynPU)      
+
 [MIMIC 사이트 바로가기](https://www.todaysmimic.today/)
 
 
@@ -66,7 +67,7 @@
 
 <br/>
 
-## **💿 기술 스택**
+## **💿기술 스택**
 
 기술스택 | 설명
 ---|:---:
@@ -116,7 +117,9 @@
 ![redis](https://img.shields.io/badge/redis-4.3.1-9E9E9E?style=flat&logoColor=white) | 방문자IP 카운터 |
 
 <br/>
-## **📂 파일 구조**
+
+
+## 📂파일 구조     
 
 ```
 📦src
@@ -194,7 +197,9 @@
 
 
 <br/>
-## 📂 ****DB ERD****
+
+
+## 📂DB ERD   
 
 ![Untitled](https://user-images.githubusercontent.com/102751923/192713435-1a6fedef-550f-472c-af89-b7b3a0a7b035.png)
 
@@ -339,7 +344,7 @@ Redis의 PFADD 명령어를 이용하여 중복되지 않는 경우에만 집계
 <br/>
 
 
-## **📈 Git Strategy**
+## **📈Git Strategy**
     - Main: 최종 배포를 담당하는 브랜치
     - Develop: 개발된 내용들을 통합하는, 개발 중심점인 브랜치
     - Features_기능: 각자 담당한 기능들을 구현하고 관리하기 위한 브랜치
@@ -347,7 +352,7 @@ Redis의 PFADD 명령어를 이용하여 중복되지 않는 경우에만 집계
 
 <br/>
 
-## **✍ Commit Rule**
+## Commit Rule
 
 - 사용 키워드
     - Initial: 초기 설정 내용
