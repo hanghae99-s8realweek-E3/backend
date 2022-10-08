@@ -2,11 +2,9 @@ const { User, EmailAuth } = require("../../models");
 const UserService = require("../../services/user.service");
 const userService = new UserService();
 const bcrypt = require("bcrypt");
-// const multer = jest.mock("multer");
 
 User.findOne = jest.fn();
 EmailAuth.findOne = jest.fn();
-// multer.deleteProfile = jest.fn();
 bcrypt.compare = jest.fn();
 User.findByPk = jest.fn();
 describe("회원가입", () => {
