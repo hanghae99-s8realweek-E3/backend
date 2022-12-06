@@ -25,7 +25,6 @@ module.exports = {
       schedule.scheduleJob("59 58 23 * * *", async () => {
         const today = date.calculateToday();
         const todayCount = await redisCli.PFCOUNT(today);
-        console.log("[" + today + "] " + "오늘의 방문자 : " + todayCount);
 
         await Count.create({
           date: today,
